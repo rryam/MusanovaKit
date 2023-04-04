@@ -1,11 +1,16 @@
-import XCTest
-@testable import MusanovaKit
+//
+//  MusanovaKitTests.swift
+//  MusanovaKitTests
+//
+//  Created by Rudrank Riyam on 04/04/23.
+//
 
-final class MusanovaKitTests: XCTestCase {
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-        XCTAssertEqual(MusanovaKit().text, "Hello, World!")
-    }
+@testable import MusanovaKit
+import XCTest
+
+final class MusanovaKitTests: XCTestCase {}
+
+public func XCTAssertEqualEndpoint(_ endpoint: URL, _ url: String) {
+  let url = URL(string: url)!
+  XCTAssertEqual(endpoint, url)
 }

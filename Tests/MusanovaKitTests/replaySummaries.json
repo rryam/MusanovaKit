@@ -1,0 +1,513 @@
+{
+    "data": [
+        {
+            "id": "year-2016",
+            "type": "music-summaries",
+            "href": "/v1/me/music-summaries/year-2016",
+            "attributes": {
+                "year": 2016,
+                "period": "year"
+            },
+            "relationships": {
+                "playlist": {
+                    "href": "/v1/me/music-summaries/year-2016/playlist",
+                    "data": [
+                        {
+                            "id": "pl.rp-bppRCjG6wWzB",
+                            "type": "playlists",
+                            "href": "/v1/catalog/in/playlists/pl.rp-bppRCjG6wWzB",
+                            "attributes": {
+                                "lastModifiedDate": "2017-01-08T00:00:00Z",
+                                "supportsSing": false,
+                                "description": {
+                                    "standard": "Relive your favourite tracks from 2016, all in one playlist."
+                                },
+                                "artwork": {
+                                    "width": 4320,
+                                    "url": "https://is2-ssl.mzstatic.com/image/thumb/Features122/v4/34/ea/a5/34eaa5fb-7182-38bd-e151-39b9a292ce09/13c7cdbc-abf7-4a26-ae0e-b2a4896437c3.png/{w}x{h}cc.jpg",
+                                    "height": 1080,
+                                    "textColor3": "312927",
+                                    "textColor2": "222222",
+                                    "textColor4": "434343",
+                                    "textColor1": "000000",
+                                    "bgColor": "f1f1f1",
+                                    "hasP3": false
+                                },
+                                "playParams": {
+                                    "id": "pl.rp-bppRCjG6wWzB",
+                                    "kind": "playlist",
+                                    "versionHash": "fb7dc7187dd0b2b0bef541f021c92dd82f6802dfe3b2834d1d4c47b954c7d218"
+                                },
+                                "url": "https://music.apple.com/in/playlist/replay-2016/pl.rp-bppRCjG6wWzB",
+                                "curatorName": "Apple Music for Rudrank Riyam",
+                                "curatorSocialHandle": "rudrankriyam",
+                                "audioTraits": [],
+                                "name": "Replay 2016",
+                                "isChart": false,
+                                "playlistType": "replay",
+                                "editorialNotes": {
+                                    "name": "Replay 2016",
+                                    "standard": "Relive your favourite tracks from 2016, all in one playlist.",
+                                    "short": "Relive your favourite tracks from 2016, all in one playlist."
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "id": "year-2017",
+            "type": "music-summaries",
+            "href": "/v1/me/music-summaries/year-2017",
+            "attributes": {
+                "year": 2017,
+                "period": "year"
+            },
+            "relationships": {
+                "playlist": {
+                    "href": "/v1/me/music-summaries/year-2017/playlist",
+                    "data": [
+                        {
+                            "id": "pl.rp-RNNZt6XYpEWw",
+                            "type": "playlists",
+                            "href": "/v1/catalog/in/playlists/pl.rp-RNNZt6XYpEWw",
+                            "attributes": {
+                                "lastModifiedDate": "2018-01-14T00:00:00Z",
+                                "supportsSing": false,
+                                "description": {
+                                    "standard": "Relive your favourite tracks from 2017, all in one playlist."
+                                },
+                                "artwork": {
+                                    "width": 4320,
+                                    "url": "https://is3-ssl.mzstatic.com/image/thumb/Features122/v4/4e/95/f2/4e95f281-2b0f-d99d-7a00-b300afe073a0/a9442507-f089-483b-bf19-99eda4f83c37.png/{w}x{h}cc.jpg",
+                                    "height": 1080,
+                                    "textColor3": "312828",
+                                    "textColor2": "222222",
+                                    "textColor4": "434343",
+                                    "textColor1": "000000",
+                                    "bgColor": "f1f1f1",
+                                    "hasP3": false
+                                },
+                                "playParams": {
+                                    "id": "pl.rp-RNNZt6XYpEWw",
+                                    "kind": "playlist",
+                                    "versionHash": "9101517e1e5e2d6eb8d53da1cd93e084adae66cfc4f227253e8ed9e85c139d06"
+                                },
+                                "url": "https://music.apple.com/in/playlist/replay-2017/pl.rp-RNNZt6XYpEWw",
+                                "curatorName": "Apple Music for Rudrank Riyam",
+                                "curatorSocialHandle": "rudrankriyam",
+                                "audioTraits": [],
+                                "name": "Replay 2017",
+                                "isChart": false,
+                                "playlistType": "replay",
+                                "editorialNotes": {
+                                    "name": "Replay 2017",
+                                    "standard": "Relive your favourite tracks from 2017, all in one playlist.",
+                                    "short": "Relive your favourite tracks from 2017, all in one playlist."
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "id": "year-2018",
+            "type": "music-summaries",
+            "href": "/v1/me/music-summaries/year-2018",
+            "attributes": {
+                "year": 2018,
+                "period": "year"
+            },
+            "relationships": {
+                "playlist": {
+                    "href": "/v1/me/music-summaries/year-2018/playlist",
+                    "data": [
+                        {
+                            "id": "pl.rp-owwdS4B7MZj1",
+                            "type": "playlists",
+                            "href": "/v1/catalog/in/playlists/pl.rp-owwdS4B7MZj1",
+                            "attributes": {
+                                "lastModifiedDate": "2019-01-13T00:00:00Z",
+                                "supportsSing": false,
+                                "description": {
+                                    "standard": "Relive your favourite tracks from 2018, all in one playlist."
+                                },
+                                "artwork": {
+                                    "width": 4320,
+                                    "url": "https://is5-ssl.mzstatic.com/image/thumb/Features112/v4/78/fd/e2/78fde2da-efc5-5e5f-7256-3550dae0a369/64755cdf-b50b-4861-89f2-93aedefc9e5a.png/{w}x{h}cc.jpg",
+                                    "height": 1080,
+                                    "textColor3": "30282c",
+                                    "textColor2": "222222",
+                                    "textColor4": "434343",
+                                    "textColor1": "000000",
+                                    "bgColor": "f1f1f1",
+                                    "hasP3": false
+                                },
+                                "playParams": {
+                                    "id": "pl.rp-owwdS4B7MZj1",
+                                    "kind": "playlist",
+                                    "versionHash": "7c09a37b1049cf0df5f7b3443d859d23942a3b30b6245e3f708fb8051b766816"
+                                },
+                                "url": "https://music.apple.com/in/playlist/replay-2018/pl.rp-owwdS4B7MZj1",
+                                "curatorName": "Apple Music for Rudrank Riyam",
+                                "curatorSocialHandle": "rudrankriyam",
+                                "audioTraits": [],
+                                "name": "Replay 2018",
+                                "isChart": false,
+                                "playlistType": "replay",
+                                "editorialNotes": {
+                                    "name": "Replay 2018",
+                                    "standard": "Relive your favourite tracks from 2018, all in one playlist.",
+                                    "short": "Relive your favourite tracks from 2018, all in one playlist."
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "id": "year-2019",
+            "type": "music-summaries",
+            "href": "/v1/me/music-summaries/year-2019",
+            "attributes": {
+                "year": 2019,
+                "period": "year"
+            },
+            "relationships": {
+                "playlist": {
+                    "href": "/v1/me/music-summaries/year-2019/playlist",
+                    "data": [
+                        {
+                            "id": "pl.rp-v22JiG6Jo2AR",
+                            "type": "playlists",
+                            "href": "/v1/catalog/in/playlists/pl.rp-v22JiG6Jo2AR",
+                            "attributes": {
+                                "lastModifiedDate": "2020-01-12T00:00:00Z",
+                                "supportsSing": false,
+                                "description": {
+                                    "standard": "Relive your favourite tracks from 2019, all in one playlist."
+                                },
+                                "artwork": {
+                                    "width": 4320,
+                                    "url": "https://is5-ssl.mzstatic.com/image/thumb/Features112/v4/75/36/fd/7536fdc2-f413-5754-7484-92cf1e75b314/dbe7054e-d7db-46f2-85a1-7444f00f9b8e.png/{w}x{h}cc.jpg",
+                                    "height": 1080,
+                                    "textColor3": "312831",
+                                    "textColor2": "222222",
+                                    "textColor4": "434343",
+                                    "textColor1": "000000",
+                                    "bgColor": "f1f1f1",
+                                    "hasP3": false
+                                },
+                                "playParams": {
+                                    "id": "pl.rp-v22JiG6Jo2AR",
+                                    "kind": "playlist",
+                                    "versionHash": "0f0c6b0724de56ff0625b83c04fbcbc96b554ec3063ea356141e0fbc760a3535"
+                                },
+                                "url": "https://music.apple.com/in/playlist/replay-2019/pl.rp-v22JiG6Jo2AR",
+                                "curatorName": "Apple Music for Rudrank Riyam",
+                                "curatorSocialHandle": "rudrankriyam",
+                                "audioTraits": [],
+                                "name": "Replay 2019",
+                                "isChart": false,
+                                "playlistType": "replay",
+                                "editorialNotes": {
+                                    "name": "Replay 2019",
+                                    "standard": "Relive your favourite tracks from 2019, all in one playlist.",
+                                    "short": "Relive your favourite tracks from 2019, all in one playlist."
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "id": "year-2020",
+            "type": "music-summaries",
+            "href": "/v1/me/music-summaries/year-2020",
+            "attributes": {
+                "year": 2020,
+                "period": "year"
+            },
+            "relationships": {
+                "playlist": {
+                    "href": "/v1/me/music-summaries/year-2020/playlist",
+                    "data": [
+                        {
+                            "id": "pl.rp-Ybb4fn75Z8vB",
+                            "type": "playlists",
+                            "href": "/v1/catalog/in/playlists/pl.rp-Ybb4fn75Z8vB",
+                            "attributes": {
+                                "lastModifiedDate": "2021-01-10T00:00:00Z",
+                                "supportsSing": false,
+                                "description": {
+                                    "standard": "Relive your favourite tracks from 2020, all in one playlist."
+                                },
+                                "artwork": {
+                                    "width": 4320,
+                                    "url": "https://is5-ssl.mzstatic.com/image/thumb/Features112/v4/fa/53/0b/fa530b57-eea7-de5a-753f-3a1b7ae18e4f/1716f4eb-225a-4c5c-aae4-4fc998896f95.png/{w}x{h}cc.jpg",
+                                    "height": 1080,
+                                    "textColor3": "4e315e",
+                                    "textColor2": "331743",
+                                    "textColor4": "533a61",
+                                    "textColor1": "000000",
+                                    "bgColor": "f1f1f1",
+                                    "hasP3": false
+                                },
+                                "playParams": {
+                                    "id": "pl.rp-Ybb4fn75Z8vB",
+                                    "kind": "playlist",
+                                    "versionHash": "1974f8dcf80834cb50f8c0f4affae336c03ac4f3292a356201b7009d802793d5"
+                                },
+                                "url": "https://music.apple.com/in/playlist/replay-2020/pl.rp-Ybb4fn75Z8vB",
+                                "curatorName": "Apple Music for Rudrank Riyam",
+                                "audioTraits": [],
+                                "curatorSocialHandle": "rudrankriyam",
+                                "isChart": false,
+                                "name": "Replay 2020",
+                                "playlistType": "replay",
+                                "editorialNotes": {
+                                    "name": "Replay 2020",
+                                    "standard": "Relive your favourite tracks from 2020, all in one playlist.",
+                                    "short": "Relive your favourite tracks from 2020, all in one playlist."
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "id": "year-2021",
+            "type": "music-summaries",
+            "href": "/v1/me/music-summaries/year-2021",
+            "attributes": {
+                "year": 2021,
+                "period": "year"
+            },
+            "relationships": {
+                "playlist": {
+                    "href": "/v1/me/music-summaries/year-2021/playlist",
+                    "data": [
+                        {
+                            "id": "pl.rp-NLLgTe2jM75W",
+                            "type": "playlists",
+                            "href": "/v1/catalog/in/playlists/pl.rp-NLLgTe2jM75W",
+                            "attributes": {
+                                "lastModifiedDate": "2022-01-09T00:00:00Z",
+                                "supportsSing": false,
+                                "description": {
+                                    "standard": "Relive your favourite tracks from 2021, all in one playlist."
+                                },
+                                "artwork": {
+                                    "width": 4320,
+                                    "url": "https://is2-ssl.mzstatic.com/image/thumb/Features112/v4/a2/a7/19/a2a719da-099a-7158-1128-86f1cba040ad/065f3d86-445a-4cb3-9023-62b434b04c66.png/{w}x{h}cc.jpg",
+                                    "height": 1080,
+                                    "textColor3": "434343",
+                                    "textColor2": "26164e",
+                                    "textColor4": "47396b",
+                                    "textColor1": "000000",
+                                    "bgColor": "f1f1f1",
+                                    "hasP3": false
+                                },
+                                "playParams": {
+                                    "id": "pl.rp-NLLgTe2jM75W",
+                                    "kind": "playlist",
+                                    "versionHash": "6ca41530286bd7c9c88835630c9a7472162a0a7ba57c60cf71c947079ebf5149"
+                                },
+                                "url": "https://music.apple.com/in/playlist/replay-2021/pl.rp-NLLgTe2jM75W",
+                                "curatorName": "Apple Music for Rudrank Riyam",
+                                "audioTraits": [],
+                                "curatorSocialHandle": "rudrankriyam",
+                                "isChart": false,
+                                "name": "Replay 2021",
+                                "playlistType": "replay",
+                                "editorialNotes": {
+                                    "name": "Replay 2021",
+                                    "standard": "Relive your favourite tracks from 2021, all in one playlist.",
+                                    "short": "Relive your favourite tracks from 2021, all in one playlist.",
+                                    "tagline": "Personalized Mix for You"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "id": "year-2022",
+            "type": "music-summaries",
+            "href": "/v1/me/music-summaries/year-2022",
+            "attributes": {
+                "year": 2022,
+                "period": "year"
+            },
+            "relationships": {
+                "playlist": {
+                    "href": "/v1/me/music-summaries/year-2022/playlist",
+                    "data": [
+                        {
+                            "id": "pl.rp-gQQ8H8Vyv4wO",
+                            "type": "playlists",
+                            "href": "/v1/catalog/in/playlists/pl.rp-gQQ8H8Vyv4wO",
+                            "attributes": {
+                                "lastModifiedDate": "2023-01-08T00:00:00Z",
+                                "supportsSing": false,
+                                "description": {
+                                    "standard": "Relive your favourite tracks from 2022, all in one playlist."
+                                },
+                                "artwork": {
+                                    "width": 4320,
+                                    "url": "https://is2-ssl.mzstatic.com/image/thumb/Features122/v4/ce/4c/24/ce4c24ec-ab33-e90f-b3e3-96e5aab3ba92/a47271d5-a0b8-431c-8818-abaeed15fc68.png/{w}x{h}cc.jpg",
+                                    "height": 1080,
+                                    "textColor3": "434343",
+                                    "textColor2": "191a59",
+                                    "textColor4": "3b3d74",
+                                    "textColor1": "000000",
+                                    "bgColor": "f1f1f1",
+                                    "hasP3": false
+                                },
+                                "playParams": {
+                                    "id": "pl.rp-gQQ8H8Vyv4wO",
+                                    "kind": "playlist",
+                                    "versionHash": "c40b9fd8150d53df0a99c11a6bb71de0ccca7eacd49c8ec79dd93130a4d22e66"
+                                },
+                                "url": "https://music.apple.com/in/playlist/replay-2022/pl.rp-gQQ8H8Vyv4wO",
+                                "curatorName": "Apple Music for Rudrank Riyam",
+                                "curatorSocialHandle": "rudrankriyam",
+                                "audioTraits": [],
+                                "name": "Replay 2022",
+                                "isChart": false,
+                                "playlistType": "replay",
+                                "editorialNotes": {
+                                    "name": "Replay 2022",
+                                    "standard": "Relive your favourite tracks from 2022, all in one playlist.",
+                                    "short": "Relive your favourite tracks from 2022, all in one playlist."
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "id": "year-2023",
+            "type": "music-summaries",
+            "href": "/v1/me/music-summaries/year-2023",
+            "attributes": {
+                "year": 2023,
+                "period": "year"
+            },
+            "relationships": {
+                "playlist": {
+                    "href": "/v1/me/music-summaries/year-2023/playlist",
+                    "data": [
+                        {
+                            "id": "pl.rp-1kk0F1eD2x5J",
+                            "type": "playlists",
+                            "href": "/v1/catalog/in/playlists/pl.rp-1kk0F1eD2x5J",
+                            "attributes": {
+                                "lastModifiedDate": "2023-04-02T01:26:44Z",
+                                "supportsSing": false,
+                                "description": {
+                                    "standard": "Your favourite tracks of the year—all in one playlist, updated weekly."
+                                },
+                                "artwork": {
+                                    "width": 4320,
+                                    "url": "https://is5-ssl.mzstatic.com/image/thumb/Features112/v4/4e/b5/c0/4eb5c0ab-ba82-94db-968c-1fe6d159709f/b3c2ee62-d839-4c60-bfa4-806917b2e16a.png/{w}x{h}cc.jpg",
+                                    "height": 1080,
+                                    "textColor3": "262c32",
+                                    "textColor2": "222222",
+                                    "textColor4": "434343",
+                                    "textColor1": "000000",
+                                    "bgColor": "f1f1f1",
+                                    "hasP3": false
+                                },
+                                "playParams": {
+                                    "id": "pl.rp-1kk0F1eD2x5J",
+                                    "kind": "playlist",
+                                    "versionHash": "f90e01e327bdc0b0627a420b7cdd07f3bb8cbaa42b868a103418450985d1964d"
+                                },
+                                "url": "https://music.apple.com/in/playlist/replay-2023/pl.rp-1kk0F1eD2x5J",
+                                "curatorName": "Apple Music for Rudrank Riyam",
+                                "curatorSocialHandle": "rudrankriyam",
+                                "audioTraits": [],
+                                "name": "Replay 2023",
+                                "isChart": false,
+                                "playlistType": "replay",
+                                "editorialNotes": {
+                                    "name": "Replay 2023",
+                                    "standard": "Your favourite tracks of the year—all in one playlist, updated weekly.",
+                                    "short": "Your favourite tracks of the year—all in one playlist, updated weekly."
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "id": "year-2015",
+            "type": "music-summaries",
+            "href": "/v1/me/music-summaries/year-2015",
+            "attributes": {
+                "year": 2015,
+                "period": "year"
+            },
+            "relationships": {
+                "playlist": {
+                    "href": "/v1/me/music-summaries/year-2015/playlist",
+                    "data": [
+                        {
+                            "id": "pl.rp-pEEBCPO0Avox",
+                            "type": "playlists",
+                            "href": "/v1/catalog/in/playlists/pl.rp-pEEBCPO0Avox",
+                            "attributes": {
+                                "lastModifiedDate": "2016-01-10T00:00:00Z",
+                                "supportsSing": false,
+                                "description": {
+                                    "standard": "Relive your favourite tracks from 2015, all in one playlist."
+                                },
+                                "artwork": {
+                                    "width": 4320,
+                                    "url": "https://is4-ssl.mzstatic.com/image/thumb/Features122/v4/a3/12/22/a31222b9-a829-4f90-76bd-69373f9890de/dbe17a32-caf7-4c0a-8116-d32c2f489bbc.png/{w}x{h}cc.jpg",
+                                    "height": 1080,
+                                    "textColor3": "312b25",
+                                    "textColor2": "222222",
+                                    "textColor4": "434343",
+                                    "textColor1": "000000",
+                                    "bgColor": "f1f1f1",
+                                    "hasP3": false
+                                },
+                                "playParams": {
+                                    "id": "pl.rp-pEEBCPO0Avox",
+                                    "kind": "playlist",
+                                    "versionHash": "c56a6e073c8de25941ba3a2cccc819185a64fd6a7a9cf83bcf259a70b64269c9"
+                                },
+                                "url": "https://music.apple.com/in/playlist/replay-2015/pl.rp-pEEBCPO0Avox",
+                                "curatorName": "Apple Music for Rudrank Riyam",
+                                "curatorSocialHandle": "rudrankriyam",
+                                "audioTraits": [],
+                                "name": "Replay 2015",
+                                "isChart": false,
+                                "playlistType": "replay",
+                                "editorialNotes": {
+                                    "name": "Replay 2015",
+                                    "standard": "Relive your favourite tracks from 2015, all in one playlist.",
+                                    "short": "Relive your favourite tracks from 2015, all in one playlist."
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "meta": {
+        "latestYear": 2023,
+        "isEndOfYear": false
+    }
+}
