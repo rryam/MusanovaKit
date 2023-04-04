@@ -1,0 +1,43 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "MusadoraKit",
+        "repositoryURL": "https://github.com/rryam/MusadoraKit",
+        "state": {
+          "branch": "main",
+          "revision": "08b6d943555c8e143e03f595b408bd8f1a8958f2",
+          "version": null
+        }
+      },
+      {
+        "package": "SwiftDocCPlugin",
+        "repositoryURL": "https://github.com/apple/swift-docc-plugin",
+        "state": {
+          "branch": null,
+          "revision": "9b1258905c21fc1b97bf03d1b4ca12c4ec4e5fda",
+          "version": "1.2.0"
+        }
+      },
+      {
+        "package": "SymbolKit",
+        "repositoryURL": "https://github.com/apple/swift-docc-symbolkit",
+        "state": {
+          "branch": null,
+          "revision": "b45d1f2ed151d057b54504d653e0da5552844e34",
+          "version": "1.0.0"
+        }
+      },
+      {
+        "package": "SwiftLintPlugin",
+        "repositoryURL": "https://github.com/lukepistrol/SwiftLintPlugin",
+        "state": {
+          "branch": null,
+          "revision": "f3586ed424d7bf5d94628332fbd0edebf1f5147f",
+          "version": "0.2.3"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
