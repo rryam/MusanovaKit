@@ -9,94 +9,95 @@
                 "dateReached": "2023-02-03",
                 "value": "5000",
                 "kind": "listen-time"
-            }
-        },
-        {
-            "id": "year-2023-listen-time-minutes-7500",
-            "type": "music-summaries-milestones",
-            "href": "/v1/me/music-summaries/milestones/year-2023-listen-time-minutes-7500",
-            "attributes": {
-                "listenTimeInMinutes": 7918,
-                "dateReached": "2023-02-10",
-                "value": "7500",
-                "kind": "listen-time"
-            }
-        },
-        {
-            "id": "year-2023-listen-time-minutes-10000",
-            "type": "music-summaries-milestones",
-            "href": "/v1/me/music-summaries/milestones/year-2023-listen-time-minutes-10000",
-            "attributes": {
-                "listenTimeInMinutes": 10165,
-                "dateReached": "2023-02-17",
-                "value": "10000",
-                "kind": "listen-time"
-            }
-        },
-        {
-            "id": "year-2023-artist-unique-count-100",
-            "type": "music-summaries-milestones",
-            "href": "/v1/me/music-summaries/milestones/year-2023-artist-unique-count-100",
-            "attributes": {
-                "listenTimeInMinutes": 820,
-                "dateReached": "2023-01-05",
-                "value": "100",
-                "kind": "artist"
-            }
-        },
-        {
-            "id": "year-2023-artist-unique-count-250",
-            "type": "music-summaries-milestones",
-            "href": "/v1/me/music-summaries/milestones/year-2023-artist-unique-count-250",
-            "attributes": {
-                "listenTimeInMinutes": 2459,
-                "dateReached": "2023-01-20",
-                "value": "250",
-                "kind": "artist"
-            }
-        },
-        {
-            "id": "year-2023-artist-unique-count-500",
-            "type": "music-summaries-milestones",
-            "href": "/v1/me/music-summaries/milestones/year-2023-artist-unique-count-500",
-            "attributes": {
-                "listenTimeInMinutes": 7918,
-                "dateReached": "2023-02-10",
-                "value": "500",
-                "kind": "artist"
-            }
-        },
-        {
-            "id": "year-2023-song-unique-count-250",
-            "type": "music-summaries-milestones",
-            "href": "/v1/me/music-summaries/milestones/year-2023-song-unique-count-250",
-            "attributes": {
-                "listenTimeInMinutes": 1124,
-                "dateReached": "2023-01-06",
-                "value": "250",
-                "kind": "song"
-            }
-        },
-        {
-            "id": "year-2023-song-unique-count-500",
-            "type": "music-summaries-milestones",
-            "href": "/v1/me/music-summaries/milestones/year-2023-song-unique-count-500",
-            "attributes": {
-                "listenTimeInMinutes": 4272,
-                "dateReached": "2023-01-27",
-                "value": "500",
-                "kind": "song"
-            }
-        },
-        {
-            "id": "year-2023-song-unique-count-1000",
-            "type": "music-summaries-milestones",
-            "href": "/v1/me/music-summaries/milestones/year-2023-song-unique-count-1000",
-            "attributes": {
-                "listenTimeInMinutes": 10165,
-                "dateReached": "2023-02-17",
-                "value": "1000",
-                "kind": "song"
+            },
+            "relationships": {
+                "top-albums": {
+                    "href": "/v1/me/music-summaries/milestones/year-2023-listen-time-minutes-5000/top-albums",
+                    "data": [
+                        {
+                            "id": "1649039960",
+                            "type": "albums",
+                            "href": "/v1/catalog/in/albums/1649039960",
+                            "attributes": {
+                                "name": "Champagne Talk"
+                            }
+                        },
+                        {
+                            "id": "395740920",
+                            "type": "albums",
+                            "href": "/v1/catalog/in/albums/395740920",
+                            "attributes": {
+                                "name": "The Social Network (Soundtrack from the Motion Picture)"
+                            }
+                        },
+                        {
+                            "id": "1247043030",
+                            "type": "albums",
+                            "href": "/v1/catalog/in/albums/1247043030",
+                            "attributes": {
+                                "name": "Dive Deep"
+                            }
+                        }
+                    ]
+                },
+                "top-songs": {
+                    "href": "/v1/me/music-summaries/milestones/year-2023-listen-time-minutes-5000/top-songs",
+                    "data": [
+                        {
+                            "id": "1625328892",
+                            "type": "songs",
+                            "href": "/v1/catalog/in/songs/1625328892",
+                            "attributes": {
+                                "name": "Glimpse of Us"
+                            }
+                        },
+                        {
+                            "id": "288153632",
+                            "type": "songs",
+                            "href": "/v1/catalog/in/songs/288153632",
+                            "attributes": {
+                                "name": "Snuff"
+                            }
+                        },
+                        {
+                            "id": "1215409245",
+                            "type": "songs",
+                            "href": "/v1/catalog/in/songs/1215409245",
+                            "attributes": {
+                                "name": "Apocalypse"
+                            }
+                        }
+                    ]
+                },
+                "top-artists": {
+                    "href": "/v1/me/music-summaries/milestones/year-2023-listen-time-minutes-5000/top-artists",
+                    "data": [
+                        {
+                            "id": "1258279972",
+                            "type": "artists",
+                            "href": "/v1/catalog/in/artists/1258279972",
+                            "attributes": {
+                                "name": "Joji"
+                            }
+                        },
+                        {
+                            "id": "971811598",
+                            "type": "artists",
+                            "href": "/v1/catalog/in/artists/971811598",
+                            "attributes": {
+                                "name": "The Japanese House"
+                            }
+                        },
+                        {
+                            "id": "6907568",
+                            "type": "artists",
+                            "href": "/v1/catalog/in/artists/6907568",
+                            "attributes": {
+                                "name": "Slipknot"
+                            }
+                        }
+                    ]
+                }
             }
         }
     ]

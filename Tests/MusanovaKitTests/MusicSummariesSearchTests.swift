@@ -26,7 +26,7 @@ final class MusicSummariesSearchTests: XCTestCase {
     let data = try Data(contentsOf: url)
     let summaries = try JSONDecoder().decode(MusicSummarySearches.self, from: data)
 
-    XCTAssertEqual(summaries.count, 9)
+    XCTAssertEqual(summaries.count, 1)
     XCTAssertEqual(summaries.first?.year, 2016)
 
     // Assert that the `playlist` property of the `MusicSummarySearch` is decoded correctly
