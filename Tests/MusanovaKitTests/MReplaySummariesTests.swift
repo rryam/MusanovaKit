@@ -11,8 +11,8 @@ import XCTest
 
 final class MReplaySummariesTests: XCTestCase {
   func testMusicSummariesEndpointURL() throws {
-    let request = MSummariesRequest(developerToken: "")
-    let endpointURL = try request.musicSummariesEndpointURL
+    let request = MusicSummarySearchRequest(developerToken: "")
+    let endpointURL = try request.musicSummariesSeaarhEndpointURL
     let url = "https://amp-api.music.apple.com/v1/me/music-summaries/search?period=year&fields[music-summaries]=period,year&include[music-summaries]=playlist"
     XCTAssertEqualEndpoint(endpointURL, url)
   }
@@ -25,12 +25,12 @@ final class MReplaySummariesTests: XCTestCase {
 //    let url = URL(fileURLWithPath: path)
 //
 //    let data = try Data(contentsOf: url)
-//    let summaries = try JSONDecoder().decode(MReplaySummaries.self, from: data)
+//    let summaries = try JSONDecoder().decode(MusicSummarySearches.self, from: data)
 //
 //    XCTAssertEqual(summaries.count, 9)
 //    XCTAssertEqual(summaries.first?.year, 2016)
 //
-//    // Assert that the `playlist` property of the `MReplaySummary` is decoded correctly
+//    // Assert that the `playlist` property of the `MusicSummarySearch` is decoded correctly
 //    let playlist = summaries.first?.playlist
 //    XCTAssertNotNil(playlist)
 //    XCTAssertEqual(playlist?.id, "pl.rp-bppRCjG6wWzB")

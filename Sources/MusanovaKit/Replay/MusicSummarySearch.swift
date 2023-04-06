@@ -1,5 +1,5 @@
 //
-//  MReplaySummary.swift
+//  MusicSummarySearch.swift
 //  MusanovaKit
 //
 //  Created by Rudrank Riyam on 04/04/23.
@@ -9,16 +9,16 @@ import Foundation
 
 /// A summary of a user's music listening history for a specific year.
 ///
-/// The `MReplaySummary` struct represents a summary of a user's music listening
+/// The `MusicSummarySearch` struct represents a summary of a user's music listening
 /// history for a specific year. It includes information such as the year,
 /// and the associated playlist.
 ///
 /// Example usage:
 ///
-///     let summary: MReplaySummary = ...
+///     let summary: MusicSummarySearch = ...
 ///     print("Year: \(summary.year), Playlist: \(summary.playlist)")
 ///
-public struct MReplaySummary: Decodable, MusicItem {
+public struct MusicSummarySearch: Decodable, MusicItem {
 
   /// The unique identifier of the `MReplaySummary`.
   ///
@@ -60,7 +60,7 @@ public struct MReplaySummary: Decodable, MusicItem {
   public let playlist: Playlist
 }
 
-extension MReplaySummary {
+extension MusicSummarySearch {
   enum CodingKeys: String, CodingKey {
     case id, attributes, relationships
   }
@@ -74,7 +74,7 @@ extension MReplaySummary {
   }
 }
 
-extension MReplaySummary {
+extension MusicSummarySearch {
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     let attributesContainer = try container.nestedContainer(keyedBy: AttributesKeys.self, forKey: .attributes)
