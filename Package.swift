@@ -15,7 +15,7 @@ let package = Package(
     .package(url: "https://github.com/rryam/MusadoraKit", branch: "main")
   ],
   targets: [
-    .target(name: "MusanovaKit", dependencies: ["MusadoraKit"], resources: [.process("Resources")], plugins: [.plugin(name: "SwiftLint", package: "SwiftLintPlugin")]),
+    .target(name: "MusanovaKit", dependencies: ["MusadoraKit"], plugins: [.plugin(name: "SwiftLint", package: "SwiftLintPlugin")]),
     .testTarget(name: "MusanovaKitTests", dependencies: ["MusanovaKit"], resources: [.process("Resources")]),
   ]
 )

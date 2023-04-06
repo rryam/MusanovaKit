@@ -1,0 +1,103 @@
+{
+    "data": [
+        {
+            "id": "year-2023-listen-time-minutes-5000",
+            "type": "music-summaries-milestones",
+            "href": "/v1/me/music-summaries/milestones/year-2023-listen-time-minutes-5000",
+            "attributes": {
+                "listenTimeInMinutes": 5955,
+                "dateReached": "2023-02-03",
+                "value": "5000",
+                "kind": "listen-time"
+            }
+        },
+        {
+            "id": "year-2023-listen-time-minutes-7500",
+            "type": "music-summaries-milestones",
+            "href": "/v1/me/music-summaries/milestones/year-2023-listen-time-minutes-7500",
+            "attributes": {
+                "listenTimeInMinutes": 7918,
+                "dateReached": "2023-02-10",
+                "value": "7500",
+                "kind": "listen-time"
+            }
+        },
+        {
+            "id": "year-2023-listen-time-minutes-10000",
+            "type": "music-summaries-milestones",
+            "href": "/v1/me/music-summaries/milestones/year-2023-listen-time-minutes-10000",
+            "attributes": {
+                "listenTimeInMinutes": 10165,
+                "dateReached": "2023-02-17",
+                "value": "10000",
+                "kind": "listen-time"
+            }
+        },
+        {
+            "id": "year-2023-artist-unique-count-100",
+            "type": "music-summaries-milestones",
+            "href": "/v1/me/music-summaries/milestones/year-2023-artist-unique-count-100",
+            "attributes": {
+                "listenTimeInMinutes": 820,
+                "dateReached": "2023-01-05",
+                "value": "100",
+                "kind": "artist"
+            }
+        },
+        {
+            "id": "year-2023-artist-unique-count-250",
+            "type": "music-summaries-milestones",
+            "href": "/v1/me/music-summaries/milestones/year-2023-artist-unique-count-250",
+            "attributes": {
+                "listenTimeInMinutes": 2459,
+                "dateReached": "2023-01-20",
+                "value": "250",
+                "kind": "artist"
+            }
+        },
+        {
+            "id": "year-2023-artist-unique-count-500",
+            "type": "music-summaries-milestones",
+            "href": "/v1/me/music-summaries/milestones/year-2023-artist-unique-count-500",
+            "attributes": {
+                "listenTimeInMinutes": 7918,
+                "dateReached": "2023-02-10",
+                "value": "500",
+                "kind": "artist"
+            }
+        },
+        {
+            "id": "year-2023-song-unique-count-250",
+            "type": "music-summaries-milestones",
+            "href": "/v1/me/music-summaries/milestones/year-2023-song-unique-count-250",
+            "attributes": {
+                "listenTimeInMinutes": 1124,
+                "dateReached": "2023-01-06",
+                "value": "250",
+                "kind": "song"
+            }
+        },
+        {
+            "id": "year-2023-song-unique-count-500",
+            "type": "music-summaries-milestones",
+            "href": "/v1/me/music-summaries/milestones/year-2023-song-unique-count-500",
+            "attributes": {
+                "listenTimeInMinutes": 4272,
+                "dateReached": "2023-01-27",
+                "value": "500",
+                "kind": "song"
+            }
+        },
+        {
+            "id": "year-2023-song-unique-count-1000",
+            "type": "music-summaries-milestones",
+            "href": "/v1/me/music-summaries/milestones/year-2023-song-unique-count-1000",
+            "attributes": {
+                "listenTimeInMinutes": 10165,
+                "dateReached": "2023-02-17",
+                "value": "1000",
+                "kind": "song"
+            }
+        }
+    ]
+}
