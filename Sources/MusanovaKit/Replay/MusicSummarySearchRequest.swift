@@ -48,7 +48,7 @@ struct MusicSummarySearchRequest {
 
   /// Initializes a new `MusicSummarySearchRequest` instance.
   ///
-  /// - Parameter developerToken: The priviledged developer token used to authorize the request.
+  /// - Parameter developerToken: The privileged developer token used to authorize the request.
   init(developerToken: String) {
     self.developerToken = developerToken
   }
@@ -71,15 +71,15 @@ struct MusicSummarySearchRequest {
   ///       print(error)
   ///     }
   func response() async throws -> MusicSummarySearches {
-    let url = try musicSummariesSeaarhEndpointURL
-    let request = MPriviledgedDataRequest(url: url, developerToken: developerToken)
+    let url = try musicSummariesSearchEndpointURL
+    let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
     let response = try await request.response()
     return try JSONDecoder().decode(MusicSummarySearches.self, from: response.data)
   }
 }
 
 extension MusicSummarySearchRequest {
-  internal var musicSummariesSeaarhEndpointURL: URL {
+  internal var musicSummariesSearchEndpointURL: URL {
     get throws {
       var components = AppleMusicAMPURLComponents()
       components.path = "me/music-summaries/search"

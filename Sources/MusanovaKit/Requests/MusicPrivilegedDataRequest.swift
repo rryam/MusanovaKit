@@ -1,5 +1,5 @@
 //
-//  MPriviledgedDataRequest.swift
+//  MusicPrivilegedDataRequest.swift
 //  MusanovaKit
 //
 //  Created by Rudrank Riyam on 04/04/23.
@@ -8,9 +8,9 @@
 import Foundation
 
 /// A custom request for loading data from an arbitrary Apple Music private API endpoint.
-public struct MPriviledgedDataRequest {
+public struct MusicPrivilegedDataRequest {
 
-  /// The priviledge developer token for Apple Music API.
+  /// The privileged developer token for Apple Music API.
   private let developerToken: String
 
   /// The URL for the data request.

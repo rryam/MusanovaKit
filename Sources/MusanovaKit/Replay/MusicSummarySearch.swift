@@ -20,33 +20,33 @@ import Foundation
 ///
 public struct MusicSummarySearch: Decodable, MusicItem {
 
-  /// The unique identifier of the `MReplaySummary`.
+  /// The unique identifier of the `MusicSummarySearch`.
   ///
   /// This property returns the unique identifier of the associated playlist.
   /// It conforms to the `MusicItemID` type, as required by the `MusicItem` protocol.
   ///
   /// Example usage:
   ///
-  ///     let summary: MReplaySummary = ...
+  ///     let summary: MusicSummarySearch = ...
   ///     print("Summary ID: \(summary.id)")
   ///
   public var id: MusicItemID {
     playlist.id
   }
 
-  /// The year of the `MReplaySummary`.
+  /// The year of the `MusicSummarySearch`.
   ///
-  /// This property represents the year associated with the MReplaySummary.
+  /// This property represents the year associated with the `MusicSummarySearch`.
   /// It is an integer value indicating the year of the music listening history.
   ///
   /// Example usage:
   ///
-  ///     let summary: MReplaySummary = ...
+  ///     let summary: MusicSummarySearch = ...
   ///     print("Summary Year: \(summary.year)")
   ///
   public let year: Int
 
-  /// The playlist associated with the `MReplaySummary`.
+  /// The playlist associated with the `MusicSummarySearch`.
   ///
   /// This property represents the playlist associated with the user's
   /// music listening history for the specified year. It contains information
@@ -54,7 +54,7 @@ public struct MusicSummarySearch: Decodable, MusicItem {
   ///
   /// Example usage:
   ///
-  ///     let summary: MReplaySummary = ...
+  ///     let summary: MusicSummarySearch = ...
   ///     print("Summary Playlist: \(summary.playlist)")
   ///
   public let playlist: Playlist

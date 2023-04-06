@@ -1,5 +1,5 @@
 //
-//  MReplaySummariesTests.swift
+//  MusicSummariesSearchTests.swift
 //  MusanovaKitTests
 //
 //  Created by Rudrank Riyam on 04/04/23.
@@ -9,8 +9,8 @@
 import MusicKit
 import XCTest
 
-final class MReplaySummariesTests: XCTestCase {
-  func testMusicSummariesEndpointURL() throws {
+final class MusicSummariesSearchTests: XCTestCase {
+  func testMusicSummariesSearchEndpointURL() throws {
     let request = MusicSummarySearchRequest(developerToken: "")
     let endpointURL = try request.musicSummariesSeaarhEndpointURL
     let url = "https://amp-api.music.apple.com/v1/me/music-summaries/search?period=year&fields[music-summaries]=period,year&include[music-summaries]=playlist"
