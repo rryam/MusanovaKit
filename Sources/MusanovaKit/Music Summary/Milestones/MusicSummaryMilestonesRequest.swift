@@ -14,7 +14,7 @@ struct MusicSummaryMilestonesRequest {
   private var developerToken: String
 
   /// The year to fetch music summary milestones for.
-  public var year: String
+  public var year: MusicYearID
 
   /// The types of music items to include in the music summary milestones.
   public var types: [MusicSummaryMilestonesMusicItemsType]
@@ -25,7 +25,7 @@ struct MusicSummaryMilestonesRequest {
   ///   - year: The year to fetch music summary milestones for.
   ///   - types: The types of music items to include in the music summary milestones.
   ///   - developerToken: The privileged developer token used to authorize the request.
-  public init(year: String, types: [MusicSummaryMilestonesMusicItemsType], developerToken: String) {
+  public init(year: MusicYearID, types: [MusicSummaryMilestonesMusicItemsType], developerToken: String) {
     self.year = year
     self.types = types
     self.developerToken = developerToken
@@ -52,10 +52,14 @@ extension MusicSummaryMilestonesRequest {
 
       let types = self.types.map { $0.rawValue }.joined(separator: ",")
 
-      components.queryItems = [
-        URLQueryItem(name: "ids", value: "year-\(year)"),
-        URLQueryItem(name: "include[music-summaries-milestones]", value: types)
-      ]
+      if types.isEmpty {
+        components.queryItems = [URLQueryItem(name: "ids", value: "year-\(year.rawValue)")]
+      } else {
+        components.queryItems = [
+          URLQueryItem(name: "ids", value: "year-\(year.rawValue)"),
+          URLQueryItem(name: "include[music-summaries-milestones]", value: types)
+        ]
+      }
 
       guard let url = components.url else {
         throw URLError(.badURL)
