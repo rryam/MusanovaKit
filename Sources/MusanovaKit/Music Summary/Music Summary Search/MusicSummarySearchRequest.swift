@@ -7,7 +7,7 @@
 
 import Foundation
 
-public extension MReplay {
+public extension MSummaries {
   /// Searches music summaries for the user's library.
   ///
   /// Use this method to search music summary playlists over the years.
@@ -15,7 +15,7 @@ public extension MReplay {
   /// Example usage:
   ///
   ///     do {
-  ///       let summaries = try await MReplay.searchSummaries(developerToken: "your_developer_token")
+  ///       let summaries = try await MSummaries.search(developerToken: "your_developer_token")
   ///
   ///       for summary in summaries {
   ///         print("Year: \(summary.year), Playlist: \(summary.playlist)")
@@ -30,7 +30,7 @@ public extension MReplay {
   /// - Returns: An instance of `MusicSummarySearches` containing the search results for music summary data for the user's library.
   ///
   /// - Throws: An error of type `URLError` or `DecodingError` if the request fails or the response cannot be decoded.
-  static func searchSummaries(developerToken: String) async throws -> MusicSummarySearches {
+  static func search(developerToken: String) async throws -> MusicSummarySearches {
     let request = MusicSummarySearchRequest(developerToken: developerToken)
     let response = try await request.response()
     return response
