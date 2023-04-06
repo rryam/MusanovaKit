@@ -8,8 +8,20 @@
 import Foundation
 
 /// A milestone object representing a music summary milestone.
-struct MusicSummaryMilestone: Codable {
-
+///
+/// A MusicSummaryMilestone object represents a milestone that a user has achieved in their music listening history, such as the number of unique songs or artists listened to.
+///
+/// It includes the unique identifier for the milestone, the amount of time the user spent listening to music to reach the milestone, the date the milestone was reached, the value associated with the milestone, and the type of music item associated with the milestone.
+///
+/// Example usage:
+///
+///     let milestone: MusicSummaryMilestone = ...
+///     print("ID: \(milestone.id), Listen Time: \(milestone.listenTimeInMinutes)")
+///     print("Date Reached: \(milestone.dateReached), Value: \(milestone.value)")
+///     print("Kind: \(milestone.kind)")
+///
+public struct MusicSummaryMilestone: Codable {
+  
   /// The unique identifier for the music summary milestone.
   let id: String
 
@@ -41,7 +53,7 @@ extension MusicSummaryMilestone {
 }
 
 extension MusicSummaryMilestone {
-  init(from decoder: Decoder) throws {
+  public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     id = try container.decode(String.self, forKey: .id)
 
@@ -52,7 +64,7 @@ extension MusicSummaryMilestone {
     kind = try attributesContainer.decode(MusicSummaryMilestoneKind.self, forKey: .kind)
   }
 
-  func encode(to encoder: Encoder) throws {
+  public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
     try container.encode(id, forKey: .id)
 

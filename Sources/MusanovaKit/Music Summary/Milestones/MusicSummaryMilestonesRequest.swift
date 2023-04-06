@@ -7,6 +7,42 @@
 
 import Foundation
 
+public extension MSummaries {
+
+  /// Fetches music summary milestones for a specified year and list of music item types.
+  ///
+  /// Use this method to fetch music summary milestones for a specific year and types of music items.
+  /// The music summary milestones include counts for items such as songs, albums, and playlists that a user has played during a specified year.
+  ///
+  /// Example usage:
+  ///
+  ///     do {
+  ///       let milestones = try await MSummaries.milestones(forYear: 2023, developerToken: "your_developer_token")
+  ///
+  ///       for milestone in milestones {
+  ///         print("ID: \(milestone.id), Listen Time: \(milestone.listenTimeInMinutes)")
+  ///         print("Date Reached: \(milestone.dateReached), Value: \(milestone.value)")
+  ///         print("Kind: \(milestone.kind)")
+  ///       }
+  ///     } catch {
+  ///       print(error)
+  ///     }
+  ///
+  /// - Parameters:
+  ///   - year: The year to fetch music summary milestones for.
+  ///   - musicItemTypes: The types of music items to include in the music summary milestones.
+  ///   - developerToken: The developer token used to authorize the request.
+  ///
+  /// - Returns: An array of `MusicSummaryMilestone` objects containing the fetched music summary milestones.
+  ///
+  /// - Throws: An error of type `URLError` or `DecodingError` if the request fails or the response cannot be decoded.
+  static func milestones(forYear year: MusicYearID, musicItemTypes: [MusicSummaryMilestonesMusicItemsType] = [], developerToken: String) async throws -> MusicSummaryMilestones {
+    let request = MusicSummaryMilestonesRequest(year: year, types: musicItemTypes, developerToken: developerToken)
+    let response = try await request.response()
+    return response
+  }
+}
+
 /// A request object used to fetch music summary milestones for a specified year and list of music item types.
 struct MusicSummaryMilestonesRequest {
 
@@ -33,14 +69,13 @@ struct MusicSummaryMilestonesRequest {
 
   /// Sends the request and returns a response object containing the fetched music summary milestones.
   ///
-  /// - Returns: A `MusicSummaryMilestonesResponse` object.
-  public func response() async throws -> MusicSummaryMilestonesResponse {
+  /// - Returns: A `MusicSummaryMilestones` object.
+  public func response() async throws -> MusicSummaryMilestones {
     let url = try musicSummariesMilestonesEndpointURL
     let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
     let response = try await request.response()
     let milestonesResponse = try JSONDecoder().decode(MusicSummaryMilestonesResponse.self, from: response.data)
-    print(milestonesResponse)
-    return milestonesResponse
+    return milestonesResponse.milestones
   }
 }
 
