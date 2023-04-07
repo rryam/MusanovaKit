@@ -23,28 +23,35 @@ import Foundation
 public struct MusicSummaryMilestone: Codable {
   
   /// The unique identifier for the music summary milestone.
-  let id: String
+  public let id: String
 
   /// The amount of time the user spent listening to music in minutes to reach the milestone.
-  let listenTimeInMinutes: Int
+  public let listenTimeInMinutes: Int
 
   /// The date the milestone was reached.
-  let dateReached: String
+  public let dateReached: String
 
   /// The value associated with the milestone, such as the number of unique songs or artists listened to.
-  let value: String
+  public let value: String
 
   /// The type of music item associated with the milestone, such as a song, artist, or listening time.
-  let kind: MusicSummaryMilestoneKind
+  public let kind: MusicSummaryMilestoneKind
 
   /// An array of `Song` objects representing the user's top songs for the given time period.
-  let topSongs: Songs
+  public let topSongs: Songs
 
   /// An array of `Artist` objects representing the user's top artists for the given time period.
-  let topArtists: Artists
+  public let topArtists: Artists
 
   /// An array of `Album` objects representing the user's top albums for the given time period.
-  let topAlbums: Albums
+  public let topAlbums: Albums
+}
+
+extension MusicSummaryMilestone: Identifiable {
+}
+
+extension MusicSummaryMilestone: Hashable {
+  
 }
 
 extension MusicSummaryMilestone {
@@ -80,9 +87,9 @@ extension MusicSummaryMilestone {
     kind = try attributesContainer.decode(MusicSummaryMilestoneKind.self, forKey: .kind)
 
     let relationshipsContainer = try container.nestedContainer(keyedBy: RelationshipsCodingKeys.self, forKey: .relationships)
-    topSongs = try relationshipsContainer.decode(Songs.self, forKey: .topSongs)
-    topAlbums = try relationshipsContainer.decode(Albums.self, forKey: .topAlbums)
-    topArtists = try relationshipsContainer.decode(Artists.self, forKey: .topArtists)
+    topSongs = try relationshipsContainer.decodeIfPresent(Songs.self, forKey: .topSongs) ?? []
+    topAlbums = try relationshipsContainer.decodeIfPresent(Albums.self, forKey: .topAlbums) ?? []
+    topArtists = try relationshipsContainer.decodeIfPresent(Artists.self, forKey: .topArtists) ?? []
   }
 
   public func encode(to encoder: Encoder) throws {
