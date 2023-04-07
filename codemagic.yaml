@@ -100,7 +100,7 @@ workflows:
     integrations:
       app_store_connect: Rudrank ASC API Key
     triggering:
-    <<: *events
+      <<: *events
     when:
       changeset:
         includes:
