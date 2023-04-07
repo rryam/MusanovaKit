@@ -20,6 +20,9 @@ do {
     print("ID: \(milestone.id), Listen Time: \(milestone.listenTimeInMinutes)")
     print("Date Reached: \(milestone.dateReached), Value: \(milestone.value)")
     print("Kind: \(milestone.kind)")
+    print("Top Songs: \(milestone.topSongs)")
+    print("Top Artists: \(milestone.topArtists)")
+    print("Top Albums: \(milestone.topAlbums)")
   }
 } catch {
   print(error)
