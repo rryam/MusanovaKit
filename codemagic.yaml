@@ -85,50 +85,50 @@ workflows:
           git remote set-url origin https://rudrankriyam:$token@github.com/rryam/MusanovaKit.git
           git pull --ff-only
           git push origin main
-musanova:
-  name: Musanova TestFlight Workflow
-  working_directory: Musanova
-  instance_type: mac_mini_m1
-  environment:
-    ios_signing:
-      distribution_type: app_store
-      bundle_identifier: com.rudrankriyam.musanova-app
-    vars:
-      XCODE_PROJECT: "Musanova.xcodeproj"
-      XCODE_SCHEME: "Musanova"
-      APP_ID: "6447436367"
-  integrations:
-    app_store_connect: Rudrank ASC API Key
-  triggering:
+  musanova:
+    name: Musanova TestFlight Workflow
+    working_directory: Musanova
+    instance_type: mac_mini_m1
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.rudrankriyam.musanova-app
+      vars:
+        XCODE_PROJECT: "Musanova.xcodeproj"
+        XCODE_SCHEME: "Musanova"
+        APP_ID: "6447436367"
+    integrations:
+      app_store_connect: Rudrank ASC API Key
+    triggering:
     <<: *events
-  when:
-    changeset:
-      includes:
-        - "Sources"
-        - "Musanova"
-      excludes:
-        - "**/*.md"
-  scripts:
-    - name: Set up provisioning profiles settings on Xcode project
-      script: xcode-project use-profiles
-    - name: Increment build number
-      script: |
-        LATEST_BUILD_NUMBER=$(app-store-connect get-latest-testflight-build-number "$APP_ID")
-        agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
-    - name: Build ipa for distribution
-      script: |
-        xcode-project build-ipa \
+    when:
+      changeset:
+        includes:
+          - "Sources"
+          - "Musanova"
+        excludes:
+          - "**/*.md"
+    scripts:
+      - name: Set up provisioning profiles settings on Xcode project
+        script: xcode-project use-profiles
+      - name: Increment build number
+        script: |
+          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-testflight-build-number "$APP_ID")
+          agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
+      - name: Build ipa for distribution
+        script: |
+          xcode-project build-ipa \
           --project "$XCODE_PROJECT" \
           --scheme "$XCODE_SCHEME" \
           --archive-flags "-destination 'generic/platform=iOS' -skipPackagePluginValidation"
-  artifacts:
-    - build/ios/ipa/*.ipa
-    - /tmp/xcodebuild_logs/*.log
-  publishing:
-    <<: *email
-    app_store_connect:
-      auth: integration
-      submit_to_testflight: true
-      beta_groups:
-        - Testers
-      submit_to_app_store: false
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      <<: *email
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        beta_groups:
+          - Testers
+        submit_to_app_store: false
