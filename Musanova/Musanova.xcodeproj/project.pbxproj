@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A4103FE29E0AADE009BFF99 /* MusanovaKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0A4103FD29E0AADE009BFF99 /* MusanovaKit */; };
 		0A61AF4429DC798C007866DA /* MusanovaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A61AF4329DC798C007866DA /* MusanovaApp.swift */; };
 		0A61AF4629DC798C007866DA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A61AF4529DC798C007866DA /* ContentView.swift */; };
 		0A61AF4829DC798D007866DA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0A61AF4729DC798D007866DA /* Assets.xcassets */; };
@@ -14,6 +15,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0A4103FF29E0AB5B009BFF99 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		0A61AF4029DC798C007866DA /* Musanova.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Musanova.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A61AF4329DC798C007866DA /* MusanovaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusanovaApp.swift; sourceTree = "<group>"; };
 		0A61AF4529DC798C007866DA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -26,6 +28,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A4103FE29E0AADE009BFF99 /* MusanovaKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -51,6 +54,7 @@
 		0A61AF4229DC798C007866DA /* Musanova */ = {
 			isa = PBXGroup;
 			children = (
+				0A4103FF29E0AB5B009BFF99 /* Info.plist */,
 				0A61AF4329DC798C007866DA /* MusanovaApp.swift */,
 				0A61AF4529DC798C007866DA /* ContentView.swift */,
 				0A61AF4729DC798D007866DA /* Assets.xcassets */,
@@ -83,6 +87,9 @@
 			dependencies = (
 			);
 			name = Musanova;
+			packageProductDependencies = (
+				0A4103FD29E0AADE009BFF99 /* MusanovaKit */,
+			);
 			productName = Musanova;
 			productReference = 0A61AF4029DC798C007866DA /* Musanova.app */;
 			productType = "com.apple.product-type.application";
@@ -111,6 +118,9 @@
 				Base,
 			);
 			mainGroup = 0A61AF3729DC798C007866DA;
+			packageReferences = (
+				0A4103FC29E0AADE009BFF99 /* XCRemoteSwiftPackageReference "MusanovaKit" */,
+			);
 			productRefGroup = 0A61AF4129DC798C007866DA /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -271,8 +281,10 @@
 				DEVELOPMENT_TEAM = YQZQG7N4WG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Musanova/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Musanova;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Please provide music usage for fetching the relevant data from the Apple Music Catalog.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -304,8 +316,10 @@
 				DEVELOPMENT_TEAM = YQZQG7N4WG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Musanova/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Musanova;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Please provide music usage for fetching the relevant data from the Apple Music Catalog.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -347,6 +361,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		0A4103FC29E0AADE009BFF99 /* XCRemoteSwiftPackageReference "MusanovaKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/rryam/MusanovaKit";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0A4103FD29E0AADE009BFF99 /* MusanovaKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0A4103FC29E0AADE009BFF99 /* XCRemoteSwiftPackageReference "MusanovaKit" */;
+			productName = MusanovaKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 0A61AF3829DC798C007866DA /* Project object */;
 }
