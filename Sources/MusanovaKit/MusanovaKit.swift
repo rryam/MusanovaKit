@@ -9,9 +9,10 @@ import Foundation
 @_exported import MusicKit
 @_exported import MusadoraKit
 
-public struct MusanovaKit {
-  public private(set) var text = "Hello, World!"
+public struct MusanovaKit {}
 
-  public init() {
+extension MusanovaKit {
+  public static var priviledgedDeveloperToken: String? {
+    ProcessInfo.processInfo.environment["DEVELOPER_TOKEN"]
   }
 }

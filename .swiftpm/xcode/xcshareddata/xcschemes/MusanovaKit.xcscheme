@@ -64,6 +64,13 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "DEVELOPER_TOKEN"
+            value = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNzE4MDUyMDUxLCJleHAiOjE3MjUzMDk2NTEsInJvb3RfaHR0cHNfb3JpZ2luIjpbImFwcGxlLmNvbSJdfQ.nC_CMYwimOXXzbgMjaiqTSRM9pw_8eXp1byKSIw9ZbC62OqSc-6PaZrdBtWhzcMx7SNQuhq98x_-JhAwzd3h2Q"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
