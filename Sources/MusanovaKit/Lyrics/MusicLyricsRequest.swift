@@ -29,8 +29,8 @@ struct MusicLyricsRequest {
   /// Sends the request and returns a response object containing the fetched lyrics.
   ///
   /// - Returns: A `MusicLyricsResponse` object.
-  func response() async throws -> MusicLyricsResponse {
-    let url = try await lyricsEndpointURL
+  func response(countryCode: String? = nil) async throws -> MusicLyricsResponse {
+    let url = try await lyricsEndpointURL(countryCode: countryCode)
     let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
     let response = try await request.response()
     let lyricsResponse = try JSONDecoder().decode(MusicLyricsResponse.self, from: response.data)
@@ -39,18 +39,23 @@ struct MusicLyricsRequest {
 }
 
 extension MusicLyricsRequest {
-  private var lyricsEndpointURL: URL {
-    get async throws {
-      var components = AppleMusicAMPURLComponents()
-      let countryCode = try await MusicDataRequest.currentCountryCode
-      components.path = "/v1/catalog/\(countryCode)/songs/\(songID.rawValue)/syllable-lyrics"
+  internal func lyricsEndpointURL(countryCode: String? = nil) async throws -> URL {
+    var components = AppleMusicAMPURLComponents()
 
-      guard let url = components.url else {
-        throw URLError(.badURL)
-      }
-
-      return url
+    let resolvedCountryCode: String
+    if let countryCode = countryCode {
+      resolvedCountryCode = countryCode
+    } else {
+      resolvedCountryCode = try await MusicDataRequest.currentCountryCode
     }
+
+    components.path = "/v1/catalog/\(resolvedCountryCode)/songs/\(songID.rawValue)/syllable-lyrics"
+
+    guard let url = components.url else {
+      throw URLError(.badURL)
+    }
+
+    return url
   }
 }
 
