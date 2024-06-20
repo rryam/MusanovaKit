@@ -57,7 +57,7 @@ extension MusicLyricsRequest {
       resolvedCountryCode = try await MusicDataRequest.currentCountryCode
     }
 
-    components.path = "/catalog/\(resolvedCountryCode)/songs/\(songID.rawValue)/syllable-lyrics"
+    components.path = "catalog/\(resolvedCountryCode)/songs/\(songID.rawValue)/syllable-lyrics"
 
     guard let url = components.url else {
       throw URLError(.badURL)
