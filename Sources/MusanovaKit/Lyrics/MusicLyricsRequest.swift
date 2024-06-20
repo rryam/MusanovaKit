@@ -28,11 +28,19 @@ struct MusicLyricsRequest {
 
   /// Sends the request and returns a response object containing the fetched lyrics.
   ///
-  /// - Returns: A `MusicLyricsResponse` object.
+  /// - Returns: A `LyricsResponse` object.
   func response(countryCode: String? = nil) async throws -> MusicLyricsResponse {
     let url = try await lyricsEndpointURL(countryCode: countryCode)
+    print(url)
     let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
     let response = try await request.response()
+
+
+    if let jsonString = String(data: response.data, encoding: .utf8) {
+      print("Raw JSON received:")
+      print(jsonString)
+    }
+
     let lyricsResponse = try JSONDecoder().decode(MusicLyricsResponse.self, from: response.data)
     return lyricsResponse
   }
@@ -49,7 +57,7 @@ extension MusicLyricsRequest {
       resolvedCountryCode = try await MusicDataRequest.currentCountryCode
     }
 
-    components.path = "/v1/catalog/\(resolvedCountryCode)/songs/\(songID.rawValue)/syllable-lyrics"
+    components.path = "/catalog/\(resolvedCountryCode)/songs/\(songID.rawValue)/syllable-lyrics"
 
     guard let url = components.url else {
       throw URLError(.badURL)
@@ -60,24 +68,44 @@ extension MusicLyricsRequest {
 }
 
 public extension MCatalog {
-
-  /// Fetches the lyrics for a specified song.
+  /// Fetches and parses the lyrics for a specified song.
+  ///
+  /// This method performs the following steps:
+  /// 1. Creates a `MusicLyricsRequest` using the provided song ID and developer token.
+  /// 2. Sends the request to fetch the lyrics data.
+  /// 3. Extracts the TTML (Timed Text Markup Language) string from the response.
+  /// 4. Parses the TTML string into a structured `LyricParagraphs` object.
   ///
   /// - Parameters:
-  ///   - song: The song to fetch the lyrics for.
-  ///   - developerToken: The developer token used to authorize the request.
+  ///   - song: The `Song` object representing the song for which to fetch lyrics.
+  ///     This object must have a valid `id` property.
+  ///   - developerToken: A string containing the developer token used to authorize the request.
+  ///     This token must be valid and have the necessary permissions to fetch lyrics.
   ///
-  /// - Returns: The lyrics for the specified song.
+  /// - Returns: A `LyricParagraphs` object containing the parsed lyrics.
+  ///   This object is an array of `LyricParagraph` structures, each representing
+  ///   a section of the song's lyrics.
   ///
-  /// - Throws: An error if the request fails or the response cannot be decoded.
-  static func lyrics(for song: Song, developerToken: String) async throws -> String {
+  /// - Throws: This method can throw errors in the following situations:
+  ///   - `MusicLyricsRequest.Error`: If there's an error creating or sending the lyrics request.
+  ///   - `DecodingError`: If the response cannot be properly decoded into the expected format.
+  ///   - `URLError`: If there's a network-related error during the request.
+  ///   - `LyricsParser.Error`: If there's an error parsing the TTML string into `LyricParagraphs`.
+  ///
+  /// - Note: If no lyrics are found for the specified song, this method returns an empty `LyricParagraphs` array
+  ///   instead of throwing an error.
+  ///
+  /// - Important: Ensure that you have the necessary permissions and a valid developer token
+  ///   before calling this method. Unauthorized or incorrect usage may result in errors or empty results.
+  static func lyrics(for song: Song, developerToken: String) async throws -> LyricParagraphs {
     let request = MusicLyricsRequest(songID: song.id, developerToken: developerToken)
     let response = try await request.response()
 
-    guard let lyrics = response.data.first?.attributes.ttml else {
-      throw URLError(.badServerResponse)
+    guard let lyricsString = response.data.first?.attributes.ttml else {
+      return []
     }
 
-    return lyrics
+    let parser = LyricsParser()
+    return parser.parse(lyricsString)
   }
 }

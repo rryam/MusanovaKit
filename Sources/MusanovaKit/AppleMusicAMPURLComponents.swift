@@ -9,20 +9,20 @@ import MusadoraKit
 import Foundation
 
 /// A structure that implements the `MURLComponents` protocol, specifically for Apple Music API requests.
-struct AppleMusicAMPURLComponents: MURLComponents {
+public struct AppleMusicAMPURLComponents: MURLComponents {
 
   /// The underlying `URLComponents` instance.
   private var components: URLComponents
 
   /// Initializes a new `AppleMusicAMPURLComponents` instance with default values for the scheme and host.
-  init() {
+  public init() {
     self.components = URLComponents()
     components.scheme = "https"
     components.host = "amp-api.music.apple.com"
   }
 
   /// The query items to include in the URL.
-  var queryItems: [URLQueryItem]? {
+  public var queryItems: [URLQueryItem]? {
     get {
       components.queryItems
     } set {
@@ -31,7 +31,7 @@ struct AppleMusicAMPURLComponents: MURLComponents {
   }
 
   /// The path for the URL, excluding the base path.
-  var path: String {
+  public var path: String {
     get {
       return components.path
     } set {
@@ -40,7 +40,7 @@ struct AppleMusicAMPURLComponents: MURLComponents {
   }
 
   /// The constructed URL, if valid.
-  var url: URL? {
+  public var url: URL? {
     components.url
   }
 }
