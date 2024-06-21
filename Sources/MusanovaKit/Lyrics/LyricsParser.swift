@@ -53,6 +53,7 @@ public class LyricsParser: NSObject, XMLParserDelegate {
       currentSongPart = attributeDict["itunes:songPart"]
       currentParagraph = []
     } else if elementName == "p" {
+      currentParagraph.append(LyricLine(text: ""))
       currentLineText = ""
     }
   }
@@ -63,8 +64,8 @@ public class LyricsParser: NSObject, XMLParserDelegate {
   ///   - parser: The parser object.
   ///   - string: The character string.
   public func parser(_ parser: XMLParser, foundCharacters string: String) {
-    if currentElement == "span" {
-      currentLineText += string.trimmingCharacters(in: .whitespacesAndNewlines)
+    if currentElement == "p", !currentParagraph.isEmpty {
+      currentParagraph[currentParagraph.count - 1].text += string.trimmingCharacters(in: .whitespacesAndNewlines)
     }
   }
 
@@ -76,10 +77,7 @@ public class LyricsParser: NSObject, XMLParserDelegate {
   ///   - namespaceURI: The namespace URI or `nil` if none is available.
   ///   - qName: The qualified name or `nil` if none is available.
   public func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-    if elementName == "p" {
-      currentParagraph.append(LyricLine(text: currentLineText))
-      currentLineText = ""
-    } else if elementName == "div" {
+    if elementName == "div" {
       let paragraph = LyricParagraph(lines: currentParagraph, songPart: currentSongPart)
       paragraphs.append(paragraph)
     }
