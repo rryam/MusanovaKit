@@ -22,6 +22,8 @@ public class LyricsParser: NSObject, XMLParserDelegate {
   /// The name of the current XML element being processed.
   private var currentElement: String = ""
 
+  private var currentLineText: String = ""
+
   /// Parses the given XML string into an array of `LyricParagraph` objects.
   ///
   /// - Parameter xmlString: The TTML lyrics string to parse.
@@ -46,11 +48,12 @@ public class LyricsParser: NSObject, XMLParserDelegate {
   ///   - attributeDict: A dictionary of attribute names and values.
   public func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String] = [:]) {
     currentElement = elementName
+
     if elementName == "div" {
       currentSongPart = attributeDict["itunes:songPart"]
       currentParagraph = []
     } else if elementName == "p" {
-      currentParagraph.append(LyricLine(text: ""))
+      currentLineText = ""
     }
   }
 
@@ -60,8 +63,8 @@ public class LyricsParser: NSObject, XMLParserDelegate {
   ///   - parser: The parser object.
   ///   - string: The character string.
   public func parser(_ parser: XMLParser, foundCharacters string: String) {
-    if currentElement == "p", !currentParagraph.isEmpty {
-      currentParagraph[currentParagraph.count - 1].text += string.trimmingCharacters(in: .whitespacesAndNewlines)
+    if currentElement == "span" {
+      currentLineText += string.trimmingCharacters(in: .whitespacesAndNewlines)
     }
   }
 
@@ -73,7 +76,10 @@ public class LyricsParser: NSObject, XMLParserDelegate {
   ///   - namespaceURI: The namespace URI or `nil` if none is available.
   ///   - qName: The qualified name or `nil` if none is available.
   public func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-    if elementName == "div" {
+    if elementName == "p" {
+      currentParagraph.append(LyricLine(text: currentLineText))
+      currentLineText = ""
+    } else if elementName == "div" {
       let paragraph = LyricParagraph(lines: currentParagraph, songPart: currentSongPart)
       paragraphs.append(paragraph)
     }

@@ -6,7 +6,16 @@
       "location" : "https://github.com/rryam/MusadoraKit",
       "state" : {
         "branch" : "main",
-        "revision" : "14e5e1c7c0410fed788b515f5dcfb27068ed295c"
+        "revision" : "557a538f88c27d459c5315528634ea97e5ffb474"
+      }
+    },
+    {
+      "identity" : "swiftlintplugin",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/lukepistrol/SwiftLintPlugin",
+      "state" : {
+        "revision" : "f3586ed424d7bf5d94628332fbd0edebf1f5147f",
+        "version" : "0.2.3"
       }
     }
   ],
