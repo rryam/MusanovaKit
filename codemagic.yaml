@@ -4,17 +4,9 @@ definitions:
       events:
         - push
         - pull_request
-  email: &email
-    email:
-      recipients:
-        - rudrankriyam@gmail.com
-      notify:
-        success: true
-        failure: true
 workflows:
   musanovakit:
     name: MusanovaKit Workflow
-    instance_type: mac_mini_m1
     environment:
       vars:
         XCODE_SCHEME: "MusanovaKit"
@@ -53,52 +45,14 @@ workflows:
                 -skipPackagePluginValidation | xcpretty --report junit
           done
         test_report: build/reports/junit.xml
-    publishing:
-      <<: *email
-
-  musanovakit-update-docs:
-    name: MusanovaKit Docs Update Workflow
-    environment:
-      groups:
-        - GitHub
-    when:
-      changeset:
-        includes:
-          - "Sources"
-          - "Musanova"
-        excludes:
-          - "**/*.md"
-    scripts:
-      - name: Update DocC Documentation
-        script: |
-          #!/bin/zsh
-
-          swift package --allow-writing-to-directory ./docs \
-          generate-documentation --target MusanovaKit \
-          --disable-indexing \
-          --transform-for-static-hosting \
-          --hosting-base-path MusanovaKit \
-          --output-path ./docs
-
-          git add .
-          git commit -m "[skip ci] Update DocC Documentation"
-          git remote set-url origin https://rudrankriyam:$token@github.com/rryam/MusanovaKit.git
-          git pull --ff-only
-          git push origin main
-  musanova:
-    name: Musanova TestFlight Workflow
+  musanova-debug:
+    name: Musanova Debug Workflow
     working_directory: Musanova
-    instance_type: mac_mini_m1
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.rudrankriyam.musanova-app
       vars:
         XCODE_PROJECT: "Musanova.xcodeproj"
         XCODE_SCHEME: "Musanova"
         APP_ID: "6447436367"
-    integrations:
-      app_store_connect: Rudrank ASC API Key
     triggering:
       <<: *events
     when:
@@ -115,17 +69,17 @@ workflows:
         script: |
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-testflight-build-number "$APP_ID")
           agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
-      - name: Build ipa for distribution
+      - name: Build Debug Configuration
         script: |
-          xcode-project build-ipa \
-          --project "$XCODE_PROJECT" \
-          --scheme "$XCODE_SCHEME" \
-          --archive-flags "-destination 'generic/platform=iOS' -skipPackagePluginValidation"
+          xcodebuild \
+          -project "$XCODE_PROJECT" \
+          -scheme "$XCODE_SCHEME" \
+          -configuration Debug \
+          -destination "generic/platform=iOS" \
+          -skipPackagePluginValidation
     artifacts:
-      - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
     publishing:
-      <<: *email
       app_store_connect:
         auth: integration
         submit_to_testflight: true
