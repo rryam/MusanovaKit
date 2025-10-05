@@ -1,82 +1,136 @@
 # MusanovaKit
 
-Explore and experiment with private Apple Music API endpoints. 
+MusanovaKit lets you explore Apple Music features that are not exposed through the public MusicKit framework. It includes helpers for private APIs such as privileged lyric endpoints and Music Summaries (Replay) data. **Use this package for research and internal tooling only.**
 
-Note: Do NOT ship with this package. If you do, you are responsible for any backlash from Apple. This uses private Apple Music API endpoints that requires a privileged developer token.
+> ⚠️ MusanovaKit calls Apple Music endpoints that require a **privileged developer token**. Shipping these APIs inside production software is likely to violate Apple’s terms and may break without notice. Proceed at your own risk.
 
-# Lyrics
+## Table of Contents
 
-The `lyrics(for:developerToken:)` method allows you to fetch lyrics for a specific song. This feature requires a privileged developer token.
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Authentication](#authentication)
+  - [Privileged developer token](#privileged-developer-token)
+  - [Music user token](#music-user-token)
+- [Lyrics](#lyrics)
+  - [Fetching TTML lyrics](#fetching-ttml-lyrics)
+  - [Working with timed segments](#working-with-timed-segments)
+- [Replay and Summaries](#replay-and-summaries)
+  - [Milestones](#milestones)
+  - [Searching replay playlists](#searching-replay-playlists)
+- [Disclaimer](#disclaimer)
 
-**Important:** This feature is experimental and should not be used in production environments.
+## Requirements
 
-Here's an example of how to use it:
+- Swift 6.2 or later
+- Xcode 16.2 (Swift 6.2 toolchain) or later
+- An Apple Developer account with access to Apple Music privileged developer tokens
+
+## Installation
+
+Add MusanovaKit to your project using the Swift Package Manager:
 
 ```swift
-do {
-    let id = MusicItemID("1156786545")
-    let song = try await MCatalog.song(id: id)
-    let lyrics = try await MCatalog.lyrics(for: song, developerToken: MusanovaKit.priviledgedDeveloperToken!)
-    
-    print("Lyrics for \(song.title):")
-    for paragraph in lyrics {
-        if let songPart = paragraph.songPart {
-            print("\n\(songPart.uppercased()):")
-        }
-        for line in paragraph.lines {
-            print(line.text)
-        }
+dependencies: [
+    .package(url: "https://github.com/rryam/MusanovaKit.git", branch: "main")
+]
+```
+
+Then add `MusanovaKit` to the target that should use these APIs.
+
+## Authentication
+
+All MusanovaKit calls depend on Apple Music authentication. There are two tokens involved:
+
+### Privileged developer token
+
+Obtain a privileged Apple Music developer token from your internal tooling and provide it to MusanovaKit (for example through the `DEVELOPER_TOKEN` environment variable or by injecting it directly into API calls).
+
+### Music user token
+
+When you call MusanovaKit from a signed-in MusicKit app, the system automatically attaches the Music User Token to privileged requests. If you issue requests from outside MusicKit (for example, using `curl`), include the `Media-User-Token` header manually.
+
+## Lyrics
+
+`MCatalog.lyrics(for:developerToken:)` fetches the syllable-lyrics TTML feed for a given song. The parser extracts both plain text and per-segment timing metadata.
+
+### Fetching TTML lyrics
+
+```swift
+let song = try await MCatalog.song(id: "1156786545")
+let lyrics = try await MCatalog.lyrics(for: song, developerToken: token)
+
+for paragraph in lyrics {
+    if let part = paragraph.songPart {
+        print("\n\(part.uppercased()):")
     }
-} catch {
-    print("Error fetching lyrics: \(error)")
+    for line in paragraph.lines {
+        print(line.text)
+    }
 }
 ```
 
-To use this feature:
-1. Obtain a privileged developer token from the Apple Music website.
-2. Set the token as an environment variable named "DEVELOPER_TOKEN".
+`lyrics` returns an array of `LyricParagraph` objects. Each paragraph contains:
 
-**Warning:** Usage of this feature may be subject to Apple's terms and conditions. I assume no liability for any issues arising from its use.
+- `songPart` – optional section labeling (Intro, Verse, Chorus, …)
+- `lines` – an array of `LyricLine`
 
-# Replay and Summaries
+Every `LyricLine` now exposes:
 
-## Milestones
+- `text` – aggregated plain text for the line
+- `segments` – `[LyricSegment]` representing the timed spans inside the line
 
-The `milestones(forYear:musicItemTypes:developerToken:)` method is used to retrieve milestones data for a given year.
+Each `LyricSegment` includes the displayed `text` and `startTime` / `endTime` as `TimeInterval` values derived from the TTML `<span begin="…" end="…">` attributes.
 
-Here is an example of how to use it:
+### Working with timed segments
 
 ```swift
-do {
-  let milestones = try await MSummaries.milestones(forYear: 2023, developerToken: "your_developer_token")
-  
-  for milestone in milestones {
-    print("ID: \(milestone.id), Listen Time: \(milestone.listenTimeInMinutes)")
-    print("Date Reached: \(milestone.dateReached), Value: \(milestone.value)")
-    print("Kind: \(milestone.kind)")
-    print("Top Songs: \(milestone.topSongs)")
-    print("Top Artists: \(milestone.topArtists)")
-    print("Top Albums: \(milestone.topAlbums)")
-  }
-} catch {
-  print(error)
+let paragraph = lyrics.first
+let line = paragraph?.lines.first
+
+line?.segments.forEach { segment in
+    print("\(segment.text) starts at \(segment.startTime)s, ends at \(segment.endTime)s")
 }
 ```
 
-## Search Replay Playlists
+Use the segment timings to drive your own lyric highlighting, karaoke bars, or subtitle cues. Segments default to a `startTime` of `0` if the TTML omits the `begin` attribute.
 
-The `search(developerToken:)` method allows you to search music summary data for the user's library like the replay playlists over the years. To use this method, you will need a privileged developer token.
+### Direct lyric requests
 
-Here's an example of how to use it:
+If you need the raw TTML, instantiate `MusicLyricsRequest` directly:
 
 ```swift
-do {
-  let summaries = try await MSummaries.search(developerToken: "developer_token")
-    
-  for summary in summaries {
-    print("Year: \(summary.year), playlist: \(summary.playlist)")
-  }
-} catch {
-  print(error)
+let request = MusicLyricsRequest(songID: MusicItemID("1156786545"), developerToken: token)
+let response = try await request.response()
+let ttml = response.data.first?.attributes.ttml
+```
+
+`MusicLyricsRequest` automatically targets the `/syllable-lyrics` endpoint and decodes the `MusicLyricsResponse` payload.
+
+## Replay and Summaries
+
+MusanovaKit also contains helpers for Replay (Music Summaries) endpoints. These APIs return insights such as top artists, albums, songs, and milestone achievements for a user’s listening history.
+
+### Milestones
+
+```swift
+let milestones = try await MSummaries.milestones(forYear: 2023, developerToken: token)
+
+for milestone in milestones {
+    print("\(milestone.kind): reached on \(milestone.dateReached)")
+    print("Listen time: \(milestone.listenTimeInMinutes) minutes")
 }
 ```
+
+### Searching replay playlists
+
+```swift
+let results = try await MSummaries.search(developerToken: token)
+
+for summary in results {
+    print("Year: \(summary.year) → playlist: \(summary.playlist)")
+}
+```
+
+## Disclaimer
+
+MusanovaKit is an exploration project. These endpoints are subject to change, can disappear without warning, and may violate Apple’s App Store policies. Do not submit apps that rely on this package to the App Store. Use the code for prototyping, research, or personal experiments only.
