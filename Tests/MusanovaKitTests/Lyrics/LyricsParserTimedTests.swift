@@ -43,6 +43,22 @@ struct LyricsParserTimedTests {
   }
 
   @Test
+  func testParserKeepsUntimedTextAlongsideSegments() throws {
+    let ttml = wrapTTML(body: """
+      <div>
+        <p>Lead in <span begin="1.0" end="1.5">timed</span> outro</p>
+      </div>
+      """)
+    let parser = LyricsParser()
+    let paragraphs = parser.parse(ttml)
+
+    let line = try #require(paragraphs.first?.lines.first)
+    #expect(line.text == "Lead in timed outro")
+    #expect(line.segments.count == 1)
+    #expect(line.segments.first?.text == "timed")
+  }
+
+  @Test
   func testParserHandlesNestedBackgroundSpans() throws {
     let ttml = wrapTTML(body: """
       <div>

@@ -92,14 +92,7 @@ public class LyricsParser: NSObject, XMLParserDelegate {
         currentSegmentText += trimmed
       }
     } else if currentElement == "p" {
-      let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
-      if !trimmed.isEmpty {
-        if currentLineText.isEmpty {
-          currentLineText = trimmed
-        } else {
-          currentLineText += " " + trimmed
-        }
-      }
+      appendToCurrentLineText(string)
     }
   }
 
@@ -122,17 +115,16 @@ public class LyricsParser: NSObject, XMLParserDelegate {
       if !currentSegmentText.isEmpty {
         let segment = LyricSegment(text: currentSegmentText, startTime: start, endTime: end)
         currentLineSegments.append(segment)
+        appendToCurrentLineText(segment.text)
       }
       currentSegmentText = ""
       currentSegmentStart = nil
       currentSegmentEnd = nil
     } else if elementName == "p" {
-      let lineText: String
-      if currentLineSegments.isEmpty {
-        lineText = currentLineText.trimmingCharacters(in: .whitespacesAndNewlines)
-      } else {
-        lineText = currentLineSegments.map { $0.text }.joined(separator: " ")
-      }
+      let trimmedText = currentLineText.trimmingCharacters(in: .whitespacesAndNewlines)
+      let lineText = trimmedText.isEmpty && !currentLineSegments.isEmpty
+        ? currentLineSegments.map { $0.text }.joined(separator: " ")
+        : trimmedText
 
       let line = LyricLine(text: lineText, segments: currentLineSegments)
       currentParagraph.append(line)
@@ -166,5 +158,16 @@ public class LyricsParser: NSObject, XMLParserDelegate {
 
     let seconds = Double(secondsComponent.replacingOccurrences(of: ",", with: ".")) ?? 0
     return TimeInterval(hours * 3600 + minutes * 60) + seconds
+  }
+
+  private func appendToCurrentLineText(_ string: String) {
+    let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !trimmed.isEmpty else { return }
+
+    if currentLineText.isEmpty {
+      currentLineText = trimmed
+    } else {
+      currentLineText += " " + trimmed
+    }
   }
 }
