@@ -35,7 +35,6 @@ struct MusicLyricsRequestTests {
 
   @Test
   func testLyricsEndpointURL() async throws {
-    let developerToken = try #require(developerToken)
     let request = MusicLyricsRequest(songID: songID, developerToken: developerToken)
     let url = try await request.lyricsEndpointURL(countryCode: "us")
 
