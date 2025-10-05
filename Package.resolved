@@ -1,4 +1,5 @@
 {
+  "originHash" : "49a8de10858dd190ed8754840418a800ca6dcd8662f256a4bb26591f882f1d82",
   "pins" : [
     {
       "identity" : "musadorakit",
@@ -8,16 +9,7 @@
         "branch" : "main",
         "revision" : "557a538f88c27d459c5315528634ea97e5ffb474"
       }
-    },
-    {
-      "identity" : "swiftlintplugin",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/lukepistrol/SwiftLintPlugin",
-      "state" : {
-        "revision" : "f3586ed424d7bf5d94628332fbd0edebf1f5147f",
-        "version" : "0.2.3"
-      }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
