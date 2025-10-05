@@ -18,4 +18,17 @@ public struct LyricLine: Identifiable {
 
   /// The text content of the lyric line.
   public var text: String
+
+  /// The timed segments that make up the lyric line.
+  public var segments: [LyricSegment]
+
+  /// Creates a new lyric line.
+  ///
+  /// - Parameters:
+  ///   - text: The complete text content for the line.
+  ///   - segments: The timed segments that compose the line. Defaults to an empty collection.
+  public init(text: String, segments: [LyricSegment] = []) {
+    self.text = text
+    self.segments = segments
+  }
 }
