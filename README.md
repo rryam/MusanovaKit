@@ -28,7 +28,7 @@ MusanovaKit lets you explore Apple Music features that are not exposed through t
   </a>
 </p>
 
-I have written a comprehensive guide—[Exploring MusicKit and Apple Music API](https://academy.rudrank.com/product/musickit)—that covers everything from authentication and storefronts to building rich MusicKit experiences. If you’re diving deeper into Apple Music development, this book contains the reference material and workflows I rely on while building tooling like MusanovaKit.
+I wrote [Exploring MusicKit and Apple Music API](https://academy.rudrank.com/product/musickit) to document how I approach Apple Music projects—auth, storefronts, tooling, and the scrappy workflows behind packages like MusanovaKit. If you need a deeper reference, that book is where I keep the details.
 
 ## Requirements
 
