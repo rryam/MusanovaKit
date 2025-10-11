@@ -1,9 +1,9 @@
-@testable import MusanovaKit
 import Foundation
 import Testing
 
-struct LyricsParserTimedTests {
+@testable import MusanovaKit
 
+struct LyricsParserTimedTests {
   @Test
   func testParserProducesTimedSegments() throws {
     let ttml = wrapTTML(body: """

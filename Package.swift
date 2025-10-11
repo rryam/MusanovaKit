@@ -10,10 +10,18 @@ let package = Package(
         .library(name: "MusanovaKit", targets: ["MusanovaKit"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/rryam/MusadoraKit", branch: "main")
+        .package(url: "https://github.com/rryam/MusadoraKit", branch: "main"),
+        .package(url: "https://github.com/apple/swift-testing", from: "0.9.0")
     ],
     targets: [
         .target(name: "MusanovaKit", dependencies: ["MusadoraKit"]),
-        .testTarget(name: "MusanovaKitTests", dependencies: ["MusanovaKit"], resources: [.process("Resources")]),
+        .testTarget(
+            name: "MusanovaKitTests",
+            dependencies: [
+                "MusanovaKit",
+                .product(name: "Testing", package: "swift-testing")
+            ],
+            resources: [.process("Resources")]
+        ),
     ]
 )
