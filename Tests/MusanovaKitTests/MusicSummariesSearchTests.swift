@@ -31,7 +31,7 @@ struct MusicSummariesSearchTests {
     let summary = try #require(summaries.first)
     #expect(summary.year == 2016)
 
-    let playlist = summary.playlist
+    let playlist = try #require(Optional(summary.playlist))
     #expect(playlist.id == "pl.rp-bppRCjG6wWzB")
     #expect(playlist.name == "Replay 2016")
   }
