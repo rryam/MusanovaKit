@@ -5,12 +5,14 @@
 //  Created by Rudrank Riyam on 07/04/23.
 //
 
-@testable import MusanovaKit
 import Foundation
 import MusicKit
 import Testing
 
-@Suite struct MusicSummariesMilestonesTests {
+@testable import MusanovaKit
+
+@Suite
+struct MusicSummariesMilestonesTests {
   @Test
   func testMusicSummariesMilestonesEndpointURL() throws {
     let request = MusicSummaryMilestonesRequest(year: 2022, types: [], developerToken: "")
@@ -18,7 +20,6 @@ import Testing
     let url = try #require(URL(string: "https://amp-api.music.apple.com/v1/me/music-summaries/milestones?ids=year-2022"))
     #expect(endpointURL == url)
   }
-
   @Test
   func testMusicSummaryMilestonesDecoding() throws {
     let path = try #require(Bundle.module.path(forResource: "musicSummariesMilestones", ofType: "json"))
@@ -33,7 +34,7 @@ import Testing
     #expect(milestone.listenTimeInMinutes == 5955)
     #expect(milestone.dateReached == "2023-02-03")
     #expect(milestone.value == "5000")
-    #expect(milestone.kind == MusicSummaryMilestoneKind.listenTime)
+    #expect(milestone.kind == .listenTime)
 
     let topSongs = milestone.topSongs
     #expect(topSongs.count == 3)

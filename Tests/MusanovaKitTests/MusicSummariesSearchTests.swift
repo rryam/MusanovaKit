@@ -5,12 +5,14 @@
 //  Created by Rudrank Riyam on 04/04/23.
 //
 
-@testable import MusanovaKit
 import Foundation
 import MusicKit
 import Testing
 
-@Suite struct MusicSummariesSearchTests {
+@testable import MusanovaKit
+
+@Suite
+struct MusicSummariesSearchTests {
   @Test
   func testMusicSummariesSearchEndpointURL() throws {
     let request = MusicSummarySearchRequest(developerToken: "")
@@ -18,7 +20,6 @@ import Testing
     let expectedURL = try #require(URL(string: "https://amp-api.music.apple.com/v1/me/music-summaries/search?period=year&fields[music-summaries]=period,year&include[music-summaries]=playlist"))
     #expect(endpointURL == expectedURL)
   }
-
   @Test
   func testMusicSummariesDecoding() throws {
     let path = try #require(Bundle.module.path(forResource: "musicSummariesSearch", ofType: "json"))
