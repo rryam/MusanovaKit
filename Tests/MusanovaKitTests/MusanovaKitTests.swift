@@ -6,11 +6,6 @@
 //
 
 @testable import MusanovaKit
-import XCTest
+import Testing
 
-final class MusanovaKitTests: XCTestCase {}
-
-public func XCTAssertEqualEndpoint(_ endpoint: URL, _ url: String) {
-  let url = URL(string: url)!
-  XCTAssertEqual(endpoint, url)
-}
+@Suite struct MusanovaKitTests {}
