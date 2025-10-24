@@ -5,6 +5,7 @@
 //  Created by Rudrank Riyam on 04/04/23.
 //
 
+@preconcurrency import MusadoraKit
 import Foundation
 
 /// HTTP methods supported for privileged data requests.
@@ -47,11 +48,7 @@ public struct MusicPrivilegedDataRequest {
         if let host = url.host {
             urlRequest.setValue(host, forHTTPHeaderField: "Host")
         }
-        
-        let userToken = try await MusicDataRequest.tokenProvider.userToken(for: developerToken, options: .ignoreCache)
-        
-        urlRequest.setValue(userToken, forHTTPHeaderField: "media-user-token")
-        
+
         var request = MDataRequest(urlRequest: urlRequest, developerToken: developerToken)
         
         let response = try await request.response()

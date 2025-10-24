@@ -80,8 +80,7 @@ struct WelcomeView: View {
     var secondaryExplanatoryText: Text?
     switch musicAuthorizationStatus {
       case .denied:
-        secondaryExplanatoryText = Text("Please grant Musadora access to ")
-        + Text(Image(systemName: "applelogo")) + Text(" Music in Settings.")
+        secondaryExplanatoryText = Text("Please grant Musadora access to \(Image(systemName: "applelogo"))) Music in Settings.")
       default:
         break
     }

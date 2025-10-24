@@ -17,24 +17,51 @@ struct LyricsView: View {
     @State private var currentTime: TimeInterval = 0
     @State private var timer: Timer?
     @State private var isPlaying = false
+    @State private var artworkURL: URL?
 
     // Hardcoded song ID from the test file
-    private let songID = MusicItemID("926187677")
+    private let songID = MusicItemID("1837754303")
 
     var body: some View {
         NavigationStack {
             ZStack {
-                // Apple Music-like gradient background
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color.black.opacity(0.9),
-                        Color.purple.opacity(0.3),
-                        Color.black.opacity(0.9)
-                    ]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
+                // Blurred artwork background
+                if let artworkURL = artworkURL {
+                    AsyncImage(url: artworkURL) { image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .blur(radius: 20)
+                            .opacity(0.3)
+                            .overlay(
+                                Color.black.opacity(0.7)
+                            )
+                    } placeholder: {
+                        // Fallback gradient while loading
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color.black.opacity(0.9),
+                                Color.purple.opacity(0.3),
+                                Color.black.opacity(0.9)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    }
+                    .ignoresSafeArea()
+                } else {
+                    // Fallback gradient when no artwork
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color.black.opacity(0.9),
+                            Color.purple.opacity(0.3),
+                            Color.black.opacity(0.9)
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .ignoresSafeArea()
+                }
 
                 VStack(spacing: 0) {
                     if isLoading {
@@ -166,6 +193,12 @@ struct LyricsView: View {
                 song = try await MCatalog.song(id: songID)
                 print("Successfully fetched song:", song?.title ?? "Unknown title")
 
+                // Extract artwork URL
+                if let song = song, let artworkURL = song.artwork?.url(width: 1000, height: 1000) {
+                    self.artworkURL = artworkURL
+                    print("Artwork URL:", artworkURL.absoluteString)
+                }
+
                 // Get developer token
                 guard let developerToken = UserDefaults.standard.string(forKey: "developerToken"), !developerToken.isEmpty else {
                     print("No developer token found in UserDefaults")
@@ -174,19 +207,11 @@ struct LyricsView: View {
                     return
                 }
                 print("Found developer token, length:", developerToken.count)
-
-                // Get media user token (optional but recommended for lyrics API)
-                let mediaUserToken = UserDefaults.standard.string(forKey: "mediaUserToken")
-                if let mediaUserToken = mediaUserToken {
-                    print("Found media user token, length:", mediaUserToken.count)
-                } else {
-                    print("No media user token found in UserDefaults - lyrics may fail")
-                }
-
+                
                 // Fetch lyrics
                 print("About to fetch lyrics for song:", song!.title)
                 do {
-                    lyrics = try await MCatalog.lyrics(for: song!, developerToken: developerToken, mediaUserToken: mediaUserToken)
+                    lyrics = try await MCatalog.lyrics(for: song!, developerToken: developerToken)
                     print("Successfully fetched lyrics with", lyrics.count, "paragraphs")
                 } catch {
                     print("Lyrics API failed:", error.localizedDescription)

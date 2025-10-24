@@ -35,19 +35,15 @@ struct MusicLyricsRequest {
   /// The privileged developer token used to authorize the request.
   let developerToken: String
 
-  /// The media user token for user authentication.
-  let mediaUserToken: String?
-
   /// Initializes a new `MusicLyricsRequest`.
   ///
   /// - Parameters:
   ///   - songID: The identifier of the song.
   ///   - developerToken: The privileged developer token used to authorize the request.
   ///   - mediaUserToken: The media user token for user authentication (optional).
-  init(songID: MusicItemID, developerToken: String, mediaUserToken: String? = nil) {
+  init(songID: MusicItemID, developerToken: String) {
     self.songID = songID
     self.developerToken = developerToken
-    self.mediaUserToken = mediaUserToken
   }
 
   /// Sends the request and returns a response object containing the fetched lyrics.
@@ -56,7 +52,7 @@ struct MusicLyricsRequest {
   func response(countryCode: String? = nil) async throws -> MusicLyricsResponse {
     let url = try await lyricsEndpointURL(countryCode: countryCode)
     print("Requesting URL:", url)
-    let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken, mediaUserToken: mediaUserToken)
+    let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
     let response = try await request.response()
 
     print("Response status: \((response.urlResponse as? HTTPURLResponse)?.statusCode ?? -1)")
@@ -140,8 +136,8 @@ public extension MCatalog {
   ///
   /// - Important: Ensure that you have the necessary permissions and a valid developer token
   ///   before calling this method. Unauthorized or incorrect usage may result in errors or empty results.
-  static func lyrics(for song: Song, developerToken: String, mediaUserToken: String? = nil) async throws -> LyricParagraphs {
-    let request = MusicLyricsRequest(songID: song.id, developerToken: developerToken, mediaUserToken: mediaUserToken)
+  static func lyrics(for song: Song, developerToken: String) async throws -> LyricParagraphs {
+    let request = MusicLyricsRequest(songID: song.id, developerToken: developerToken)
     let response = try await request.response()
 
     guard let lyricsString = response.data.first?.attributes.ttml else {

@@ -30,6 +30,7 @@ public class LyricsParser: NSObject, XMLParserDelegate {
   private var currentSegmentStart: TimeInterval?
   private var currentSegmentEnd: TimeInterval?
   private var currentSegmentText: String = ""
+  private var pendingSpace: String = ""
 
   /// Parses the given XML string into an array of `LyricParagraph` objects.
   ///
@@ -44,6 +45,7 @@ public class LyricsParser: NSObject, XMLParserDelegate {
     currentSegmentStart = nil
     currentSegmentEnd = nil
     currentSegmentText = ""
+    pendingSpace = ""
     elementStack = []
     if let data = xmlString.data(using: .utf8) {
       let parser = XMLParser(data: data)
@@ -71,8 +73,10 @@ public class LyricsParser: NSObject, XMLParserDelegate {
     } else if elementName == "p" {
       currentLineText = ""
       currentLineSegments = []
+      pendingSpace = ""
     } else if elementName == "span" {
-      currentSegmentText = ""
+      currentSegmentText = pendingSpace  // Include any pending space at start of segment
+      pendingSpace = ""
       currentSegmentStart = attributeDict["begin"].flatMap(parseTimecode)
       currentSegmentEnd = attributeDict["end"].flatMap(parseTimecode)
     }
@@ -92,6 +96,8 @@ public class LyricsParser: NSObject, XMLParserDelegate {
         currentSegmentText += trimmed
       }
     } else if currentElement == "p" {
+      // Collect spaces between spans to be included in the next segment
+      pendingSpace += string
       appendToCurrentLineText(string)
     }
   }
