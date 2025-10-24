@@ -8,6 +8,7 @@
 import SwiftUI
 import MusadoraKit
 import MusanovaKit
+import MusicKit
 
 struct LyricsView: View {
     @State private var lyrics: LyricParagraphs = []
@@ -15,17 +16,16 @@ struct LyricsView: View {
     @State private var errorMessage: String?
     @State private var song: Song?
     @State private var currentTime: TimeInterval = 0
-    @State private var timer: Timer?
     @State private var isPlaying = false
     @State private var artworkURL: URL?
 
-    // Hardcoded song ID from the test file
+    private let player = ApplicationMusicPlayer.shared
+
     private let songID = MusicItemID("1837754303")
 
     var body: some View {
         NavigationStack {
             ZStack {
-                // Blurred artwork background
                 if let artworkURL = artworkURL {
                     AsyncImage(url: artworkURL) { image in
                         image
@@ -37,7 +37,6 @@ struct LyricsView: View {
                                 Color.black.opacity(0.7)
                             )
                     } placeholder: {
-                        // Fallback gradient while loading
                         LinearGradient(
                             gradient: Gradient(colors: [
                                 Color.black.opacity(0.9),
@@ -50,7 +49,6 @@ struct LyricsView: View {
                     }
                     .ignoresSafeArea()
                 } else {
-                    // Fallback gradient when no artwork
                     LinearGradient(
                         gradient: Gradient(colors: [
                             Color.black.opacity(0.9),
@@ -101,7 +99,6 @@ struct LyricsView: View {
                         }
                         .frame(maxHeight: .infinity)
                     } else {
-                        // Song info header
                         if let song = song {
                             VStack(spacing: 8) {
                                 Text(song.title)
@@ -123,7 +120,6 @@ struct LyricsView: View {
                             .padding(.bottom, 10)
                         }
 
-                        // Lyrics content
                         ScrollViewReader { proxy in
                             ScrollView(showsIndicators: false) {
                                 VStack(spacing: 24) {
@@ -144,7 +140,6 @@ struct LyricsView: View {
                                 .padding(.vertical, 20)
                             }
                             .onChange(of: currentTime) { oldValue, newValue in
-                                // Auto-scroll to current line
                                 if let currentLine = findCurrentLine(at: newValue) {
                                     withAnimation(.easeInOut(duration: 0.3)) {
                                         proxy.scrollTo(currentLine.id, anchor: .center)
@@ -153,7 +148,6 @@ struct LyricsView: View {
                             }
                         }
 
-                        // Playback controls (simplified)
                         HStack(spacing: 40) {
                             Button(action: togglePlayback) {
                                 Image(systemName: isPlaying ? "pause.fill" : "play.fill")
@@ -178,7 +172,7 @@ struct LyricsView: View {
             loadSongAndLyrics()
         }
         .onDisappear {
-            stopTimer()
+            player.stop()
         }
     }
 
@@ -189,17 +183,14 @@ struct LyricsView: View {
 
             do {
                 print("Starting to load song with ID:", songID.rawValue)
-                // Fetch song details
                 song = try await MCatalog.song(id: songID)
                 print("Successfully fetched song:", song?.title ?? "Unknown title")
 
-                // Extract artwork URL
                 if let song = song, let artworkURL = song.artwork?.url(width: 1000, height: 1000) {
                     self.artworkURL = artworkURL
                     print("Artwork URL:", artworkURL.absoluteString)
                 }
 
-                // Get developer token
                 guard let developerToken = UserDefaults.standard.string(forKey: "developerToken"), !developerToken.isEmpty else {
                     print("No developer token found in UserDefaults")
                     errorMessage = "Developer token is required. Please set it in Settings."
@@ -207,8 +198,7 @@ struct LyricsView: View {
                     return
                 }
                 print("Found developer token, length:", developerToken.count)
-                
-                // Fetch lyrics
+
                 print("About to fetch lyrics for song:", song!.title)
                 do {
                     lyrics = try await MCatalog.lyrics(for: song!, developerToken: developerToken)
@@ -240,32 +230,42 @@ struct LyricsView: View {
     }
 
     private func togglePlayback() {
-        isPlaying.toggle()
-
-        if isPlaying {
-            startTimer()
-        } else {
-            stopTimer()
+        Task {
+            do {
+                if isPlaying {
+                    player.stop()
+                    isPlaying = false
+                } else {
+                    if let song = song {
+                        player.queue = [song]
+                        try await player.play()
+                        isPlaying = true
+                        startPlaybackObserver()
+                    }
+                }
+            } catch {
+                print("Playback error:", error.localizedDescription)
+                errorMessage = "Failed to play song: \(error.localizedDescription)"
+                isPlaying = false
+            }
         }
     }
 
     private func resetPlayback() {
-        stopTimer()
+        player.stop()
         currentTime = 0
         isPlaying = false
+        player.playbackTime = 0
     }
 
-    private func startTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
-            currentTime += 0.1
+    private func startPlaybackObserver() {
+        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+            Task { @MainActor in
+                currentTime = player.playbackTime
+                isPlaying = player.state.playbackStatus == .playing
+            }
         }
     }
-
-    private func stopTimer() {
-        timer?.invalidate()
-        timer = nil
-    }
-
 
     private func findCurrentLine(at time: TimeInterval) -> LyricLine? {
         for paragraph in lyrics {
@@ -296,7 +296,6 @@ struct LyricLineView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // Display line text with karaoke highlighting
             HStack(spacing: 0) {
                 ForEach(line.segments) { segment in
                     Text(segment.text)
@@ -317,11 +316,11 @@ struct LyricLineView: View {
         }
 
         if currentTime >= segment.startTime && currentTime <= segment.endTime {
-            return .purple // Highlighted color for current segment
+            return .purple
         } else if currentTime > segment.endTime {
-            return .white.opacity(0.8) // Already sung
+            return .white.opacity(0.8)
         } else {
-            return .white.opacity(0.6) // Not yet sung
+            return .white.opacity(0.6)
         }
     }
 }
