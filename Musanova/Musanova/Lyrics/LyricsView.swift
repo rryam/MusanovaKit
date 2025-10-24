@@ -18,8 +18,8 @@ struct LyricsView: View {
     @State private var timer: Timer?
     @State private var isPlaying = false
 
-    // Hardcoded song ID from the provided URL
-    private let songID = MusicItemID("1837754303")
+    // Hardcoded song ID that has working lyrics
+    private let songID = MusicItemID("1422648824")
 
     var body: some View {
         NavigationStack {
