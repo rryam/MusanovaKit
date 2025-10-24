@@ -139,7 +139,7 @@ struct LyricsView: View {
                                 .padding(.horizontal, 20)
                                 .padding(.vertical, 20)
                             }
-                            .onChange(of: currentTime) { oldValue, newValue in
+                            .onChange(of: currentTime) { _, newValue in
                                 if let currentLine = findCurrentLine(at: newValue) {
                                     withAnimation(.easeInOut(duration: 0.3)) {
                                         proxy.scrollTo(currentLine.id, anchor: .center)
@@ -191,7 +191,8 @@ struct LyricsView: View {
                     print("Artwork URL:", artworkURL.absoluteString)
                 }
 
-                guard let developerToken = UserDefaults.standard.string(forKey: "developerToken"), !developerToken.isEmpty else {
+                guard let developerToken = UserDefaults.standard.string(forKey: "developerToken"),
+                      !developerToken.isEmpty else {
                     print("No developer token found in UserDefaults")
                     errorMessage = "Developer token is required. Please set it in Settings."
                     isLoading = false
@@ -212,9 +213,12 @@ struct LyricsView: View {
                 switch lyricsError {
                 case .apiError(let detail):
                     if detail.contains("No related resources found") {
-                        errorMessage = "Lyrics are not available for this song. The Apple Music lyrics API may be temporarily unavailable or this song may not have lyrics."
+                        errorMessage = "Lyrics are not available for this song. " +
+                            "The Apple Music lyrics API may be temporarily unavailable " +
+                            "or this song may not have lyrics."
                     } else if detail.contains("Empty response") {
-                        errorMessage = "Unable to fetch lyrics. This may be due to authentication issues or the song not having lyrics available."
+                        errorMessage = "Unable to fetch lyrics. " +
+                            "This may be due to authentication issues or the song not having lyrics available."
                     } else {
                         errorMessage = detail
                     }
