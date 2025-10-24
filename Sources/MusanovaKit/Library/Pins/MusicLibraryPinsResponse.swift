@@ -79,4 +79,4 @@ public struct MusicLibraryPinsResponse: Decodable, Sendable {
 ///         print("Pin: \(pin.attributes.name ?? "Unknown")")
 ///     }
 ///
-public typealias LibraryPins = [LibraryPin]
+public typealias LibraryPins = MusicItemCollection<LibraryPin>
