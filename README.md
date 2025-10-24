@@ -18,6 +18,9 @@ MusanovaKit lets you explore Apple Music features that are not exposed through t
 - [Replay and Summaries](#replay-and-summaries)
   - [Milestones](#milestones)
   - [Searching replay playlists](#searching-replay-playlists)
+- [Library Pins](#library-pins)
+  - [Fetching pinned items](#fetching-pinned-items)
+  - [Custom pin requests](#custom-pin-requests)
 - [Disclaimer](#disclaimer)
 
 ## Exploring MusicKit and Apple Music API Book
@@ -141,6 +144,56 @@ for summary in results {
     print("Year: \(summary.year) → playlist: \(summary.playlist)")
 }
 ```
+
+## Library Pins
+
+MusanovaKit provides access to the user's pinned items in their Apple Music library. Pinned items represent content that users have marked as favorites or important, and may appear prominently in the Apple Music interface.
+
+### Fetching pinned items
+
+```swift
+let pins = try await MLibrary.pins(developerToken: token, limit: 25)
+
+for pin in pins {
+    print("Pinned: \(pin.attributes.name ?? "Unknown") - Type: \(pin.type)")
+    if let relationships = pin.relationships {
+        print("Related albums: \(relationships.albums?.count ?? 0)")
+        print("Related artists: \(relationships.artists?.count ?? 0)")
+    }
+}
+```
+
+The `pins()` method returns an array of `LibraryPin` objects, each containing:
+- `id`: The music item identifier
+- `type`: The type of content (song, artist, album, etc.)
+- `attributes`: Name, artwork, and metadata
+- `relationships`: Related content (albums, artists, playlists)
+
+### Custom pin requests
+
+For full control over the request parameters, create a configuration object and pass it to the method:
+
+```swift
+var configuration = MusicLibraryPinsRequest(developerToken: token)
+configuration.limit = 50
+configuration.language = "es-ES"
+configuration.librarySongIncludes = ["albums", "artists"]
+configuration.libraryArtistIncludes = ["catalog"]
+
+let response = try await MLibrary.pins(configuration: configuration)
+
+// Access the raw response data
+for (key, pin) in response.pins {
+    print("Pin \(key): \(pin.attributes.name ?? "Unknown")")
+}
+```
+
+Available configuration options:
+- `limit`: Maximum number of pins to return (default: 25)
+- `language`: Language/locale for the request (default: "en-GB")
+- `librarySongIncludes`: Relationships to include for songs
+- `libraryArtistIncludes`: Relationships to include for artists
+- `libraryMusicVideoIncludes`: Relationships to include for music videos
 
 ## Disclaimer
 
