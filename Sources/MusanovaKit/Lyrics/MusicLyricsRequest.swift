@@ -7,6 +7,25 @@
 
 import Foundation
 
+/// Represents an error response from the Apple Music API.
+public struct MusicErrorResponse: Codable {
+  let errors: [MusicError]
+}
+
+/// Represents a single error from the Apple Music API.
+public struct MusicError: Codable {
+  let id: String
+  let title: String
+  let detail: String
+  let status: String
+  let code: String
+}
+
+/// Errors that can occur during lyrics operations.
+public enum LyricsError: Error {
+  case apiError(String)
+}
+
 /// A request object used to fetch lyrics for a specified song.
 struct MusicLyricsRequest {
 
@@ -35,12 +54,19 @@ struct MusicLyricsRequest {
     let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
     let response = try await request.response()
 
-
     if let jsonString = String(data: response.data, encoding: .utf8) {
-      print("Raw JSON received:")
+      print("Raw response received:")
       print(jsonString)
     }
 
+    // First try to decode as error response
+    if let errorResponse = try? JSONDecoder().decode(MusicErrorResponse.self, from: response.data) {
+      if let error = errorResponse.errors.first {
+        throw LyricsError.apiError(error.detail)
+      }
+    }
+
+    // If not an error, try to decode as successful response
     let lyricsResponse = try JSONDecoder().decode(MusicLyricsResponse.self, from: response.data)
     return lyricsResponse
   }

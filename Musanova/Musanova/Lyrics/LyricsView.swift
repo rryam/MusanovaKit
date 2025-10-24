@@ -19,7 +19,7 @@ struct LyricsView: View {
     @State private var isPlaying = false
 
     // Hardcoded song ID from the provided URL
-    private let songID = MusicItemID("1770187510")
+    private let songID = MusicItemID("1837754303")
 
     var body: some View {
         NavigationStack {
@@ -174,6 +174,16 @@ struct LyricsView: View {
                 // Fetch lyrics
                 lyrics = try await MCatalog.lyrics(for: song!, developerToken: developerToken)
 
+            } catch let lyricsError as LyricsError {
+                switch lyricsError {
+                case .apiError(let detail):
+                    if detail.contains("No related resources found") {
+                        errorMessage = "Lyrics are not available for this song. The Apple Music lyrics API may be temporarily unavailable or this song may not have lyrics."
+                    } else {
+                        errorMessage = detail
+                    }
+                }
+                print("Lyrics error:", lyricsError)
             } catch {
                 errorMessage = error.localizedDescription
                 print("Lyrics error:", error)
