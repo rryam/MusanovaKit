@@ -24,6 +24,25 @@ struct LyricsView: View {
 
     private let songID = MusicItemID("1837754303")
 
+    /// Flattened array of all lyric lines sorted by time for efficient binary search
+    private var flattenedLyrics: [LyricLine] {
+        lyrics.flatMap { $0.lines }
+    }
+
+    @ViewBuilder
+    private var backgroundGradient: some View {
+        LinearGradient(
+            gradient: Gradient(colors: [
+                Color.black.opacity(0.9),
+                Color.purple.opacity(0.3),
+                Color.black.opacity(0.9)
+            ]),
+            startPoint: .top,
+            endPoint: .bottom
+        )
+        .ignoresSafeArea()
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -38,28 +57,10 @@ struct LyricsView: View {
                                 Color.black.opacity(0.7)
                             )
                     } placeholder: {
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color.black.opacity(0.9),
-                                Color.purple.opacity(0.3),
-                                Color.black.opacity(0.9)
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
+                        backgroundGradient
                     }
-                    .ignoresSafeArea()
                 } else {
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            Color.black.opacity(0.9),
-                            Color.purple.opacity(0.3),
-                            Color.black.opacity(0.9)
-                        ]),
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .ignoresSafeArea()
+                    backgroundGradient
                 }
 
                 VStack(spacing: 0) {
@@ -184,11 +185,9 @@ struct LyricsView: View {
             errorMessage = nil
 
             do {
-                song = try await MCatalog.song(id: songID)
-
-                if let song = song, let artworkURL = song.artwork?.url(width: 1000, height: 1000) {
-                    self.artworkURL = artworkURL
-                }
+                let fetchedSong = try await MCatalog.song(id: songID)
+                self.song = fetchedSong
+                self.artworkURL = fetchedSong.artwork?.url(width: 1000, height: 1000)
 
                 guard let developerToken = UserDefaults.standard.string(forKey: "developerToken"),
                       !developerToken.isEmpty else {
@@ -197,11 +196,7 @@ struct LyricsView: View {
                     return
                 }
 
-                do {
-                    lyrics = try await MCatalog.lyrics(for: song!, developerToken: developerToken)
-                } catch {
-                    throw error
-                }
+                self.lyrics = try await MCatalog.lyrics(for: fetchedSong, developerToken: developerToken)
 
             } catch let lyricsError as LyricsError {
                 switch lyricsError {
@@ -258,11 +253,17 @@ struct LyricsView: View {
     private func startPlaybackObserver() {
         invalidatePlaybackTimer()
 
-        playbackTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+        playbackTimer = Timer(timeInterval: 0.1, repeats: true) { _ in
             Task { @MainActor in
-                currentTime = player.playbackTime
-                isPlaying = player.state.playbackStatus == .playing
+                self.currentTime = self.player.playbackTime
+                self.isPlaying = self.player.state.playbackStatus == .playing
             }
+        }
+
+        if let timer = playbackTimer {
+            // Schedule on main run loop to ensure it fires correctly,
+            // especially when called from a background task.
+            RunLoop.main.add(timer, forMode: .common)
         }
     }
 
@@ -272,15 +273,36 @@ struct LyricsView: View {
     }
 
     private func findCurrentLine(at time: TimeInterval) -> LyricLine? {
-        for paragraph in lyrics {
-            for line in paragraph.lines {
-                if let lastSegment = line.segments.last {
-                    if time >= line.segments.first?.startTime ?? 0 && time <= lastSegment.endTime {
-                        return line
-                    }
-                }
+        let lines = flattenedLyrics
+        guard !lines.isEmpty else { return nil }
+
+        var left = 0
+        var right = lines.count - 1
+
+        while left <= right {
+            let mid = (left + right) / 2
+            let line = lines[mid]
+
+            guard let firstSegment = line.segments.first,
+                  let lastSegment = line.segments.last else {
+                return nil
+            }
+
+            let lineStartTime = firstSegment.startTime
+            let lineEndTime = lastSegment.endTime
+
+            if time >= lineStartTime && time <= lineEndTime {
+                // Found the current line
+                return line
+            } else if time < lineStartTime {
+                // Time is before this line's range, search left half
+                right = mid - 1
+            } else {
+                // Time is after this line's range, search right half
+                left = mid + 1
             }
         }
+
         return nil
     }
 }
