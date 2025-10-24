@@ -28,58 +28,34 @@ public enum LyricsError: Error {
 
 /// A request object used to fetch lyrics for a specified song.
 struct MusicLyricsRequest {
-
   /// The identifier of the song.
   let songID: MusicItemID
 
   /// The privileged developer token used to authorize the request.
   let developerToken: String
 
-  /// Initializes a new `MusicLyricsRequest`.
-  ///
-  /// - Parameters:
-  ///   - songID: The identifier of the song.
-  ///   - developerToken: The privileged developer token used to authorize the request.
-  ///   - mediaUserToken: The media user token for user authentication (optional).
-  init(songID: MusicItemID, developerToken: String) {
-    self.songID = songID
-    self.developerToken = developerToken
-  }
-
   /// Sends the request and returns a response object containing the fetched lyrics.
   ///
   /// - Returns: A `LyricsResponse` object.
   func response(countryCode: String? = nil) async throws -> MusicLyricsResponse {
     let url = try await lyricsEndpointURL(countryCode: countryCode)
-    print("Requesting URL:", url)
     let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
     let response = try await request.response()
 
-    print("Response status: \((response.urlResponse as? HTTPURLResponse)?.statusCode ?? -1)")
-    print("Response data size: \(response.data.count) bytes")
-
     if response.data.isEmpty {
-      print("Response data is empty!")
       throw LyricsError.apiError("Empty response from lyrics API")
     }
 
-    if let jsonString = String(data: response.data, encoding: .utf8) {
-      print("Raw response received:")
-      print(jsonString.prefix(500)) // Limit output to first 500 chars
-    } else {
-      print("Response data is not valid UTF-8!")
+    guard String(data: response.data, encoding: .utf8) != nil else {
       throw LyricsError.apiError("Invalid response format from lyrics API")
     }
 
-    // First try to decode as error response
     if let errorResponse = try? JSONDecoder().decode(MusicErrorResponse.self, from: response.data) {
       if let error = errorResponse.errors.first {
-        print("API returned error: \(error.detail)")
         throw LyricsError.apiError(error.detail)
       }
     }
 
-    // If not an error, try to decode as successful response
     let lyricsResponse = try JSONDecoder().decode(MusicLyricsResponse.self, from: response.data)
     return lyricsResponse
   }

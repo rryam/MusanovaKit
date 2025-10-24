@@ -49,7 +49,7 @@ public struct MusicPrivilegedDataRequest {
             urlRequest.setValue(host, forHTTPHeaderField: "Host")
         }
 
-        var request = MDataRequest(urlRequest: urlRequest, developerToken: developerToken)
+        let request = MDataRequest(urlRequest: urlRequest, developerToken: developerToken)
         
         let response = try await request.response()
         return response

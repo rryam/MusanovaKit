@@ -184,31 +184,23 @@ struct LyricsView: View {
             errorMessage = nil
 
             do {
-                print("Starting to load song with ID:", songID.rawValue)
                 song = try await MCatalog.song(id: songID)
-                print("Successfully fetched song:", song?.title ?? "Unknown title")
 
                 if let song = song, let artworkURL = song.artwork?.url(width: 1000, height: 1000) {
                     self.artworkURL = artworkURL
-                    print("Artwork URL:", artworkURL.absoluteString)
                 }
 
                 guard let developerToken = UserDefaults.standard.string(forKey: "developerToken"),
                       !developerToken.isEmpty else {
-                    print("No developer token found in UserDefaults")
                     errorMessage = "Developer token is required. Please set it in Settings."
                     isLoading = false
                     return
                 }
-                print("Found developer token, length:", developerToken.count)
 
-                print("About to fetch lyrics for song:", song!.title)
                 do {
                     lyrics = try await MCatalog.lyrics(for: song!, developerToken: developerToken)
-                    print("Successfully fetched lyrics with", lyrics.count, "paragraphs")
                 } catch {
-                    print("Lyrics API failed:", error.localizedDescription)
-                    throw error // Let it be handled by the outer catch blocks
+                    throw error
                 }
 
             } catch let lyricsError as LyricsError {
@@ -225,10 +217,8 @@ struct LyricsView: View {
                         errorMessage = detail
                     }
                 }
-                print("Lyrics error:", lyricsError)
             } catch {
                 errorMessage = error.localizedDescription
-                print("Lyrics error:", error)
             }
 
             isLoading = false
@@ -251,7 +241,6 @@ struct LyricsView: View {
                     }
                 }
             } catch {
-                print("Playback error:", error.localizedDescription)
                 errorMessage = "Failed to play song: \(error.localizedDescription)"
                 isPlaying = false
             }
