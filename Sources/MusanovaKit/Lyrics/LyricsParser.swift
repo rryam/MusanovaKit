@@ -25,12 +25,17 @@ public class LyricsParser: NSObject, XMLParserDelegate {
   /// The element stack to track the current parsing context.
   private var elementStack: [String] = []
 
-  private var currentLineText: String = ""
+  private struct LineToken {
+    let text: String
+    let needsLeadingSpace: Bool
+  }
+
+  private var currentLineTokens: [LineToken] = []
   private var currentLineSegments: [LyricSegment] = []
   private var currentSegmentStart: TimeInterval?
   private var currentSegmentEnd: TimeInterval?
   private var currentSegmentText: String = ""
-  private var pendingSpace: String = ""
+  private var hasPendingWhitespace: Bool = false
 
   /// Parses the given XML string into an array of `LyricParagraph` objects.
   ///
@@ -40,12 +45,12 @@ public class LyricsParser: NSObject, XMLParserDelegate {
     paragraphs = []
     currentParagraph = []
     currentSongPart = nil
-    currentLineText = ""
+    currentLineTokens = []
     currentLineSegments = []
     currentSegmentStart = nil
     currentSegmentEnd = nil
     currentSegmentText = ""
-    pendingSpace = ""
+    hasPendingWhitespace = false
     elementStack = []
     if let data = xmlString.data(using: .utf8) {
       let parser = XMLParser(data: data)
@@ -71,12 +76,11 @@ public class LyricsParser: NSObject, XMLParserDelegate {
       currentSongPart = attributeDict["itunes:songPart"]
       currentParagraph = []
     } else if elementName == "p" {
-      currentLineText = ""
+      currentLineTokens = []
       currentLineSegments = []
-      pendingSpace = ""
+      hasPendingWhitespace = false
     } else if elementName == "span" {
-      currentSegmentText = pendingSpace  // Include any pending space at start of segment
-      pendingSpace = ""
+      currentSegmentText = ""
       currentSegmentStart = attributeDict["begin"].flatMap(parseTimecode)
       currentSegmentEnd = attributeDict["end"].flatMap(parseTimecode)
     }
@@ -91,14 +95,22 @@ public class LyricsParser: NSObject, XMLParserDelegate {
     guard let currentElement = elementStack.last else { return }
 
     if currentElement == "span" {
-      let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
-      if !trimmed.isEmpty {
-        currentSegmentText += trimmed
+      let normalized = normalizeSpanText(string)
+      if !normalized.isEmpty {
+        if !currentSegmentText.isEmpty {
+          currentSegmentText += " "
+        }
+        currentSegmentText += normalized
+      } else if string.containsWhitespaceOnly {
+        hasPendingWhitespace = true
       }
     } else if currentElement == "p" {
-      // Collect spaces between spans to be included in the next segment
-      pendingSpace += string
-      appendToCurrentLineText(string)
+      let normalized = normalizePlainText(string)
+      if !normalized.isEmpty {
+        appendToCurrentLineTokens(normalized)
+      } else if string.containsWhitespaceOnly {
+        hasPendingWhitespace = true
+      }
     }
   }
 
@@ -118,24 +130,24 @@ public class LyricsParser: NSObject, XMLParserDelegate {
     } else if elementName == "span" {
       let start = currentSegmentStart ?? 0
       let end = currentSegmentEnd ?? start
-      if !currentSegmentText.isEmpty {
-        let segment = LyricSegment(text: currentSegmentText, startTime: start, endTime: end)
+      let trimmedText = currentSegmentText.trimmingCharacters(in: .whitespacesAndNewlines)
+      if !trimmedText.isEmpty {
+        let segment = LyricSegment(text: trimmedText, startTime: start, endTime: end)
         currentLineSegments.append(segment)
-        appendToCurrentLineText(segment.text)
+        appendToCurrentLineTokens(trimmedText)
       }
       currentSegmentText = ""
       currentSegmentStart = nil
       currentSegmentEnd = nil
+      hasPendingWhitespace = false
     } else if elementName == "p" {
-      let trimmedText = currentLineText.trimmingCharacters(in: .whitespacesAndNewlines)
-      let lineText = trimmedText.isEmpty && !currentLineSegments.isEmpty
-        ? currentLineSegments.map { $0.text }.joined(separator: " ")
-        : trimmedText
+      let lineText = assembledLineText()
 
       let line = LyricLine(text: lineText, segments: currentLineSegments)
       currentParagraph.append(line)
-      currentLineText = ""
+      currentLineTokens = []
       currentLineSegments = []
+      hasPendingWhitespace = false
     }
     if !elementStack.isEmpty {
       elementStack.removeLast()
@@ -166,14 +178,59 @@ public class LyricsParser: NSObject, XMLParserDelegate {
     return TimeInterval(hours * 3600 + minutes * 60) + seconds
   }
 
-  private func appendToCurrentLineText(_ string: String) {
-    let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
-    guard !trimmed.isEmpty else { return }
+  private func appendToCurrentLineTokens(_ text: String) {
+    guard !text.isEmpty else { return }
 
-    if currentLineText.isEmpty {
-      currentLineText = trimmed
-    } else {
-      currentLineText += " " + trimmed
+    let needsSpace = hasPendingWhitespace && !currentLineTokens.isEmpty
+    currentLineTokens.append(LineToken(text: text, needsLeadingSpace: needsSpace))
+    hasPendingWhitespace = false
+  }
+
+  private func assembledLineText() -> String {
+    currentLineTokens.reduce(into: "") { result, token in
+      guard !token.text.isEmpty else { return }
+
+      if result.isEmpty {
+        result = token.text
+        return
+      }
+
+      let avoidSpace = shouldAvoidPrecedingSpace(before: token.text)
+      if token.needsLeadingSpace && !avoidSpace && !result.hasSuffix(" ") {
+        result += " "
+      }
+
+      if !token.needsLeadingSpace && !avoidSpace && !result.hasSuffix(" ") {
+        result += " "
+      }
+
+      result += token.text
     }
+  }
+
+  private func normalizeSpanText(_ string: String) -> String {
+    string.collapsingWhitespace()
+  }
+
+  private func normalizePlainText(_ string: String) -> String {
+    string.collapsingWhitespace()
+  }
+
+  private func shouldAvoidPrecedingSpace(before token: String) -> Bool {
+    guard let first = token.first else { return false }
+    return ",.!?:;)]}".contains(first)
+  }
+}
+
+private extension String {
+  func collapsingWhitespace() -> String {
+    guard !isEmpty else { return self }
+
+    let collapsed = replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+    return collapsed.trimmingCharacters(in: .whitespacesAndNewlines)
+  }
+
+  var containsWhitespaceOnly: Bool {
+    !isEmpty && allSatisfy { $0.isWhitespace }
   }
 }

@@ -12,7 +12,7 @@ import Foundation
 public struct MusanovaKit {}
 
 extension MusanovaKit {
-  public static var priviledgedDeveloperToken: String? {
+  public static var privilegedDeveloperToken: String? {
     ProcessInfo.processInfo.environment["DEVELOPER_TOKEN"]
   }
 }
