@@ -9,12 +9,14 @@ import SwiftUI
 
 struct SettingsView: View {
   var body: some View {
-    NavigationListStack("Settings") {
-      Text("Made for [MusadoraKit](https://github.com/rryam/MusadoraKit). Go ⭐️ it!")
-
-      Text("Made by [Rudrank Riyam](https://twitter.com/rudrankriyam). Go follow him!")
+    NavigationStack {
+      List {
+        Text("Made for [MusadoraKit](https://github.com/rryam/MusadoraKit). Go ⭐️ it!")
+        Text("Made by [Rudrank Riyam](https://twitter.com/rudrankriyam). Go follow him!")
+      }
+      .navigationTitle("Settings")
     }
-    .tint(.indigo)
+    .tint(Color.indigo)
   }
 }
 

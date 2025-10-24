@@ -11,11 +11,10 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/rryam/MusadoraKit", branch: "main"),
-        .package(path: "Packages/SwiftLintPlugin"),
         .package(url: "https://github.com/apple/swift-testing", from: "0.9.0")
     ],
     targets: [
-        .target(name: "MusanovaKit", dependencies: ["MusadoraKit"], plugins: [.plugin(name: "SwiftLint", package: "SwiftLintPlugin")]),
+        .target(name: "MusanovaKit", dependencies: ["MusadoraKit"]),
         .testTarget(
             name: "MusanovaKitTests",
             dependencies: [
