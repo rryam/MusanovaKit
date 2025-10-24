@@ -18,6 +18,9 @@ MusanovaKit lets you explore Apple Music features that are not exposed through t
 - [Replay and Summaries](#replay-and-summaries)
   - [Milestones](#milestones)
   - [Searching replay playlists](#searching-replay-playlists)
+- [Library Pins](#library-pins)
+  - [Fetching pinned items](#fetching-pinned-items)
+  - [Custom pin requests](#custom-pin-requests)
 - [Disclaimer](#disclaimer)
 
 ## Exploring MusicKit and Apple Music API Book
@@ -141,6 +144,100 @@ for summary in results {
     print("Year: \(summary.year) → playlist: \(summary.playlist)")
 }
 ```
+
+## Library Pins
+
+MusanovaKit provides access to the user's pinned items in their Apple Music library. Pinned items represent content that users have marked as favorites or important, and may appear prominently in the Apple Music interface.
+
+### Fetching pinned items
+
+```swift
+let response = try await MLibrary.pins(developerToken: token, limit: 25)
+
+for pinRef in response.data {
+    print("Pinned: \(pinRef.id) - Type: \(pinRef.type)")
+}
+
+// Access detailed resources
+if let albums = response.resources?.libraryAlbums {
+    for (id, album) in albums {
+        print("Album: \(album.attributes?.name ?? "Unknown") by \(album.attributes?.artistName ?? "Unknown")")
+    }
+}
+
+if let songs = response.resources?.librarySongs {
+    for (id, song) in songs {
+        print("Song: \(song.attributes?.name ?? "Unknown") by \(song.attributes?.artistName ?? "Unknown")")
+    }
+}
+```
+
+The `pins()` method returns a `MusicLibraryPinsResponse` containing:
+- `data`: Array of pin references with basic information
+- `resources`: Detailed information about pinned items organized by type
+
+### Custom pin requests
+
+For full control over the request parameters, create a configuration object and pass it to the method:
+
+```swift
+var configuration = MusicLibraryPinsRequest(developerToken: token)
+configuration.limit = 50
+configuration.language = "es-ES"
+configuration.librarySongIncludes = ["albums", "artists"]
+configuration.libraryArtistIncludes = ["catalog"]
+
+let response = try await MLibrary.pins(configuration: configuration)
+
+// Access the raw response data
+for pinRef in response.data {
+    print("Pinned: \(pinRef.id) of type \(pinRef.type)")
+}
+```
+
+### Pinning and unpinning items
+
+Pin and unpin albums, songs, artists, and playlists to/from the user's Apple Music library:
+
+```swift
+// Pin items
+let album: Album = // ... fetched album
+try await MLibrary.pin(album, developerToken: token)
+
+let song: Song = // ... fetched song
+try await MLibrary.pin(song, developerToken: token)
+
+let playlist: Playlist = // ... fetched playlist
+try await MLibrary.pin(playlist, developerToken: token)
+
+let artist: Artist = // ... fetched artist
+try await MLibrary.pin(artist, developerToken: token)
+
+// Unpin items
+try await MLibrary.unpin(album, developerToken: token)
+try await MLibrary.unpin(song, developerToken: token)
+try await MLibrary.unpin(playlist, developerToken: token)
+try await MLibrary.unpin(artist, developerToken: token)
+```
+
+All `Album`, `Song`, `Playlist`, and `Artist` types conform to the `Pinnable` protocol, allowing them to be used with the `pin(_:developerToken:)` and `unpin(_:developerToken:)` methods.
+
+The `Pinnable` protocol is defined as:
+
+```swift
+/// A protocol that represents a music item that can be pinned to the user's Apple Music library.
+///
+/// This protocol includes the requirement that items must be music items that can be identified
+/// and pinned through Apple's private API endpoints.
+public protocol Pinnable: MusicItem {}
+```
+
+Available configuration options:
+- `limit`: Maximum number of pins to return (default: 25)
+- `language`: Language/locale for the request (default: "en-GB")
+- `librarySongIncludes`: Relationships to include for songs
+- `libraryArtistIncludes`: Relationships to include for artists
+- `libraryMusicVideoIncludes`: Relationships to include for music videos
 
 ## Disclaimer
 
