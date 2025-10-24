@@ -42,39 +42,21 @@ struct ReplayView: View {
       }
 
       if viewModel.isEligible && !viewModel.title.isEmpty {
-        VStack(alignment: .leading, spacing: 4) {
-          Text(viewModel.title)
-            .font(.headline)
-          if let subtitle = viewModel.subtitle {
-            Text(subtitle)
-              .font(.subheadline)
+        Section {
+          VStack(alignment: .leading, spacing: 8) {
+            Text(viewModel.title)
+              .font(.headline)
+            if let subtitle = viewModel.subtitle {
+              Text(subtitle)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            }
+            Text("Open in Apple Music to view your personalized replay playlist")
+              .font(.caption)
               .foregroundStyle(.secondary)
+              .padding(.top, 4)
           }
-        }
-        .padding(.vertical, 8)
-
-        if !viewModel.topSongs.isEmpty {
-          Section("Top Songs (\(viewModel.topSongs.count))") {
-            ForEach(viewModel.topSongs.prefix(10)) { song in
-              ReplayListItem(item: song, type: .song)
-            }
-          }
-        }
-
-        if !viewModel.topAlbums.isEmpty {
-          Section("Top Albums (\(viewModel.topAlbums.count))") {
-            ForEach(viewModel.topAlbums.prefix(10)) { album in
-              ReplayListItem(item: album, type: .album)
-            }
-          }
-        }
-
-        if !viewModel.topArtists.isEmpty {
-          Section("Top Artists (\(viewModel.topArtists.count))") {
-            ForEach(viewModel.topArtists.prefix(10)) { artist in
-              ReplayListItem(item: artist, type: .artist)
-            }
-          }
+          .padding(.vertical, 4)
         }
       }
     }

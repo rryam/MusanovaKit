@@ -7,7 +7,6 @@
 
 import Foundation
 import MusanovaKit
-import MusadoraKit
 import MusicKit
 import Observation
 
@@ -16,9 +15,6 @@ import Observation
 class ReplayViewModel {
   var selectedYear: Int?
   var availableYears: [Int] = []
-  var topArtists: Artists = []
-  var topAlbums: Albums = []
-  var topSongs: Songs = []
   var title: String = ""
   var subtitle: String?
   var isEligible: Bool = false
@@ -95,9 +91,6 @@ class ReplayViewModel {
       print("[Replay] Error type: \(type(of: error))")
       print("[Replay] Error description: \(error.localizedDescription)")
       errorMessage = "Could not load Replay (\(error.localizedDescription))."
-      topArtists = []
-      topAlbums = []
-      topSongs = []
       isEligible = false
     }
   }
@@ -106,60 +99,14 @@ class ReplayViewModel {
     guard let year = selectedYear else { return }
     guard let summary = summaries.first(where: { $0.year == year }) else { return }
     
-    do {
-      print("[Replay] Fetching songs for year \(year)")
-      
-      let playlist = try await MCatalog.playlist(id: summary.playlist.id, fetch: .tracks)
-      
-      let tracks = Array(playlist.tracks ?? [])
-      print("[Replay] Fetched \(tracks.count) tracks from playlist")
-      
-      // Extract songs from tracks
-      let songs: [Song] = tracks.compactMap { track -> Song? in
-        switch track {
-        case .song(let song):
-          return song
-        default:
-          return nil
-        }
-      }
-      
-      topSongs = MusicItemCollection(songs)
-      print("[Replay] Extracted \(songs.count) songs from tracks")
-      
-      // Extract unique artists and albums
-      var artistDict: [String: Artist] = [:]
-      var albumDict: [String: Album] = [:]
-      
-      for song in songs {
-        // Fetch full song details to get artist and album info
-        var songRequest = MusicCatalogResourceRequest<Song>(matching: \.id, equalTo: song.id)
-        songRequest.properties = [.artists, .albums]
-        do {
-          let response = try await songRequest.response()
-          if let fullSong = response.items.first {
-            if let artist = fullSong.artists?.first {
-              artistDict[artist.id.rawValue] = artist
-            }
-            if let album = fullSong.albums?.first {
-              albumDict[album.id.rawValue] = album
-            }
-          }
-        } catch {
-          print("[Replay] Error fetching song details: \(error)")
-        }
-      }
-      
-      topArtists = MusicItemCollection(Array(artistDict.values))
-      topAlbums = MusicItemCollection(Array(albumDict.values))
-      
-      print("[Replay] Extracted \(topArtists.count) artists and \(topAlbums.count) albums")
-      
-      title = "Year: \(year)"
-      subtitle = summary.playlist.name
-      
-    } catch {
-      print("[Replay] Error loading playlist songs: \(error)")
-    }
+    print("[Replay] ===== Summary for Year \(year) =====")
+    print("[Replay] Playlist ID: \(summary.playlist.id)")
+    print("[Replay] Playlist Name: \(summary.playlist.name)")
+    print("[Replay] Playlist Description: \(summary.playlist.description ?? "N/A")")
+    print("[Replay] Full Summary: \(summary)")
+    print("[Replay] ==============================")
+    
+    title = "Year: \(year)"
+    subtitle = summary.playlist.name
   }
 }
