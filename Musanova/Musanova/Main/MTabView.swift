@@ -10,6 +10,11 @@ import SwiftUI
 struct MTabView: View {
   var body: some View {
     TabView {
+      ReplayView()
+        .tabItem {
+          Label("Replay", systemImage: "clock.arrow.circlepath")
+        }
+
       LyricsView()
         .tabItem {
           Label("Lyrics", systemImage: "music.note")

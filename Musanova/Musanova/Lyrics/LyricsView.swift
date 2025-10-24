@@ -184,23 +184,41 @@ struct LyricsView: View {
             isLoading = true
             errorMessage = nil
 
+            print("[Lyrics] Starting to load song and lyrics")
+
             do {
+                print("[Lyrics] Fetching song with ID: \(songID)")
                 let fetchedSong = try await MCatalog.song(id: songID)
+                print("[Lyrics] Song fetched: \(fetchedSong.title) by \(fetchedSong.artistName)")
                 self.song = fetchedSong
                 self.artworkURL = fetchedSong.artwork?.url(width: 1000, height: 1000)
+                print("[Lyrics] Artwork URL: \(self.artworkURL?.absoluteString ?? "nil")")
 
                 guard let developerToken = UserDefaults.standard.string(forKey: "developerToken"),
                       !developerToken.isEmpty else {
+                    print("[Lyrics] ERROR: Developer token is missing or empty")
                     errorMessage = "Developer token is required. Please set it in Settings."
                     isLoading = false
                     return
                 }
 
+                print("[Lyrics] Developer token found, fetching lyrics...")
+                print("[Lyrics] Token length: \(developerToken.count)")
                 self.lyrics = try await MCatalog.lyrics(for: fetchedSong, developerToken: developerToken)
+                print("[Lyrics] Lyrics fetched successfully")
+                print("[Lyrics] Number of paragraphs: \(self.lyrics.count)")
+                for (index, paragraph) in self.lyrics.enumerated() {
+                    print("[Lyrics] Paragraph \(index): \(paragraph.lines.count) lines")
+                    for (lineIndex, line) in paragraph.lines.prefix(3).enumerated() {
+                        print("[Lyrics]   Line \(lineIndex): \(line.segments.map { $0.text }.joined())")
+                    }
+                }
 
             } catch let lyricsError as LyricsError {
+                print("[Lyrics] LyricsError caught: \(lyricsError)")
                 switch lyricsError {
                 case .apiError(let detail):
+                    print("[Lyrics] API Error detail: \(detail)")
                     if detail.contains("No related resources found") {
                         errorMessage = "Lyrics are not available for this song. " +
                             "The Apple Music lyrics API may be temporarily unavailable " +
@@ -213,9 +231,13 @@ struct LyricsView: View {
                     }
                 }
             } catch {
+                print("[Lyrics] Unexpected error: \(error)")
+                print("[Lyrics] Error type: \(type(of: error))")
+                print("[Lyrics] Error description: \(error.localizedDescription)")
                 errorMessage = error.localizedDescription
             }
 
+            print("[Lyrics] Loading complete. isLoading: false")
             isLoading = false
         }
     }
@@ -223,19 +245,26 @@ struct LyricsView: View {
     private func togglePlayback() {
         Task {
             do {
+                print("[Lyrics] togglePlayback called, isPlaying: \(isPlaying)")
                 if isPlaying {
+                    print("[Lyrics] Stopping playback")
                     player.stop()
                     isPlaying = false
                     invalidatePlaybackTimer()
                 } else {
                     if let song = song {
+                        print("[Lyrics] Starting playback for: \(song.title)")
                         player.queue = [song]
                         try await player.play()
+                        print("[Lyrics] Playback started successfully")
                         isPlaying = true
                         startPlaybackObserver()
+                    } else {
+                        print("[Lyrics] ERROR: No song available for playback")
                     }
                 }
             } catch {
+                print("[Lyrics] Playback error: \(error)")
                 errorMessage = "Failed to play song: \(error.localizedDescription)"
                 isPlaying = false
             }
