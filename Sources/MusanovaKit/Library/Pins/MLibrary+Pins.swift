@@ -88,12 +88,12 @@ public extension MLibrary {
   /// Example usage:
   ///
   ///     let album: Album = // ... fetched album
-  ///     try await MLibrary.createPin(for: album, developerToken: token)
+  ///     try await MLibrary.pin(album, developerToken: token)
   ///     print("Album pinned successfully!")
   ///
   @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *)
-  static func createPin(for album: Album, developerToken: String) async throws {
-    try await createPin(for: album.id.rawValue, developerToken: developerToken)
+  static func pin(_ album: Album, developerToken: String) async throws {
+    try await pin(itemId: album.id.rawValue, developerToken: developerToken)
   }
 
   /// Pins a song to the user's Apple Music library.
@@ -112,12 +112,12 @@ public extension MLibrary {
   /// Example usage:
   ///
   ///     let song: Song = // ... fetched song
-  ///     try await MLibrary.createPin(for: song, developerToken: token)
+  ///     try await MLibrary.pin(song, developerToken: token)
   ///     print("Song pinned successfully!")
   ///
   @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *)
-  static func createPin(for song: Song, developerToken: String) async throws {
-    try await createPin(for: song.id.rawValue, developerToken: developerToken)
+  static func pin(_ song: Song, developerToken: String) async throws {
+    try await pin(itemId: song.id.rawValue, developerToken: developerToken)
   }
 
   /// Pins a playlist to the user's Apple Music library.
@@ -136,12 +136,12 @@ public extension MLibrary {
   /// Example usage:
   ///
   ///     let playlist: Playlist = // ... fetched playlist
-  ///     try await MLibrary.createPin(for: playlist, developerToken: token)
+  ///     try await MLibrary.pin(playlist, developerToken: token)
   ///     print("Playlist pinned successfully!")
   ///
   @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *)
-  static func createPin(for playlist: Playlist, developerToken: String) async throws {
-    try await createPin(for: playlist.id.rawValue, developerToken: developerToken)
+  static func pin(_ playlist: Playlist, developerToken: String) async throws {
+    try await pin(itemId: playlist.id.rawValue, developerToken: developerToken)
   }
 
   /// Pins an artist to the user's Apple Music library.
@@ -160,12 +160,12 @@ public extension MLibrary {
   /// Example usage:
   ///
   ///     let artist: Artist = // ... fetched artist
-  ///     try await MLibrary.createPin(for: artist, developerToken: token)
+  ///     try await MLibrary.pin(artist, developerToken: token)
   ///     print("Artist pinned successfully!")
   ///
   @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *)
-  static func createPin(for artist: Artist, developerToken: String) async throws {
-    try await createPin(for: artist.id.rawValue, developerToken: developerToken)
+  static func pin(_ artist: Artist, developerToken: String) async throws {
+    try await pin(itemId: artist.id.rawValue, developerToken: developerToken)
   }
 
   /// Private helper method that performs the actual pinning operation using an item ID.
@@ -190,6 +190,152 @@ public extension MLibrary {
     }
 
     let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken, method: "POST")
+    _ = try await request.response()
+  }
+
+  /// Unpins an album from the user's Apple Music library.
+  ///
+  /// This method sends a DELETE request to remove the specified album from the user's
+  /// pinned items, removing it from the prominent display in the Apple Music interface.
+  ///
+  /// - Parameters:
+  ///   - album: The album to unpin from the library.
+  ///   - developerToken: The privileged developer token used to authorize the request.
+  ///
+  /// - Throws: An error if the request fails or the pin cannot be deleted.
+  ///
+  /// - Note: This endpoint requires a privileged developer token and access to private Apple Music APIs.
+  ///
+  /// Example usage:
+  ///
+  ///     let album: Album = // ... fetched album
+  ///     try await MLibrary.unpin(album, developerToken: token)
+  ///     print("Album unpinned successfully!")
+  ///
+  @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *)
+  static func unpin(_ album: Album, developerToken: String) async throws {
+    try await unpin(itemId: album.id.rawValue, developerToken: developerToken)
+  }
+
+  /// Unpins a song from the user's Apple Music library.
+  ///
+  /// This method sends a DELETE request to remove the specified song from the user's
+  /// pinned items, removing it from the prominent display in the Apple Music interface.
+  ///
+  /// - Parameters:
+  ///   - song: The song to unpin from the library.
+  ///   - developerToken: The privileged developer token used to authorize the request.
+  ///
+  /// - Throws: An error if the request fails or the pin cannot be deleted.
+  ///
+  /// - Note: This endpoint requires a privileged developer token and access to private Apple Music APIs.
+  ///
+  /// Example usage:
+  ///
+  ///     let song: Song = // ... fetched song
+  ///     try await MLibrary.unpin(song, developerToken: token)
+  ///     print("Song unpinned successfully!")
+  ///
+  @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *)
+  static func unpin(_ song: Song, developerToken: String) async throws {
+    try await unpin(itemId: song.id.rawValue, developerToken: developerToken)
+  }
+
+  /// Unpins a playlist from the user's Apple Music library.
+  ///
+  /// This method sends a DELETE request to remove the specified playlist from the user's
+  /// pinned items, removing it from the prominent display in the Apple Music interface.
+  ///
+  /// - Parameters:
+  ///   - playlist: The playlist to unpin from the library.
+  ///   - developerToken: The privileged developer token used to authorize the request.
+  ///
+  /// - Throws: An error if the request fails or the pin cannot be deleted.
+  ///
+  /// - Note: This endpoint requires a privileged developer token and access to private Apple Music APIs.
+  ///
+  /// Example usage:
+  ///
+  ///     let playlist: Playlist = // ... fetched playlist
+  ///     try await MLibrary.unpin(playlist, developerToken: token)
+  ///     print("Playlist unpinned successfully!")
+  ///
+  @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *)
+  static func unpin(_ playlist: Playlist, developerToken: String) async throws {
+    try await unpin(itemId: playlist.id.rawValue, developerToken: developerToken)
+  }
+
+  /// Unpins an artist from the user's Apple Music library.
+  ///
+  /// This method sends a DELETE request to remove the specified artist from the user's
+  /// pinned items, removing it from the prominent display in the Apple Music interface.
+  ///
+  /// - Parameters:
+  ///   - artist: The artist to unpin from the library.
+  ///   - developerToken: The privileged developer token used to authorize the request.
+  ///
+  /// - Throws: An error if the request fails or the pin cannot be deleted.
+  ///
+  /// - Note: This endpoint requires a privileged developer token and access to private Apple Music APIs.
+  ///
+  /// Example usage:
+  ///
+  ///     let artist: Artist = // ... fetched artist
+  ///     try await MLibrary.unpin(artist, developerToken: token)
+  ///     print("Artist unpinned successfully!")
+  ///
+  @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *)
+  static func unpin(_ artist: Artist, developerToken: String) async throws {
+    try await unpin(itemId: artist.id.rawValue, developerToken: developerToken)
+  }
+
+  /// Private helper method that performs the actual pinning operation using an item ID.
+  ///
+  /// - Parameters:
+  ///   - itemId: The raw string ID of the item to pin.
+  ///   - developerToken: The privileged developer token used to authorize the request.
+  ///
+  /// - Throws: An error if the request fails or the pin cannot be created.
+  private static func pin(itemId: String, developerToken: String) async throws {
+    var components = AppleMusicAMPURLComponents()
+    components.path = "me/library/pins/\(itemId)"
+
+    components.queryItems = [
+      URLQueryItem(name: "art[url]", value: "f"),
+      URLQueryItem(name: "format[resources]", value: "map"),
+      URLQueryItem(name: "l", value: "en-GB")
+    ]
+
+    guard let url = components.url else {
+      throw URLError(.badURL)
+    }
+
+    let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken, method: "POST")
+    _ = try await request.response()
+  }
+
+  /// Private helper method that performs the actual unpinning operation using an item ID.
+  ///
+  /// - Parameters:
+  ///   - itemId: The raw string ID of the item to unpin.
+  ///   - developerToken: The privileged developer token used to authorize the request.
+  ///
+  /// - Throws: An error if the request fails or the pin cannot be deleted.
+  private static func unpin(itemId: String, developerToken: String) async throws {
+    var components = AppleMusicAMPURLComponents()
+    components.path = "me/library/pins/\(itemId)"
+
+    components.queryItems = [
+      URLQueryItem(name: "art[url]", value: "f"),
+      URLQueryItem(name: "format[resources]", value: "map"),
+      URLQueryItem(name: "l", value: "en-GB")
+    ]
+
+    guard let url = components.url else {
+      throw URLError(.badURL)
+    }
+
+    let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken, method: "DELETE")
     _ = try await request.response()
   }
 }

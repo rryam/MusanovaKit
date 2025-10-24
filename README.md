@@ -202,23 +202,49 @@ Pin albums, songs, artists, and playlists to the user's Apple Music library:
 ```swift
 // Pin an album
 let album: Album = // ... fetched album
-try await MLibrary.createPin(for: album, developerToken: token)
+try await MLibrary.pin(album, developerToken: token)
 print("Album pinned successfully!")
 
 // Pin a song
 let song: Song = // ... fetched song
-try await MLibrary.createPin(for: song, developerToken: token)
+try await MLibrary.pin(song, developerToken: token)
 print("Song pinned successfully!")
 
 // Pin a playlist
 let playlist: Playlist = // ... fetched playlist
-try await MLibrary.createPin(for: playlist, developerToken: token)
+try await MLibrary.pin(playlist, developerToken: token)
 print("Playlist pinned successfully!")
 
 // Pin an artist
 let artist: Artist = // ... fetched artist
-try await MLibrary.createPin(for: artist, developerToken: token)
+try await MLibrary.pin(artist, developerToken: token)
 print("Artist pinned successfully!")
+```
+
+### Deleting pins
+
+Unpin items from the user's Apple Music library:
+
+```swift
+// Unpin an album
+let album: Album = // ... fetched album
+try await MLibrary.unpin(album, developerToken: token)
+print("Album unpinned successfully!")
+
+// Unpin a song
+let song: Song = // ... fetched song
+try await MLibrary.unpin(song, developerToken: token)
+print("Song unpinned successfully!")
+
+// Unpin a playlist
+let playlist: Playlist = // ... fetched playlist
+try await MLibrary.unpin(playlist, developerToken: token)
+print("Playlist unpinned successfully!")
+
+// Unpin an artist
+let artist: Artist = // ... fetched artist
+try await MLibrary.unpin(artist, developerToken: token)
+print("Artist unpinned successfully!")
 ```
 
 Available configuration options:
