@@ -58,6 +58,34 @@ struct ReplayView: View {
           }
           .padding(.vertical, 4)
         }
+        
+        if !viewModel.milestones.isEmpty {
+          Section("Your Milestones") {
+            ForEach(viewModel.milestones) { milestone in
+              VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                  VStack(alignment: .leading, spacing: 2) {
+                    Text(milestone.value)
+                      .font(.headline)
+                    Text(milestone.kind.rawValue.capitalized)
+                      .font(.caption)
+                      .foregroundStyle(.secondary)
+                  }
+                  Spacer()
+                  VStack(alignment: .trailing, spacing: 2) {
+                    Text("\(milestone.listenTimeInMinutes) min")
+                      .font(.caption2)
+                      .foregroundStyle(.secondary)
+                    Text(milestone.dateReached)
+                      .font(.caption2)
+                      .foregroundStyle(.secondary)
+                  }
+                }
+              }
+              .padding(.vertical, 4)
+            }
+          }
+        }
       }
     }
     .navigationTitle("Music Replay")

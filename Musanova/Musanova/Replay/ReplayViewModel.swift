@@ -21,6 +21,7 @@ class ReplayViewModel {
   var isLoading: Bool = false
   var errorMessage: String?
   var summaries: [MusicSummarySearch] = []
+  var milestones: [MusicSummaryMilestone] = []
   
   private var developerToken: String? {
     UserDefaults.standard.string(forKey: "developerToken")
@@ -98,15 +99,19 @@ class ReplayViewModel {
   func loadPlaylistSongs() async {
     guard let year = selectedYear else { return }
     guard let summary = summaries.first(where: { $0.year == year }) else { return }
-    
-    print("[Replay] ===== Summary for Year \(year) =====")
-    print("[Replay] Playlist ID: \(summary.playlist.id)")
-    print("[Replay] Playlist Name: \(summary.playlist.name)")
-    print("[Replay] Playlist Description: \(summary.playlist.description ?? "N/A")")
-    print("[Replay] Full Summary: \(summary)")
-    print("[Replay] ==============================")
+    guard let token = developerToken, !token.isEmpty else { return }
     
     title = "Year: \(year)"
     subtitle = summary.playlist.name
+    
+    do {
+      print("[Replay] Fetching milestones for year \(year)")
+      let fetchedMilestones = try await MSummaries.milestones(forYear: MusicYearID(year), developerToken: token)
+      self.milestones = Array(fetchedMilestones)
+      print("[Replay] Fetched \(self.milestones.count) milestones")
+    } catch {
+      print("[Replay] Error fetching milestones: \(error)")
+      self.milestones = []
+    }
   }
 }
