@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import MusadoraKit
 
 /// Represents a pinned item in the user's Apple Music library.
 ///
@@ -68,16 +69,19 @@ public struct LibraryPinAttributes: Decodable, Sendable {
 public struct LibraryPinRelationships: Decodable, Sendable {
 
   /// Related albums (if applicable).
-  public let albums: MusicItemCollection<Album>?
+  public let albums: Albums
 
   /// Related playlists (if applicable).
-  public let playlists: MusicItemCollection<Playlist>?
+  public let playlists: Playlists
 
   /// Related artists (if applicable).
-  public let artists: MusicItemCollection<Artist>?
+  public let artists: Artists
+
+  /// Related songs (if applicable).
+  public let songs: Songs
 
   /// Coding keys for decoding relationships.
   enum CodingKeys: String, CodingKey {
-    case albums, playlists, artists
+    case albums, playlists, artists, songs
   }
 }

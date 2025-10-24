@@ -13,7 +13,6 @@ import Testing
 
 @Suite
 struct LibraryPinsTests {
-
   @Test
   func testMusicLibraryPinsEndpointURL() throws {
     let request = MusicLibraryPinsRequest(developerToken: "test_token")
@@ -212,5 +211,4 @@ struct LibraryPinsTests {
     #expect(response.data[0].type == "library-albums")
     #expect(response.resources?.libraryAlbums?["l.Vkvyybh"] != nil) // Album exists in resources
   }
-
 }
