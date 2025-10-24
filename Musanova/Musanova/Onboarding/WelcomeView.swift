@@ -79,11 +79,12 @@ struct WelcomeView: View {
   private var secondaryExplanatoryText: Text? {
     var secondaryExplanatoryText: Text?
     switch musicAuthorizationStatus {
-      case .denied:
-        secondaryExplanatoryText = Text("Please grant Musadora access to ")
-        + Text(Image(systemName: "applelogo")) + Text(" Music in Settings.")
-      default:
-        break
+    case .denied:
+      secondaryExplanatoryText = Text(
+        "Please grant Musadora access to \(Image(systemName: "applelogo"))) Music in Settings."
+      )
+    default:
+      break
     }
     return secondaryExplanatoryText
   }
@@ -91,31 +92,31 @@ struct WelcomeView: View {
   private var buttonText: Text {
     let buttonText: Text
     switch musicAuthorizationStatus {
-      case .notDetermined:
-        buttonText = Text("Continue")
-      case .denied:
-        buttonText = Text("Open Settings")
-      default:
-        fatalError("No button should be displayed for current authorization status: \(musicAuthorizationStatus).")
+    case .notDetermined:
+      buttonText = Text("Continue")
+    case .denied:
+      buttonText = Text("Open Settings")
+    default:
+      fatalError("No button should be displayed for current authorization status: \(musicAuthorizationStatus).")
     }
     return buttonText
   }
 
   private func handleButtonPressed() {
     switch musicAuthorizationStatus {
-      case .notDetermined:
-        Task {
-          let musicAuthorizationStatus = await MusicAuthorization.request()
+    case .notDetermined:
+      Task {
+        let musicAuthorizationStatus = await MusicAuthorization.request()
         update(with: musicAuthorizationStatus)
-        }
-      case .denied:
+      }
+    case .denied:
 #if os(iOS)
-        if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-          openURL(settingsURL)
-        }
+      if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+        openURL(settingsURL)
+      }
 #endif
-      default:
-        fatalError("No button should be displayed for current authorization status: \(musicAuthorizationStatus).")
+    default:
+      fatalError("No button should be displayed for current authorization status: \(musicAuthorizationStatus).")
     }
   }
 

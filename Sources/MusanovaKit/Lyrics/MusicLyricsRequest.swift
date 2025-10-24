@@ -7,38 +7,53 @@
 
 import Foundation
 
+/// Represents an error response from the Apple Music API.
+public struct MusicErrorResponse: Codable {
+  let errors: [MusicError]
+}
+
+/// Represents a single error from the Apple Music API.
+public struct MusicError: Codable {
+  let id: String
+  let title: String
+  let detail: String
+  let status: String
+  let code: String
+}
+
+/// Errors that can occur during lyrics operations.
+public enum LyricsError: Error {
+  case apiError(String)
+}
+
 /// A request object used to fetch lyrics for a specified song.
 struct MusicLyricsRequest {
-
   /// The identifier of the song.
   let songID: MusicItemID
 
   /// The privileged developer token used to authorize the request.
   let developerToken: String
 
-  /// Initializes a new `MusicLyricsRequest`.
-  ///
-  /// - Parameters:
-  ///   - songID: The identifier of the song.
-  ///   - developerToken: The privileged developer token used to authorize the request.
-  init(songID: MusicItemID, developerToken: String) {
-    self.songID = songID
-    self.developerToken = developerToken
-  }
-
   /// Sends the request and returns a response object containing the fetched lyrics.
   ///
   /// - Returns: A `LyricsResponse` object.
   func response(countryCode: String? = nil) async throws -> MusicLyricsResponse {
     let url = try await lyricsEndpointURL(countryCode: countryCode)
-    print(url)
     let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
     let response = try await request.response()
 
+    if response.data.isEmpty {
+      throw LyricsError.apiError("Empty response from lyrics API")
+    }
 
-    if let jsonString = String(data: response.data, encoding: .utf8) {
-      print("Raw JSON received:")
-      print(jsonString)
+    guard String(data: response.data, encoding: .utf8) != nil else {
+      throw LyricsError.apiError("Invalid response format from lyrics API")
+    }
+
+    if let errorResponse = try? JSONDecoder().decode(MusicErrorResponse.self, from: response.data) {
+      if let error = errorResponse.errors.first {
+        throw LyricsError.apiError(error.detail)
+      }
     }
 
     let lyricsResponse = try JSONDecoder().decode(MusicLyricsResponse.self, from: response.data)

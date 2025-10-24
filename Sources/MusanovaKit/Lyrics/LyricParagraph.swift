@@ -20,4 +20,14 @@ public struct LyricParagraph: Identifiable {
 
     /// An optional string indicating the part of the song this paragraph represents (e.g., "Verse", "Chorus").
     public let songPart: String?
+
+    /// Creates a new lyric paragraph.
+    ///
+    /// - Parameters:
+    ///   - lines: The lyric lines that make up this paragraph.
+    ///   - songPart: An optional string indicating the part of the song this paragraph represents.
+    public init(lines: LyricLines, songPart: String? = nil) {
+        self.lines = lines
+        self.songPart = songPart
+    }
 }
