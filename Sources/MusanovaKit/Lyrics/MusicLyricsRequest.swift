@@ -50,18 +50,30 @@ struct MusicLyricsRequest {
   /// - Returns: A `LyricsResponse` object.
   func response(countryCode: String? = nil) async throws -> MusicLyricsResponse {
     let url = try await lyricsEndpointURL(countryCode: countryCode)
-    print(url)
+    print("Requesting URL:", url)
     let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
     let response = try await request.response()
 
+    print("Response status: \((response.urlResponse as? HTTPURLResponse)?.statusCode ?? -1)")
+    print("Response data size: \(response.data.count) bytes")
+
+    if response.data.isEmpty {
+      print("Response data is empty!")
+      throw LyricsError.apiError("Empty response from lyrics API")
+    }
+
     if let jsonString = String(data: response.data, encoding: .utf8) {
       print("Raw response received:")
-      print(jsonString)
+      print(jsonString.prefix(500)) // Limit output to first 500 chars
+    } else {
+      print("Response data is not valid UTF-8!")
+      throw LyricsError.apiError("Invalid response format from lyrics API")
     }
 
     // First try to decode as error response
     if let errorResponse = try? JSONDecoder().decode(MusicErrorResponse.self, from: response.data) {
       if let error = errorResponse.errors.first {
+        print("API returned error: \(error.detail)")
         throw LyricsError.apiError(error.detail)
       }
     }
