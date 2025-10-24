@@ -1,0 +1,24 @@
+{
+  "originHash" : "a308218417dbfd15194737f5c5ae0216fe3bf57f44f708ef24b88749a58137f5",
+  "pins" : [
+    {
+      "identity" : "musadorakit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/rryam/MusadoraKit",
+      "state" : {
+        "branch" : "main",
+        "revision" : "29a724599881465b0ab7d07894e0b10d751e0de7"
+      }
+    },
+    {
+      "identity" : "swiftlintplugin",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/lukepistrol/SwiftLintPlugin",
+      "state" : {
+        "revision" : "be0b5c5a83cf90e62a51e61624f5b5f9a46279c9",
+        "version" : "0.61.0"
+      }
+    }
+  ],
+  "version" : 3
+}

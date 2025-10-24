@@ -8,8 +8,8 @@
 import MusadoraKit
 import Foundation
 
-/// A structure that implements the `MURLComponents` protocol, specifically for Apple Music API requests.
-public struct AppleMusicAMPURLComponents: MURLComponents {
+/// A structure for constructing URLs for Apple Music AMP API requests.
+public struct AppleMusicAMPURLComponents {
 
   /// The underlying `URLComponents` instance.
   private var components: URLComponents
