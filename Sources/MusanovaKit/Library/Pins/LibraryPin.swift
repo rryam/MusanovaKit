@@ -69,16 +69,16 @@ public struct LibraryPinAttributes: Decodable, Sendable {
 public struct LibraryPinRelationships: Decodable, Sendable {
 
   /// Related albums (if applicable).
-  public let albums: Albums
+  public let albums: Albums?
 
   /// Related playlists (if applicable).
-  public let playlists: Playlists
+  public let playlists: Playlists?
 
   /// Related artists (if applicable).
-  public let artists: Artists
+  public let artists: Artists?
 
   /// Related songs (if applicable).
-  public let songs: Songs
+  public let songs: Songs?
 
   /// Coding keys for decoding relationships.
   enum CodingKeys: String, CodingKey {
