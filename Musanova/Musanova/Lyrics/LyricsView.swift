@@ -18,6 +18,7 @@ struct LyricsView: View {
     @State private var currentTime: TimeInterval = 0
     @State private var isPlaying = false
     @State private var artworkURL: URL?
+    @State private var playbackTimer: Timer?
 
     private let player = ApplicationMusicPlayer.shared
 
@@ -173,6 +174,7 @@ struct LyricsView: View {
         }
         .onDisappear {
             player.stop()
+            invalidatePlaybackTimer()
         }
     }
 
@@ -239,6 +241,7 @@ struct LyricsView: View {
                 if isPlaying {
                     player.stop()
                     isPlaying = false
+                    invalidatePlaybackTimer()
                 } else {
                     if let song = song {
                         player.queue = [song]
@@ -260,15 +263,23 @@ struct LyricsView: View {
         currentTime = 0
         isPlaying = false
         player.playbackTime = 0
+        invalidatePlaybackTimer()
     }
 
     private func startPlaybackObserver() {
-        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+        invalidatePlaybackTimer()
+
+        playbackTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
             Task { @MainActor in
                 currentTime = player.playbackTime
                 isPlaying = player.state.playbackStatus == .playing
             }
         }
+    }
+
+    private func invalidatePlaybackTimer() {
+        playbackTimer?.invalidate()
+        playbackTimer = nil
     }
 
     private func findCurrentLine(at time: TimeInterval) -> LyricLine? {
