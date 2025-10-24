@@ -100,14 +100,15 @@ public extension MLibrary {
     try await pin(itemId: item.id.rawValue, developerToken: developerToken)
   }
 
-  /// Private helper method that performs the actual pinning operation using an item ID.
+  /// Private helper method that performs pin/unpin operations using an item ID.
   ///
   /// - Parameters:
-  ///   - itemId: The raw string ID of the item to pin.
+  ///   - itemId: The raw string ID of the item to pin or unpin.
   ///   - developerToken: The privileged developer token used to authorize the request.
+  ///   - method: The HTTP method to use (.post for pinning, .delete for unpinning).
   ///
-  /// - Throws: An error if the request fails or the pin cannot be created.
-  private static func createPin(for itemId: String, developerToken: String) async throws {
+  /// - Throws: An error if the request fails or the operation cannot be completed.
+  private static func performPinOperation(itemId: String, developerToken: String, method: HTTPMethod) async throws {
     var components = AppleMusicAMPURLComponents()
     components.path = "me/library/pins/\(itemId)"
 
@@ -121,7 +122,7 @@ public extension MLibrary {
       throw URLError(.badURL)
     }
 
-    let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken, method: "POST")
+    let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken, method: method)
     _ = try await request.response()
   }
 
@@ -162,21 +163,7 @@ public extension MLibrary {
   ///
   /// - Throws: An error if the request fails or the pin cannot be created.
   private static func pin(itemId: String, developerToken: String) async throws {
-    var components = AppleMusicAMPURLComponents()
-    components.path = "me/library/pins/\(itemId)"
-
-    components.queryItems = [
-      URLQueryItem(name: "art[url]", value: "f"),
-      URLQueryItem(name: "format[resources]", value: "map"),
-      URLQueryItem(name: "l", value: "en-GB")
-    ]
-
-    guard let url = components.url else {
-      throw URLError(.badURL)
-    }
-
-    let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken, method: "POST")
-    _ = try await request.response()
+    try await performPinOperation(itemId: itemId, developerToken: developerToken, method: .post)
   }
 
   /// Private helper method that performs the actual unpinning operation using an item ID.
@@ -187,20 +174,6 @@ public extension MLibrary {
   ///
   /// - Throws: An error if the request fails or the pin cannot be deleted.
   private static func unpin(itemId: String, developerToken: String) async throws {
-    var components = AppleMusicAMPURLComponents()
-    components.path = "me/library/pins/\(itemId)"
-
-    components.queryItems = [
-      URLQueryItem(name: "art[url]", value: "f"),
-      URLQueryItem(name: "format[resources]", value: "map"),
-      URLQueryItem(name: "l", value: "en-GB")
-    ]
-
-    guard let url = components.url else {
-      throw URLError(.badURL)
-    }
-
-    let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken, method: "DELETE")
-    _ = try await request.response()
+    try await performPinOperation(itemId: itemId, developerToken: developerToken, method: .delete)
   }
 }
