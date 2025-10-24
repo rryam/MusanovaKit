@@ -7,6 +7,18 @@
 
 import Foundation
 
+/// Represents the format for resource responses.
+public enum ResourceFormat: String, Sendable {
+  /// Map format for resource responses.
+  case map
+}
+
+/// Represents metadata types for library pins.
+public enum LibraryPinMeta: String, Sendable {
+  /// Library pin metadata type.
+  case libraryPin = "libraryPin"
+}
+
 /// A request that your app uses to fetch pinned items from the user's Apple Music library.
 ///
 /// Use this request to fetch music content that the user has pinned in their library.
@@ -33,7 +45,7 @@ public struct MusicLibraryPinsRequest {
   public var artistFields: [String] = ["artwork"]
 
   /// Response format for resources.
-  public var resourceFormat: String = "map"
+  public var resourceFormat: ResourceFormat = .map
 
   /// Relationships to include for library artists.
   public var libraryArtistIncludes: [String] = ["catalog"]
@@ -51,10 +63,7 @@ public struct MusicLibraryPinsRequest {
   public var limit: Int = 25
 
   /// Metadata type for the pins.
-  public var meta: String = "libraryPin"
-
-  /// Target platform for the request.
-  public var platform: String = "web"
+  public var meta: LibraryPinMeta = .libraryPin
 
   /// Initializes a new pins request.
   ///
@@ -92,27 +101,15 @@ extension MusicLibraryPinsRequest {
       }
 
       // Artist fields
-      if !artistFields.isEmpty {
-        queryItems.append(URLQueryItem(name: "fields[artists]", value: artistFields.joined(separator: ",")))
-      }
+      addQueryItem(for: artistFields, key: "fields[artists]", to: &queryItems)
 
       // Resource format
-      queryItems.append(URLQueryItem(name: "format[resources]", value: resourceFormat))
+      queryItems.append(URLQueryItem(name: "format[resources]", value: resourceFormat.rawValue))
 
-      // Library artist includes
-      if !libraryArtistIncludes.isEmpty {
-        queryItems.append(URLQueryItem(name: "include[library-artists]", value: libraryArtistIncludes.joined(separator: ",")))
-      }
-
-      // Library music video includes
-      if !libraryMusicVideoIncludes.isEmpty {
-        queryItems.append(URLQueryItem(name: "include[library-music-videos]", value: libraryMusicVideoIncludes.joined(separator: ",")))
-      }
-
-      // Library song includes
-      if !librarySongIncludes.isEmpty {
-        queryItems.append(URLQueryItem(name: "include[library-songs]", value: librarySongIncludes.joined(separator: ",")))
-      }
+      // Library includes
+      addQueryItem(for: libraryArtistIncludes, key: "include[library-artists]", to: &queryItems)
+      addQueryItem(for: libraryMusicVideoIncludes, key: "include[library-music-videos]", to: &queryItems)
+      addQueryItem(for: librarySongIncludes, key: "include[library-songs]", to: &queryItems)
 
       // Language
       queryItems.append(URLQueryItem(name: "l", value: language))
@@ -121,10 +118,7 @@ extension MusicLibraryPinsRequest {
       queryItems.append(URLQueryItem(name: "limit", value: String(limit)))
 
       // Meta
-      queryItems.append(URLQueryItem(name: "meta", value: meta))
-
-      // Platform
-      queryItems.append(URLQueryItem(name: "platform", value: platform))
+      queryItems.append(URLQueryItem(name: "meta", value: meta.rawValue))
 
       components.queryItems = queryItems
 
@@ -133,6 +127,18 @@ extension MusicLibraryPinsRequest {
       }
 
       return url
+    }
+  }
+
+  /// Adds a query item for an array of values if the array is not empty.
+  ///
+  /// - Parameters:
+  ///   - values: The array of string values to join.
+  ///   - key: The query parameter key.
+  ///   - queryItems: The array to append the query item to.
+  private func addQueryItem(for values: [String], key: String, to queryItems: inout [URLQueryItem]) {
+    if !values.isEmpty {
+      queryItems.append(URLQueryItem(name: key, value: values.joined(separator: ",")))
     }
   }
 }

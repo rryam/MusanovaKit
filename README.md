@@ -152,22 +152,29 @@ MusanovaKit provides access to the user's pinned items in their Apple Music libr
 ### Fetching pinned items
 
 ```swift
-let pins = try await MLibrary.pins(developerToken: token, limit: 25)
+let response = try await MLibrary.pins(developerToken: token, limit: 25)
 
-for pin in pins {
-    print("Pinned: \(pin.attributes.name ?? "Unknown") - Type: \(pin.type)")
-    if let relationships = pin.relationships {
-        print("Related albums: \(relationships.albums?.count ?? 0)")
-        print("Related artists: \(relationships.artists?.count ?? 0)")
+for pinRef in response.data {
+    print("Pinned: \(pinRef.id) - Type: \(pinRef.type)")
+}
+
+// Access detailed resources
+if let albums = response.resources?.libraryAlbums {
+    for (id, album) in albums {
+        print("Album: \(album.attributes?.name ?? "Unknown") by \(album.attributes?.artistName ?? "Unknown")")
+    }
+}
+
+if let songs = response.resources?.librarySongs {
+    for (id, song) in songs {
+        print("Song: \(song.attributes?.name ?? "Unknown") by \(song.attributes?.artistName ?? "Unknown")")
     }
 }
 ```
 
-The `pins()` method returns an array of `LibraryPin` objects, each containing:
-- `id`: The music item identifier
-- `type`: The type of content (song, artist, album, etc.)
-- `attributes`: Name, artwork, and metadata
-- `relationships`: Related content (albums, artists, playlists)
+The `pins()` method returns a `MusicLibraryPinsResponse` containing:
+- `data`: Array of pin references with basic information
+- `resources`: Detailed information about pinned items organized by type
 
 ### Custom pin requests
 
@@ -183,9 +190,35 @@ configuration.libraryArtistIncludes = ["catalog"]
 let response = try await MLibrary.pins(configuration: configuration)
 
 // Access the raw response data
-for (key, pin) in response.pins {
-    print("Pin \(key): \(pin.attributes.name ?? "Unknown")")
+for pinRef in response.data {
+    print("Pinned: \(pinRef.id) of type \(pinRef.type)")
 }
+```
+
+### Creating pins
+
+Pin albums, songs, artists, and playlists to the user's Apple Music library:
+
+```swift
+// Pin an album
+let album: Album = // ... fetched album
+try await MLibrary.createPin(for: album, developerToken: token)
+print("Album pinned successfully!")
+
+// Pin a song
+let song: Song = // ... fetched song
+try await MLibrary.createPin(for: song, developerToken: token)
+print("Song pinned successfully!")
+
+// Pin a playlist
+let playlist: Playlist = // ... fetched playlist
+try await MLibrary.createPin(for: playlist, developerToken: token)
+print("Playlist pinned successfully!")
+
+// Pin an artist
+let artist: Artist = // ... fetched artist
+try await MLibrary.createPin(for: artist, developerToken: token)
+print("Artist pinned successfully!")
 ```
 
 Available configuration options:

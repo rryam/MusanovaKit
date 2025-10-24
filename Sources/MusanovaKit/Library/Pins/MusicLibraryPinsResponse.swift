@@ -7,53 +7,74 @@
 
 import Foundation
 
+/// A reference to a pinned item in the library.
+///
+/// This represents a minimal reference to a pinned item, containing only
+/// the essential identification information.
+public struct PinReference: Decodable, Sendable {
+  /// The unique identifier of the pinned item.
+  public let id: String
+
+  /// The type of the pinned item (e.g., "library-albums", "library-songs").
+  public let type: String
+
+  /// The href for accessing the full item details.
+  public let href: String
+}
+
+/// Resources containing detailed information about pinned items and their relationships.
+public struct PinResources: Decodable, Sendable {
+  /// Catalog artists referenced by pinned items.
+  public let artists: [String: Artist]?
+
+  /// Library albums referenced by pinned items.
+  public let libraryAlbums: [String: Album]?
+
+  /// Library artists referenced by pinned items.
+  public let libraryArtists: [String: Artist]?
+
+  /// Library songs referenced by pinned items.
+  public let librarySongs: [String: Song]?
+
+  enum CodingKeys: String, CodingKey {
+    case artists
+    case libraryAlbums = "library-albums"
+    case libraryArtists = "library-artists"
+    case librarySongs = "library-songs"
+  }
+}
+
 /// The response containing pinned items from the user's Apple Music library.
 ///
-/// This response contains a map of pinned music items, organized by their types
-/// and identifiers. The response format is designed to efficiently represent
-/// pinned content with all necessary relationships and metadata.
+/// This response contains pinned items with their references and full resource details.
+/// The API separates pin references from detailed resource data for efficiency.
 ///
 /// Example usage:
 ///
 ///     let response = try await request.response()
-///     for (key, pin) in response.pins {
-///         print("Pinned: \(pin.attributes.name ?? "Unknown")")
+///     for pin in response.data {
+///         print("Pinned: \(pin.id) of type \(pin.type)")
+///     }
+///     if let album = response.resources?.libraryAlbums?[pinId] {
+///         print("Album: \(album.attributes?.name ?? "Unknown")")
 ///     }
 ///
-public struct MusicLibraryPinsResponse: Decodable {
+public struct MusicLibraryPinsResponse: Decodable, Sendable {
 
-  /// A dictionary mapping pin identifiers to their corresponding LibraryPin objects.
-  ///
-  /// The keys are typically in the format "type-id" (e.g., "song-12345"),
-  /// and the values contain the full pin data including attributes and relationships.
-  public let pins: [String: LibraryPin]
+  /// Array of pin references containing basic identification information.
+  public let data: [PinReference]
 
-  /// Coding keys for decoding the response.
-  enum CodingKeys: String, CodingKey {
-    case pins = "data"
-  }
-
-  /// Initializes a new pins response from a decoder.
-  ///
-  /// This custom initializer handles the map-based response format
-  /// where pins are returned as a dictionary rather than an array.
-  public init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-
-    // The API returns pins in a map format
-    let pinsDictionary = try container.decode([String: LibraryPin].self, forKey: .pins)
-    self.pins = pinsDictionary
-  }
+  /// Detailed resource information for all pinned items and their relationships.
+  public let resources: PinResources?
 }
 
 /// A collection of library pins.
 ///
 /// This type alias provides a convenient way to work with collections of pinned items.
-/// It uses MusicKit's MusicItemCollection for consistency with other collection types.
 ///
 /// Example usage:
 ///
-///     let pins: LibraryPins = ...
+///     let pins: LibraryPins = try await MLibrary.pins(developerToken: token)
 ///     for pin in pins {
 ///         print("Pin: \(pin.attributes.name ?? "Unknown")")
 ///     }

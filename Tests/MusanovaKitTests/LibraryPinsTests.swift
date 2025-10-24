@@ -38,7 +38,6 @@ struct LibraryPinsTests {
     #expect(paramNames.contains("l"))
     #expect(paramNames.contains("limit"))
     #expect(paramNames.contains("meta"))
-    #expect(paramNames.contains("platform"))
   }
 
   @Test
@@ -177,19 +176,28 @@ struct LibraryPinsTests {
   func testMusicLibraryPinsResponseDecoding() throws {
     let jsonString = """
     {
-      "data": {
-        "song-123": {
-          "id": "song-123",
-          "type": "songs",
-          "attributes": {
-            "name": "Test Song"
-          }
-        },
-        "artist-456": {
-          "id": "artist-456",
-          "type": "artists",
-          "attributes": {
-            "name": "Test Artist"
+      "data": [
+        {
+          "id": "l.Vkvyybh",
+          "type": "library-albums",
+          "href": "/v1/me/library/albums/l.Vkvyybh?l=en-GB"
+        }
+      ],
+      "resources": {
+        "library-albums": {
+          "l.Vkvyybh": {
+            "id": "l.Vkvyybh",
+            "type": "library-albums",
+            "href": "/v1/me/library/albums/l.Vkvyybh?l=en-GB",
+            "attributes": {
+              "artistName": "ABBA",
+              "name": "ABBA Gold: Greatest Hits",
+              "artwork": {
+                "height": 1200,
+                "width": 1200,
+                "url": "https://example.com/artwork.jpg"
+              }
+            }
           }
         }
       }
@@ -199,8 +207,10 @@ struct LibraryPinsTests {
     let data = try #require(jsonString.data(using: .utf8))
     let response = try JSONDecoder().decode(MusicLibraryPinsResponse.self, from: data)
 
-    #expect(response.pins.count == 2)
-    #expect(response.pins["song-123"]?.attributes.name == "Test Song")
-    #expect(response.pins["artist-456"]?.attributes.name == "Test Artist")
+    #expect(response.data.count == 1)
+    #expect(response.data[0].id == "l.Vkvyybh")
+    #expect(response.data[0].type == "library-albums")
+    #expect(response.resources?.libraryAlbums?["l.Vkvyybh"] != nil) // Album exists in resources
   }
+
 }
