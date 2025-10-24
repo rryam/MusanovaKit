@@ -29,8 +29,8 @@ public enum LibraryPinMeta: String, Sendable {
 ///
 ///     let request = MusicLibraryPinsRequest(developerToken: token)
 ///     let response = try await request.response()
-///     for (key, pin) in response.pins {
-///         print("Pinned: \(pin.attributes.name ?? "Unknown")")
+///     for pinRef in response.data {
+///         print("Pinned: \(pinRef.id) of type \(pinRef.type)")
 ///     }
 ///
 public struct MusicLibraryPinsRequest {
