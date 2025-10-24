@@ -15,6 +15,11 @@ struct MTabView: View {
           Label("Pins", systemImage: "pin")
         }
 
+      LyricsView()
+        .tabItem {
+          Label("Lyrics", systemImage: "music.note")
+        }
+
       SettingsView()
         .tabItem {
           Label("Settings", systemImage: "gear")
