@@ -1,4 +1,4 @@
-// swift-tools-version: 6.2
+// swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -11,7 +11,6 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/rryam/MusadoraKit", branch: "main"),
-        .package(url: "https://github.com/apple/swift-testing", from: "0.9.0")
     ],
     targets: [
         .target(name: "MusanovaKit", dependencies: ["MusadoraKit"]),
@@ -19,7 +18,6 @@ let package = Package(
             name: "MusanovaKitTests",
             dependencies: [
                 "MusanovaKit",
-                .product(name: "Testing", package: "swift-testing")
             ],
             resources: [.process("Resources")]
         ),
