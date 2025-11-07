@@ -20,6 +20,32 @@ struct MusicSummariesSearchTests {
     let expectedURL = try #require(URL(string: "https://amp-api.music.apple.com/v1/me/music-summaries/search?period=year&fields[music-summaries]=period,year&include[music-summaries]=playlist"))
     #expect(endpointURL == expectedURL)
   }
+
+  // MARK: - URL Construction Edge Cases
+
+  @Test
+  func testMusicSummariesSearchEndpointURLHasRequiredParameters() throws {
+    let request = MusicSummarySearchRequest(developerToken: "")
+    let endpointURL = try request.musicSummariesSearchEndpointURL
+    let components = try #require(URLComponents(url: endpointURL, resolvingAgainstBaseURL: false))
+    let queryItems = try #require(components.queryItems)
+
+    let queryDict = Dictionary(uniqueKeysWithValues: queryItems.map { ($0.name, $0.value) })
+
+    // Verify required parameters are present
+    #expect(queryDict["period"] == "year")
+    #expect(queryDict["fields[music-summaries]"] == "period,year")
+    #expect(queryDict["include[music-summaries]"] == "playlist")
+  }
+
+  @Test
+  func testMusicSummariesSearchEndpointURLStructure() throws {
+    let request = MusicSummarySearchRequest(developerToken: "")
+    let endpointURL = try request.musicSummariesSearchEndpointURL
+
+    #expect(endpointURL.absoluteString.hasPrefix("https://amp-api.music.apple.com/v1/me/music-summaries/search"))
+    #expect(endpointURL.path == "/v1/me/music-summaries/search")
+  }
   @Test
   func testMusicSummariesDecoding() throws {
     let path = try #require(Bundle.module.path(forResource: "musicSummariesSearch", ofType: "json"))

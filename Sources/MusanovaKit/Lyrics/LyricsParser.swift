@@ -195,11 +195,9 @@ public class LyricsParser: NSObject, XMLParserDelegate {
       }
 
       let avoidSpace = shouldAvoidPrecedingSpace(before: token.text)
-      if token.needsLeadingSpace && !avoidSpace && !result.hasSuffix(" ") {
-        result += " "
-      }
-
-      if !token.needsLeadingSpace && !avoidSpace && !result.hasSuffix(" ") {
+      // Add space between tokens unless avoiding it (punctuation) or result already ends with space
+      // Tokens come from different XML elements and should be separated
+      if !avoidSpace && !result.hasSuffix(" ") {
         result += " "
       }
 

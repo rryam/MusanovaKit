@@ -77,6 +77,78 @@ struct LibraryPinsTests {
     #expect(queryDict["include[library-songs]"] == nil)
   }
 
+  // MARK: - URL Construction Edge Cases
+
+  @Test
+  func testMusicLibraryPinsEndpointURLWithEmptyArtistFields() throws {
+    var request = MusicLibraryPinsRequest(developerToken: "test_token")
+    request.artistFields = []
+
+    let endpointURL = try request.pinsEndpointURL
+    let components = try #require(URLComponents(url: endpointURL, resolvingAgainstBaseURL: false))
+    let queryItems = try #require(components.queryItems)
+    let queryDict = Dictionary(uniqueKeysWithValues: queryItems.map { ($0.name, $0.value) })
+
+    // Empty artist fields should not add query parameter
+    #expect(queryDict["fields[artists]"] == nil)
+  }
+
+  @Test
+  func testMusicLibraryPinsEndpointURLWithZeroLimit() throws {
+    var request = MusicLibraryPinsRequest(developerToken: "test_token")
+    request.limit = 0
+
+    let endpointURL = try request.pinsEndpointURL
+    let components = try #require(URLComponents(url: endpointURL, resolvingAgainstBaseURL: false))
+    let queryItems = try #require(components.queryItems)
+    let queryDict = Dictionary(uniqueKeysWithValues: queryItems.map { ($0.name, $0.value) })
+
+    #expect(queryDict["limit"] == "0")
+  }
+
+  @Test
+  func testMusicLibraryPinsEndpointURLWithHighLimit() throws {
+    var request = MusicLibraryPinsRequest(developerToken: "test_token")
+    request.limit = 100
+
+    let endpointURL = try request.pinsEndpointURL
+    let components = try #require(URLComponents(url: endpointURL, resolvingAgainstBaseURL: false))
+    let queryItems = try #require(components.queryItems)
+    let queryDict = Dictionary(uniqueKeysWithValues: queryItems.map { ($0.name, $0.value) })
+
+    #expect(queryDict["limit"] == "100")
+  }
+
+  @Test
+  func testMusicLibraryPinsEndpointURLWithDifferentLanguages() throws {
+    let languages = ["en-US", "es-ES", "fr-FR", "de-DE", "ja-JP"]
+    for language in languages {
+      var request = MusicLibraryPinsRequest(developerToken: "test_token")
+      request.language = language
+
+      let endpointURL = try request.pinsEndpointURL
+      let components = try #require(URLComponents(url: endpointURL, resolvingAgainstBaseURL: false))
+      let queryItems = try #require(components.queryItems)
+      let queryDict = Dictionary(uniqueKeysWithValues: queryItems.map { ($0.name, $0.value) })
+
+      #expect(queryDict["l"] == language)
+    }
+  }
+
+  @Test
+  func testMusicLibraryPinsEndpointURLWithArtworkDisabled() throws {
+    var request = MusicLibraryPinsRequest(developerToken: "test_token")
+    request.includeArtworkURLs = false
+
+    let endpointURL = try request.pinsEndpointURL
+    let components = try #require(URLComponents(url: endpointURL, resolvingAgainstBaseURL: false))
+    let queryItems = try #require(components.queryItems)
+    let queryDict = Dictionary(uniqueKeysWithValues: queryItems.map { ($0.name, $0.value) })
+
+    // When artwork URLs are disabled, art[url] should not be present
+    #expect(queryDict["art[url]"] == nil)
+  }
+
   @Test
   func testLibraryPinAttributesDecoding() throws {
     let jsonString = """

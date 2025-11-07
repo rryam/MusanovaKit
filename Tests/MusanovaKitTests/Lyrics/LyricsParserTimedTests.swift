@@ -145,6 +145,139 @@ struct LyricsParserTimedTests {
     }
   }
 
+  // MARK: - Error Cases
+
+  @Test
+  func testParserHandlesEmptyInput() throws {
+    let parser = LyricsParser()
+    let paragraphs = parser.parse("")
+    #expect(paragraphs.isEmpty)
+  }
+
+  @Test
+  func testParserHandlesInvalidXML() throws {
+    let invalidXML = "<not>valid</xml>"
+    let parser = LyricsParser()
+    let paragraphs = parser.parse(invalidXML)
+    // Parser should handle gracefully and return empty or partial results
+    #expect(paragraphs.isEmpty || paragraphs.allSatisfy { $0.lines.isEmpty })
+  }
+
+  @Test
+  func testParserHandlesMalformedTTML() throws {
+    let malformed = """
+    <tt xmlns="http://www.w3.org/ns/ttml">
+      <body>
+        <div>
+          <p>Unclosed tag
+        </div>
+      </body>
+    </tt>
+    """
+    let parser = LyricsParser()
+    let paragraphs = parser.parse(malformed)
+    // Should handle gracefully
+    #expect(paragraphs.isEmpty || paragraphs.allSatisfy { $0.lines.isEmpty })
+  }
+
+  @Test
+  func testParserHandlesInvalidTimecodeFormat() throws {
+    let ttml = wrapTTML(body: """
+      <div>
+        <p><span begin="invalid" end="also-invalid">Text</span></p>
+      </div>
+      """)
+    let parser = LyricsParser()
+    let paragraphs = parser.parse(ttml)
+
+    let line = try #require(paragraphs.first?.lines.first)
+    let segment = try #require(line.segments.first)
+    // Invalid timecodes should default to 0 for start, end should match start
+    #expect(segment.startTime == 0)
+    #expect(segment.endTime == 0)
+    #expect(segment.text == "Text")
+  }
+
+  @Test
+  func testParserHandlesEmptyTimecode() throws {
+    let ttml = wrapTTML(body: """
+      <div>
+        <p><span begin="" end="">Text</span></p>
+      </div>
+      """)
+    let parser = LyricsParser()
+    let paragraphs = parser.parse(ttml)
+
+    let line = try #require(paragraphs.first?.lines.first)
+    let segment = try #require(line.segments.first)
+    // Empty timecodes should default to 0
+    #expect(segment.startTime == 0)
+    #expect(segment.endTime == 0)
+  }
+
+  @Test
+  func testParserHandlesInvalidTimecodeWithCommas() throws {
+    let ttml = wrapTTML(body: """
+      <div>
+        <p><span begin="1,2,3" end="4,5,6">Text</span></p>
+      </div>
+      """)
+    let parser = LyricsParser()
+    let paragraphs = parser.parse(ttml)
+
+    let line = try #require(paragraphs.first?.lines.first)
+    let segment = try #require(line.segments.first)
+    // Should handle gracefully, defaults to 0
+    #expect(segment.startTime == 0)
+    #expect(segment.endTime == 0)
+  }
+
+  @Test
+  func testParserHandlesTimecodeWithTooManyComponents() throws {
+    let ttml = wrapTTML(body: """
+      <div>
+        <p><span begin="1:2:3:4" end="5:6:7:8">Text</span></p>
+      </div>
+      """)
+    let parser = LyricsParser()
+    let paragraphs = parser.parse(ttml)
+
+    let line = try #require(paragraphs.first?.lines.first)
+    let segment = try #require(line.segments.first)
+    // Should parse what it can, defaulting invalid parts to 0
+    #expect(segment.text == "Text")
+  }
+
+  @Test
+  func testParserHandlesEmptySpans() throws {
+    let ttml = wrapTTML(body: """
+      <div>
+        <p><span begin="1.0" end="2.0"></span></p>
+      </div>
+      """)
+    let parser = LyricsParser()
+    let paragraphs = parser.parse(ttml)
+
+    let line = try #require(paragraphs.first?.lines.first)
+    // Empty spans should not create segments
+    #expect(line.segments.isEmpty)
+  }
+
+  @Test
+  func testParserHandlesWhitespaceOnlySpans() throws {
+    let ttml = wrapTTML(body: """
+      <div>
+        <p><span begin="1.0" end="2.0">   </span></p>
+      </div>
+      """)
+    let parser = LyricsParser()
+    let paragraphs = parser.parse(ttml)
+
+    let line = try #require(paragraphs.first?.lines.first)
+    // Whitespace-only spans should not create segments
+    #expect(line.segments.isEmpty)
+  }
+
   private func wrapTTML(body: String) -> String {
     """
     <tt xmlns="http://www.w3.org/ns/ttml" xmlns:itunes="http://music.apple.com/lyric-ttml-internal" xmlns:ttm="http://www.w3.org/ns/ttml#metadata">
