@@ -8,8 +8,8 @@
 import Foundation
 
 /// An object that represents a unique identifier for a music year.
-@frozen public struct MusicYearID: Equatable, Hashable, Sendable, RawRepresentable, ExpressibleByStringLiteral, ExpressibleByIntegerLiteral {
-
+@frozen
+public struct MusicYearID: Equatable, Hashable, Sendable, RawRepresentable, ExpressibleByStringLiteral, ExpressibleByIntegerLiteral {
   /// The corresponding value of the raw type.
   public let rawValue: String
 

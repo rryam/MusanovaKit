@@ -8,7 +8,6 @@
 import Foundation
 
 public extension MSummaries {
-
   /// Fetches music summary milestones for a specified year and list of music item types.
   ///
   /// Use this method to fetch music summary milestones for a specific year and types of music items.
@@ -45,15 +44,14 @@ public extension MSummaries {
 
 /// A request object used to fetch music summary milestones for a specified year and list of music item types.
 struct MusicSummaryMilestonesRequest {
-
   /// The privileged developer token used to authorize the request.
   private var developerToken: String
 
   /// The year to fetch music summary milestones for.
-  public var year: MusicYearID
+  var year: MusicYearID
 
   /// The types of music items to include in the music summary milestones.
-  public var types: [MusicSummaryMilestonesMusicItemsType]
+  var types: [MusicSummaryMilestonesMusicItemsType]
 
   /// Initializes a new `MusicSummaryMilestonesRequest`.
   ///
@@ -61,7 +59,7 @@ struct MusicSummaryMilestonesRequest {
   ///   - year: The year to fetch music summary milestones for.
   ///   - types: The types of music items to include in the music summary milestones.
   ///   - developerToken: The privileged developer token used to authorize the request.
-  public init(year: MusicYearID, types: [MusicSummaryMilestonesMusicItemsType], developerToken: String) {
+  init(year: MusicYearID, types: [MusicSummaryMilestonesMusicItemsType], developerToken: String) {
     self.year = year
     self.types = types
     self.developerToken = developerToken
@@ -70,7 +68,7 @@ struct MusicSummaryMilestonesRequest {
   /// Sends the request and returns a response object containing the fetched music summary milestones.
   ///
   /// - Returns: A `MusicSummaryMilestones` object.
-  public func response() async throws -> MusicSummaryMilestones {
+  func response() async throws -> MusicSummaryMilestones {
     let url = try musicSummariesMilestonesEndpointURL
     let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
     let response = try await request.response()

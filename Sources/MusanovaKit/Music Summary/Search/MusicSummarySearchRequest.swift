@@ -42,7 +42,6 @@ public extension MSummaries {
 /// Use this request to fetch music summary data for the user's library, such as their most frequently played songs, albums, and playlists over the course of a year.
 /// After creating an instance of this request, call the `response()` method to retrieve the music summary data for the user's library.
 struct MusicSummarySearchRequest {
-
   /// The developer token used to authorize the request.
   private var developerToken: String
 

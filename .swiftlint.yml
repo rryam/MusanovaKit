@@ -1,6 +1,6 @@
 included:
   - Plugins
-  - Source
+  - Sources
   - Tests
 excluded:
   - Tests/SwiftLintFrameworkTests/Resources

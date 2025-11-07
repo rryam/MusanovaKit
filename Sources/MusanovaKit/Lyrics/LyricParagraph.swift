@@ -11,7 +11,7 @@ import Foundation
 public typealias LyricParagraphs = [LyricParagraph]
 
 /// Represents a paragraph or section of lyrics.
-public struct LyricParagraph: Identifiable {
+public struct LyricParagraph: Identifiable, Sendable {
     /// A unique identifier for the lyric paragraph.
     public let id = UUID()
 

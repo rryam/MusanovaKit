@@ -1,8 +1,7 @@
 import Foundation
 
 /// Represents a timed segment of a lyric line.
-public struct LyricSegment: Identifiable {
-
+public struct LyricSegment: Identifiable, Sendable {
   /// A unique identifier for the lyric segment.
   public let id = UUID()
 

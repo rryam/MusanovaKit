@@ -8,15 +8,13 @@
 import Foundation
 
 /// Represents the response containing lyrics data.
-public struct MusicLyricsResponse: Codable {
-
+public struct MusicLyricsResponse: Codable, Sendable {
   /// An array of `LyricsData` objects containing the lyrics information.
   let data: [LyricsData]
 }
 
 /// Represents the data for a single lyrics item.
-public struct LyricsData: Codable {
-
+public struct LyricsData: Codable, Sendable {
   /// The unique identifier for the lyrics item.
   let id: String
 
@@ -28,8 +26,7 @@ public struct LyricsData: Codable {
 }
 
 /// Contains the lyrics content and play parameters.
-public struct LyricsAttributes: Codable {
-
+public struct LyricsAttributes: Codable, Sendable {
   /// The lyrics content in TTML (Timed Text Markup Language) format.
   let ttml: String
 
@@ -38,8 +35,7 @@ public struct LyricsAttributes: Codable {
 }
 
 /// Represents parameters for playing the lyrics.
-public struct PlayParams: Codable {
-
+public struct PlayParams: Codable, Sendable {
   /// The unique identifier for the play parameters.
   let id: String
 

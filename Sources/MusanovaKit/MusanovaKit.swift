@@ -6,13 +6,13 @@
 //
 
 import Foundation
-@_exported import MusicKit
 @_exported import MusadoraKit
+@_exported import MusicKit
 
 public struct MusanovaKit {}
 
-extension MusanovaKit {
-  public static var privilegedDeveloperToken: String? {
+public extension MusanovaKit {
+  static var privilegedDeveloperToken: String? {
     ProcessInfo.processInfo.environment["DEVELOPER_TOKEN"]
   }
 }

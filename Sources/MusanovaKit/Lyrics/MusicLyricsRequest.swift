@@ -8,12 +8,12 @@
 import Foundation
 
 /// Represents an error response from the Apple Music API.
-public struct MusicErrorResponse: Codable {
+public struct MusicErrorResponse: Codable, Sendable {
   let errors: [MusicError]
 }
 
 /// Represents a single error from the Apple Music API.
-public struct MusicError: Codable {
+public struct MusicError: Codable, Sendable {
   let id: String
   let title: String
   let detail: String
@@ -22,7 +22,7 @@ public struct MusicError: Codable {
 }
 
 /// Errors that can occur during lyrics operations.
-public enum LyricsError: Error {
+public enum LyricsError: Error, Sendable {
   case apiError(String)
 }
 

@@ -5,12 +5,11 @@
 //  Created by Rudrank Riyam on 04/04/23.
 //
 
-import MusadoraKit
 import Foundation
+import MusadoraKit
 
 /// A structure for constructing URLs for Apple Music AMP API requests.
 public struct AppleMusicAMPURLComponents {
-
   /// The underlying `URLComponents` instance.
   private var components: URLComponents
 

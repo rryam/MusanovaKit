@@ -11,8 +11,7 @@ import Foundation
 public typealias LyricLines = [LyricLine]
 
 /// Represents a single line of lyrics.
-public struct LyricLine: Identifiable {
-
+public struct LyricLine: Identifiable, Sendable {
   /// A unique identifier for the lyric line.
   public let id = UUID()
 

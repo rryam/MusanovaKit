@@ -8,7 +8,6 @@
 import Foundation
 
 public extension MLibrary {
-
   /// Fetches pinned items from the user's Apple Music library.
   ///
   /// This method retrieves music content that the user has pinned in their library.

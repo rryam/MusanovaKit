@@ -8,10 +8,9 @@
 import Foundation
 
 /// A response object representing a list of music summary milestones.
-struct MusicSummaryMilestonesResponse: Decodable {
-
+struct MusicSummaryMilestonesResponse: Decodable, Sendable {
   /// An array of `MusicSummaryMilestone` objects.
-  public let milestones: [MusicSummaryMilestone]
+  let milestones: [MusicSummaryMilestone]
 }
 
 extension MusicSummaryMilestonesResponse {

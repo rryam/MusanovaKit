@@ -18,8 +18,7 @@ import MusadoraKit
 ///     let pin: LibraryPin = ...
 ///     print("Pinned item ID: \(pin.id), Type: \(pin.type)")
 ///
-public struct LibraryPin: Decodable, MusicItem {
-
+public struct LibraryPin: Decodable, MusicItem, Sendable {
   /// The unique identifier of the pinned item.
   ///
   /// This corresponds to the music item ID of the pinned content.
@@ -48,7 +47,6 @@ public struct LibraryPin: Decodable, MusicItem {
 
 /// Attributes for a library pin item.
 public struct LibraryPinAttributes: Decodable, Sendable {
-
   /// The name or title of the pinned item.
   public let name: String?
 
@@ -67,7 +65,6 @@ public struct LibraryPinAttributes: Decodable, Sendable {
 /// This structure contains references to related music content
 /// that may be associated with the pinned item.
 public struct LibraryPinRelationships: Decodable, Sendable {
-
   /// Related albums (if applicable).
   public let albums: Albums?
 

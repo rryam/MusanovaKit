@@ -16,7 +16,7 @@ public enum ResourceFormat: String, Sendable {
 /// Represents metadata types for library pins.
 public enum LibraryPinMeta: String, Sendable {
   /// Library pin metadata type.
-  case libraryPin = "libraryPin"
+  case libraryPin
 }
 
 /// A request that your app uses to fetch pinned items from the user's Apple Music library.
@@ -34,7 +34,6 @@ public enum LibraryPinMeta: String, Sendable {
 ///     }
 ///
 public struct MusicLibraryPinsRequest {
-
   /// The privileged developer token used to authorize the request.
   private let developerToken: String
 
@@ -86,7 +85,6 @@ public struct MusicLibraryPinsRequest {
 
 /// URL construction for the pins endpoint.
 extension MusicLibraryPinsRequest {
-
   /// The endpoint URL for fetching library pins.
   var pinsEndpointURL: URL {
     get throws {

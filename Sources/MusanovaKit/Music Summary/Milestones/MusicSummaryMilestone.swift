@@ -20,8 +20,7 @@ import Foundation
 ///     print("Date Reached: \(milestone.dateReached), Value: \(milestone.value)")
 ///     print("Kind: \(milestone.kind)")
 ///
-public struct MusicSummaryMilestone: Codable {
-  
+public struct MusicSummaryMilestone: Codable, Sendable {
   /// The unique identifier for the music summary milestone.
   public let id: String
 
@@ -51,23 +50,22 @@ extension MusicSummaryMilestone: Identifiable {
 }
 
 extension MusicSummaryMilestone: Hashable {
-  
 }
 
-extension MusicSummaryMilestone {
-  private enum CodingKeys: String, CodingKey {
+private extension MusicSummaryMilestone {
+  enum CodingKeys: String, CodingKey {
     case id
     case attributes
     case relationships
   }
 
-  private enum RelationshipsCodingKeys: String, CodingKey {
+  enum RelationshipsCodingKeys: String, CodingKey {
     case topSongs = "top-songs"
     case topArtists = "top-artists"
     case topAlbums = "top-albums"
   }
 
-  private enum AttributesCodingKeys: String, CodingKey {
+  enum AttributesCodingKeys: String, CodingKey {
     case listenTimeInMinutes
     case dateReached
     case value
@@ -75,8 +73,8 @@ extension MusicSummaryMilestone {
   }
 }
 
-extension MusicSummaryMilestone {
-  public init(from decoder: Decoder) throws {
+public extension MusicSummaryMilestone {
+  init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     id = try container.decode(String.self, forKey: .id)
 
@@ -92,7 +90,7 @@ extension MusicSummaryMilestone {
     topArtists = try relationshipsContainer.decodeIfPresent(Artists.self, forKey: .topArtists) ?? []
   }
 
-  public func encode(to encoder: Encoder) throws {
+  func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
     try container.encode(id, forKey: .id)
 

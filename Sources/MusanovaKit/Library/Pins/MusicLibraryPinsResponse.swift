@@ -60,7 +60,6 @@ public struct PinResources: Decodable, Sendable {
 ///     }
 ///
 public struct MusicLibraryPinsResponse: Decodable, Sendable {
-
   /// Array of pin references containing basic identification information.
   public let data: [PinReference]
 

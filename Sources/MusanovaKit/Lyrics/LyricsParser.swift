@@ -9,7 +9,6 @@ import Foundation
 
 /// A parser for converting TTML (Timed Text Markup Language) lyrics into structured `LyricParagraph` objects.
 public class LyricsParser: NSObject, XMLParserDelegate {
-
   /// The parsed lyric paragraphs.
   private var paragraphs: [LyricParagraph] = []
 
@@ -68,7 +67,7 @@ public class LyricsParser: NSObject, XMLParserDelegate {
   ///   - namespaceURI: The namespace URI or `nil` if none is available.
   ///   - qName: The qualified name or `nil` if none is available.
   ///   - attributeDict: A dictionary of attribute names and values.
-  public func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String] = [:]) {
+  public func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String: String] = [:]) {
     currentElement = elementName
     elementStack.append(elementName)
 

@@ -18,8 +18,7 @@ import Foundation
 ///     let summary: MusicSummarySearch = ...
 ///     print("Year: \(summary.year), Playlist: \(summary.playlist)")
 ///
-public struct MusicSummarySearch: Decodable, MusicItem {
-
+public struct MusicSummarySearch: Decodable, MusicItem, Sendable {
   /// The unique identifier of the `MusicSummarySearch`.
   ///
   /// This property returns the unique identifier of the associated playlist.
@@ -74,8 +73,8 @@ extension MusicSummarySearch {
   }
 }
 
-extension MusicSummarySearch {
-  public init(from decoder: Decoder) throws {
+public extension MusicSummarySearch {
+  init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     let attributesContainer = try container.nestedContainer(keyedBy: AttributesKeys.self, forKey: .attributes)
     year = try attributesContainer.decode(Int.self, forKey: .year)
