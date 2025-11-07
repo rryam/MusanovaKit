@@ -21,11 +21,6 @@ public struct MusicError: Codable, Sendable {
   let code: String
 }
 
-/// Errors that can occur during lyrics operations.
-public enum LyricsError: Error, Sendable {
-  case apiError(String)
-}
-
 /// A request object used to fetch lyrics for a specified song.
 struct MusicLyricsRequest {
   /// The identifier of the song.
@@ -40,24 +35,44 @@ struct MusicLyricsRequest {
   func response(countryCode: String? = nil) async throws -> MusicLyricsResponse {
     let url = try await lyricsEndpointURL(countryCode: countryCode)
     let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
-    let response = try await request.response()
+    
+    do {
+      let response = try await request.response()
 
-    if response.data.isEmpty {
-      throw LyricsError.apiError("Empty response from lyrics API")
-    }
-
-    guard String(data: response.data, encoding: .utf8) != nil else {
-      throw LyricsError.apiError("Invalid response format from lyrics API")
-    }
-
-    if let errorResponse = try? JSONDecoder().decode(MusicErrorResponse.self, from: response.data) {
-      if let error = errorResponse.errors.first {
-        throw LyricsError.apiError(error.detail)
+      if response.data.isEmpty {
+        throw MusanovaKitError.emptyResponse
       }
-    }
 
-    let lyricsResponse = try JSONDecoder().decode(MusicLyricsResponse.self, from: response.data)
-    return lyricsResponse
+      // Check for API error responses first
+      if let errorResponse = try? JSONDecoder().decode(MusicErrorResponse.self, from: response.data),
+         !errorResponse.errors.isEmpty {
+        let error = errorResponse.errors.first!
+        throw MusanovaKitError.apiError(
+          message: error.detail,
+          code: error.code,
+          status: error.status
+        )
+      }
+
+      guard String(data: response.data, encoding: .utf8) != nil else {
+        throw MusanovaKitError.invalidResponseFormat(description: "Response data is not valid UTF-8")
+      }
+
+      do {
+        let lyricsResponse = try JSONDecoder().decode(MusicLyricsResponse.self, from: response.data)
+        return lyricsResponse
+      } catch let decodingError as DecodingError {
+        throw MusanovaKitError.decodingError(decodingError.localizedDescription)
+      } catch {
+        throw MusanovaKitError.decodingError(error.localizedDescription)
+      }
+    } catch let error as MusanovaKitError {
+      throw error
+    } catch let error as URLError {
+      throw MusanovaKitError.networkError(error.localizedDescription)
+    } catch {
+      throw MusanovaKitError.networkError(error.localizedDescription)
+    }
   }
 }
 
@@ -75,7 +90,7 @@ extension MusicLyricsRequest {
     components.path = "catalog/\(resolvedCountryCode)/songs/\(songID.rawValue)/syllable-lyrics"
 
     guard let url = components.url else {
-      throw URLError(.badURL)
+      throw MusanovaKitError.invalidURL(description: "Failed to construct lyrics endpoint URL with path: \(components.path)")
     }
 
     return url
@@ -102,10 +117,13 @@ public extension MCatalog {
   ///   a section of the song's lyrics.
   ///
   /// - Throws: This method can throw errors in the following situations:
-  ///   - `MusicLyricsRequest.Error`: If there's an error creating or sending the lyrics request.
-  ///   - `DecodingError`: If the response cannot be properly decoded into the expected format.
-  ///   - `URLError`: If there's a network-related error during the request.
-  ///   - `LyricsParser.Error`: If there's an error parsing the TTML string into `LyricParagraphs`.
+  ///   - `MusanovaKitError.apiError`: If the API returns an error response.
+  ///   - `MusanovaKitError.emptyResponse`: If the API returns an empty response.
+  ///   - `MusanovaKitError.invalidResponseFormat`: If the response format is invalid.
+  ///   - `MusanovaKitError.invalidURL`: If the request URL could not be constructed.
+  ///   - `MusanovaKitError.decodingError`: If the response cannot be properly decoded.
+  ///   - `MusanovaKitError.networkError`: If a network error occurs during the request.
+  ///   - `MusanovaKitError.countryCodeUnavailable`: If the country code cannot be determined.
   ///
   /// - Note: If no lyrics are found for the specified song, this method returns an empty `LyricParagraphs` array
   ///   instead of throwing an error.

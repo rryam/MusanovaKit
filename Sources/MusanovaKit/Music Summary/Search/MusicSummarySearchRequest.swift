@@ -29,7 +29,7 @@ public extension MSummaries {
   ///
   /// - Returns: An instance of `MusicSummarySearches` containing the search results for music summary data for the user's library.
   ///
-  /// - Throws: An error of type `URLError` or `DecodingError` if the request fails or the response cannot be decoded.
+  /// - Throws: `MusanovaKitError` if the request fails or the response cannot be decoded.
   static func search(developerToken: String) async throws -> MusicSummarySearches {
     let request = MusicSummarySearchRequest(developerToken: developerToken)
     let response = try await request.response()
@@ -55,7 +55,7 @@ struct MusicSummarySearchRequest {
   /// Fetches music summaries for the user's library.
   ///
   /// - Returns: An instance of `MusicSummarySearches` containing the music summary data for the user's library.
-  /// - Throws: An error of type `URLError` or `DecodingError` if the request fails or the response cannot be decoded.
+  /// - Throws: `MusanovaKitError` if the request fails or the response cannot be decoded.
   ///
   /// Example usage:
   ///
@@ -70,10 +70,25 @@ struct MusicSummarySearchRequest {
   ///       print(error)
   ///     }
   func response() async throws -> MusicSummarySearches {
-    let url = try musicSummariesSearchEndpointURL
-    let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
-    let response = try await request.response()
-    return try JSONDecoder().decode(MusicSummarySearches.self, from: response.data)
+    do {
+      let url = try musicSummariesSearchEndpointURL
+      let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
+      let response = try await request.response()
+      
+      do {
+        return try JSONDecoder().decode(MusicSummarySearches.self, from: response.data)
+      } catch let decodingError as DecodingError {
+        throw MusanovaKitError.decodingError(decodingError.localizedDescription)
+      } catch {
+        throw MusanovaKitError.decodingError(error.localizedDescription)
+      }
+    } catch let error as MusanovaKitError {
+      throw error
+    } catch let error as URLError {
+      throw MusanovaKitError.networkError(error.localizedDescription)
+    } catch {
+      throw MusanovaKitError.networkError(error.localizedDescription)
+    }
   }
 }
 
@@ -90,7 +105,7 @@ extension MusicSummarySearchRequest {
       ]
 
       guard let url = components.url else {
-        throw URLError(.badURL)
+        throw MusanovaKitError.invalidURL(description: "Failed to construct search endpoint URL with path: \(components.path)")
       }
       return url
     }

@@ -34,7 +34,7 @@ public extension MSummaries {
   ///
   /// - Returns: An array of `MusicSummaryMilestone` objects containing the fetched music summary milestones.
   ///
-  /// - Throws: An error of type `URLError` or `DecodingError` if the request fails or the response cannot be decoded.
+  /// - Throws: `MusanovaKitError` if the request fails or the response cannot be decoded.
   static func milestones(forYear year: MusicYearID, musicItemTypes: [MusicSummaryMilestonesMusicItemsType] = [], developerToken: String) async throws -> MusicSummaryMilestones {
     let request = MusicSummaryMilestonesRequest(year: year, types: musicItemTypes, developerToken: developerToken)
     let response = try await request.response()
@@ -69,11 +69,26 @@ struct MusicSummaryMilestonesRequest {
   ///
   /// - Returns: A `MusicSummaryMilestones` object.
   func response() async throws -> MusicSummaryMilestones {
-    let url = try musicSummariesMilestonesEndpointURL
-    let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
-    let response = try await request.response()
-    let milestonesResponse = try JSONDecoder().decode(MusicSummaryMilestonesResponse.self, from: response.data)
-    return milestonesResponse.milestones
+    do {
+      let url = try musicSummariesMilestonesEndpointURL
+      let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
+      let response = try await request.response()
+      
+      do {
+        let milestonesResponse = try JSONDecoder().decode(MusicSummaryMilestonesResponse.self, from: response.data)
+        return milestonesResponse.milestones
+      } catch let decodingError as DecodingError {
+        throw MusanovaKitError.decodingError(decodingError.localizedDescription)
+      } catch {
+        throw MusanovaKitError.decodingError(error.localizedDescription)
+      }
+    } catch let error as MusanovaKitError {
+      throw error
+    } catch let error as URLError {
+      throw MusanovaKitError.networkError(error.localizedDescription)
+    } catch {
+      throw MusanovaKitError.networkError(error.localizedDescription)
+    }
   }
 }
 
@@ -95,7 +110,7 @@ extension MusicSummaryMilestonesRequest {
       }
 
       guard let url = components.url else {
-        throw URLError(.badURL)
+        throw MusanovaKitError.invalidURL(description: "Failed to construct milestones endpoint URL with path: \(components.path)")
       }
       return url
     }

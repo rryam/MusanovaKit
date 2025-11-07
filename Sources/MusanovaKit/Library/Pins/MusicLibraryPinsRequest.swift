@@ -74,12 +74,27 @@ public struct MusicLibraryPinsRequest {
   /// Fetches pinned items from the user's library.
   ///
   /// - Returns: A `MusicLibraryPinsResponse` containing the pinned items.
-  /// - Throws: An error if the request fails or the response cannot be decoded.
+  /// - Throws: `MusanovaKitError` if the request fails or the response cannot be decoded.
   public func response() async throws -> MusicLibraryPinsResponse {
-    let url = try pinsEndpointURL
-    let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
-    let response = try await request.response()
-    return try JSONDecoder().decode(MusicLibraryPinsResponse.self, from: response.data)
+    do {
+      let url = try pinsEndpointURL
+      let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
+      let response = try await request.response()
+      
+      do {
+        return try JSONDecoder().decode(MusicLibraryPinsResponse.self, from: response.data)
+      } catch let decodingError as DecodingError {
+        throw MusanovaKitError.decodingError(decodingError.localizedDescription)
+      } catch {
+        throw MusanovaKitError.decodingError(error.localizedDescription)
+      }
+    } catch let error as MusanovaKitError {
+      throw error
+    } catch let error as URLError {
+      throw MusanovaKitError.networkError(error.localizedDescription)
+    } catch {
+      throw MusanovaKitError.networkError(error.localizedDescription)
+    }
   }
 }
 
@@ -121,7 +136,7 @@ extension MusicLibraryPinsRequest {
       components.queryItems = queryItems
 
       guard let url = components.url else {
-        throw URLError(.badURL)
+        throw MusanovaKitError.invalidURL(description: "Failed to construct pins endpoint URL with path: \(components.path)")
       }
 
       return url

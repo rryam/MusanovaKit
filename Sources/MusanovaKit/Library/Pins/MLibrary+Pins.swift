@@ -118,7 +118,7 @@ public extension MLibrary {
     ]
 
     guard let url = components.url else {
-      throw URLError(.badURL)
+      throw MusanovaKitError.invalidURL(description: "Failed to construct pin operation URL with path: \(components.path)")
     }
 
     let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken, method: method)

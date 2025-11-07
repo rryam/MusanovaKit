@@ -84,7 +84,7 @@ public extension MusicSummarySearch {
     if let firstPlaylist = playlists.first {
       playlist = firstPlaylist
     } else {
-      throw DecodingError.dataCorrupted(.init(codingPath: relationshipsContainer.codingPath, debugDescription: "The replay year \(year) does not contain any playlist."))
+      throw MusanovaKitError.decodingError("The replay year \(year) does not contain any playlist.")
     }
   }
 }
