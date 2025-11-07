@@ -66,8 +66,12 @@ public struct MusicLibraryPinsRequest {
 
   /// Initializes a new pins request.
   ///
-  /// - Parameter developerToken: The privileged developer token for authentication.
-  public init(developerToken: String) {
+  /// - Parameter developerToken: The privileged developer token for authentication. Must not be empty.
+  /// - Throws: `MusanovaKitError.missingDeveloperToken` if the developer token is empty.
+  public init(developerToken: String) throws {
+    guard !developerToken.isEmpty else {
+      throw MusanovaKitError.missingDeveloperToken
+    }
     self.developerToken = developerToken
   }
 
@@ -80,7 +84,7 @@ public struct MusicLibraryPinsRequest {
       let url = try pinsEndpointURL
       let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
       let response = try await request.response()
-      
+
       do {
         return try JSONDecoder().decode(MusicLibraryPinsResponse.self, from: response.data)
       } catch let decodingError as DecodingError {

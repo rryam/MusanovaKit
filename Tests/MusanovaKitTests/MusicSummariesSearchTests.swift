@@ -15,7 +15,7 @@ import Testing
 struct MusicSummariesSearchTests {
   @Test
   func testMusicSummariesSearchEndpointURL() throws {
-    let request = MusicSummarySearchRequest(developerToken: "")
+    let request = try MusicSummarySearchRequest(developerToken: "test_token")
     let endpointURL = try request.musicSummariesSearchEndpointURL
     let expectedURL = try #require(URL(string: "https://amp-api.music.apple.com/v1/me/music-summaries/search?period=year&fields[music-summaries]=period,year&include[music-summaries]=playlist"))
     #expect(endpointURL == expectedURL)
@@ -25,7 +25,7 @@ struct MusicSummariesSearchTests {
 
   @Test
   func testMusicSummariesSearchEndpointURLHasRequiredParameters() throws {
-    let request = MusicSummarySearchRequest(developerToken: "")
+    let request = try MusicSummarySearchRequest(developerToken: "test_token")
     let endpointURL = try request.musicSummariesSearchEndpointURL
     let components = try #require(URLComponents(url: endpointURL, resolvingAgainstBaseURL: false))
     let queryItems = try #require(components.queryItems)
@@ -40,7 +40,7 @@ struct MusicSummariesSearchTests {
 
   @Test
   func testMusicSummariesSearchEndpointURLStructure() throws {
-    let request = MusicSummarySearchRequest(developerToken: "")
+    let request = try MusicSummarySearchRequest(developerToken: "test_token")
     let endpointURL = try request.musicSummariesSearchEndpointURL
 
     #expect(endpointURL.absoluteString.hasPrefix("https://amp-api.music.apple.com/v1/me/music-summaries/search"))

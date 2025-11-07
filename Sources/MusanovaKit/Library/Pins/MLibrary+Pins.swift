@@ -40,7 +40,10 @@ public extension MLibrary {
   ///     }
   ///
   static func pins(developerToken: String, limit: Int = 25) async throws -> MusicLibraryPinsResponse {
-    var request = MusicLibraryPinsRequest(developerToken: developerToken)
+    guard !developerToken.isEmpty else {
+      throw MusanovaKitError.missingDeveloperToken
+    }
+    var request = try MusicLibraryPinsRequest(developerToken: developerToken)
     request.limit = limit
     request.includeArtworkURLs = true
 
@@ -96,6 +99,9 @@ public extension MLibrary {
   ///
   @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *)
   static func pin(_ item: some Pinnable, developerToken: String) async throws {
+    guard !developerToken.isEmpty else {
+      throw MusanovaKitError.missingDeveloperToken
+    }
     try await pin(itemId: item.id.rawValue, developerToken: developerToken)
   }
 
@@ -108,6 +114,9 @@ public extension MLibrary {
   ///
   /// - Throws: An error if the request fails or the operation cannot be completed.
   private static func performPinOperation(itemId: String, developerToken: String, method: HTTPMethod) async throws {
+    guard !developerToken.isEmpty else {
+      throw MusanovaKitError.missingDeveloperToken
+    }
     var components = AppleMusicAMPURLComponents()
     components.path = "me/library/pins/\(itemId)"
 
@@ -151,6 +160,9 @@ public extension MLibrary {
   ///
   @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *)
   static func unpin(_ item: some Pinnable, developerToken: String) async throws {
+    guard !developerToken.isEmpty else {
+      throw MusanovaKitError.missingDeveloperToken
+    }
     try await unpin(itemId: item.id.rawValue, developerToken: developerToken)
   }
 

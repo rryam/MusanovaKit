@@ -29,6 +29,11 @@ public struct MusicPrivilegedDataRequest {
     private let method: HTTPMethod
 
     /// Creates a data request with a URL request.
+    ///
+    /// - Parameters:
+    ///   - url: The URL for the data request.
+    ///   - developerToken: The privileged developer token for Apple Music API. Must not be empty.
+    ///   - method: The HTTP method for the request. Defaults to `.get`.
     public init(url: URL, developerToken: String, method: HTTPMethod = .get) {
         self.url = url
         self.developerToken = developerToken

@@ -31,7 +31,10 @@ public extension MSummaries {
   ///
   /// - Throws: `MusanovaKitError` if the request fails or the response cannot be decoded.
   static func search(developerToken: String) async throws -> MusicSummarySearches {
-    let request = MusicSummarySearchRequest(developerToken: developerToken)
+    guard !developerToken.isEmpty else {
+      throw MusanovaKitError.missingDeveloperToken
+    }
+    let request = try MusicSummarySearchRequest(developerToken: developerToken)
     let response = try await request.response()
     return response
   }
@@ -47,8 +50,12 @@ struct MusicSummarySearchRequest {
 
   /// Initializes a new `MusicSummarySearchRequest` instance.
   ///
-  /// - Parameter developerToken: The privileged developer token used to authorize the request.
-  init(developerToken: String) {
+  /// - Parameter developerToken: The privileged developer token used to authorize the request. Must not be empty.
+  /// - Throws: `MusanovaKitError.missingDeveloperToken` if the developer token is empty.
+  init(developerToken: String) throws {
+    guard !developerToken.isEmpty else {
+      throw MusanovaKitError.missingDeveloperToken
+    }
     self.developerToken = developerToken
   }
 
@@ -74,7 +81,7 @@ struct MusicSummarySearchRequest {
       let url = try musicSummariesSearchEndpointURL
       let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
       let response = try await request.response()
-      
+
       do {
         return try JSONDecoder().decode(MusicSummarySearches.self, from: response.data)
       } catch let decodingError as DecodingError {

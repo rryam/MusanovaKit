@@ -13,6 +13,7 @@ public struct MusanovaKit {}
 
 public extension MusanovaKit {
   static var privilegedDeveloperToken: String? {
-    ProcessInfo.processInfo.environment["DEVELOPER_TOKEN"]
+    let token = ProcessInfo.processInfo.environment["DEVELOPER_TOKEN"]
+    return token?.isEmpty == false ? token : nil
   }
 }

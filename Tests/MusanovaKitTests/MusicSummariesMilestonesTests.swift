@@ -15,7 +15,7 @@ import Testing
 struct MusicSummariesMilestonesTests {
   @Test
   func testMusicSummariesMilestonesEndpointURL() throws {
-    let request = MusicSummaryMilestonesRequest(year: 2022, types: [], developerToken: "")
+    let request = try MusicSummaryMilestonesRequest(year: 2022, types: [], developerToken: "test_token")
     let endpointURL = try request.musicSummariesMilestonesEndpointURL
     let url = try #require(URL(string: "https://amp-api.music.apple.com/v1/me/music-summaries/milestones?ids=year-2022"))
     #expect(endpointURL == url)
@@ -25,10 +25,10 @@ struct MusicSummariesMilestonesTests {
 
   @Test
   func testMusicSummariesMilestonesEndpointURLWithTypes() throws {
-    let request = MusicSummaryMilestonesRequest(
+    let request = try MusicSummaryMilestonesRequest(
       year: 2023,
       types: [.topArtists, .topSongs],
-      developerToken: ""
+      developerToken: "test_token"
     )
     let endpointURL = try request.musicSummariesMilestonesEndpointURL
     let urlString = endpointURL.absoluteString
@@ -42,10 +42,10 @@ struct MusicSummariesMilestonesTests {
 
   @Test
   func testMusicSummariesMilestonesEndpointURLWithAllTypes() throws {
-    let request = MusicSummaryMilestonesRequest(
+    let request = try MusicSummaryMilestonesRequest(
       year: 2024,
       types: [.topArtists, .topSongs, .topAlbums],
-      developerToken: ""
+      developerToken: "test_token"
     )
     let endpointURL = try request.musicSummariesMilestonesEndpointURL
     let urlString = endpointURL.absoluteString
@@ -60,7 +60,7 @@ struct MusicSummariesMilestonesTests {
   func testMusicSummariesMilestonesEndpointURLWithDifferentYears() throws {
     let years = [2020, 2021, 2022, 2023, 2024]
     for year in years {
-      let request = MusicSummaryMilestonesRequest(year: MusicYearID(year), types: [], developerToken: "")
+      let request = try MusicSummaryMilestonesRequest(year: MusicYearID(year), types: [], developerToken: "test_token")
       let endpointURL = try request.musicSummariesMilestonesEndpointURL
       let urlString = endpointURL.absoluteString
       #expect(urlString.contains("year-\(year)"))

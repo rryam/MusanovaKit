@@ -29,13 +29,27 @@ struct MusicLyricsRequest {
   /// The privileged developer token used to authorize the request.
   let developerToken: String
 
+  /// Initializes a new lyrics request.
+  ///
+  /// - Parameters:
+  ///   - songID: The identifier of the song.
+  ///   - developerToken: The privileged developer token used to authorize the request. Must not be empty.
+  /// - Throws: `MusanovaKitError.missingDeveloperToken` if the developer token is empty.
+  init(songID: MusicItemID, developerToken: String) throws {
+    guard !developerToken.isEmpty else {
+      throw MusanovaKitError.missingDeveloperToken
+    }
+    self.songID = songID
+    self.developerToken = developerToken
+  }
+
   /// Sends the request and returns a response object containing the fetched lyrics.
   ///
   /// - Returns: A `LyricsResponse` object.
   func response(countryCode: String? = nil) async throws -> MusicLyricsResponse {
     let url = try await lyricsEndpointURL(countryCode: countryCode)
     let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
-    
+
     do {
       let response = try await request.response()
 
@@ -131,7 +145,10 @@ public extension MCatalog {
   /// - Important: Ensure that you have the necessary permissions and a valid developer token
   ///   before calling this method. Unauthorized or incorrect usage may result in errors or empty results.
   static func lyrics(for song: Song, developerToken: String) async throws -> LyricParagraphs {
-    let request = MusicLyricsRequest(songID: song.id, developerToken: developerToken)
+    guard !developerToken.isEmpty else {
+      throw MusanovaKitError.missingDeveloperToken
+    }
+    let request = try MusicLyricsRequest(songID: song.id, developerToken: developerToken)
     let response = try await request.response()
 
     guard let lyricsString = response.data.first?.attributes.ttml else {

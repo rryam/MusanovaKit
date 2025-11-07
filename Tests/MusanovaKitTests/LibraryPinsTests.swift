@@ -15,7 +15,7 @@ import Testing
 struct LibraryPinsTests {
   @Test
   func testMusicLibraryPinsEndpointURL() throws {
-    let request = MusicLibraryPinsRequest(developerToken: "test_token")
+    let request = try MusicLibraryPinsRequest(developerToken: "test_token")
     let endpointURL = try request.pinsEndpointURL
 
     // Verify the base URL and path
@@ -41,7 +41,7 @@ struct LibraryPinsTests {
 
   @Test
   func testMusicLibraryPinsEndpointURLWithCustomParameters() throws {
-    var request = MusicLibraryPinsRequest(developerToken: "test_token")
+    var request = try MusicLibraryPinsRequest(developerToken: "test_token")
     request.limit = 10
     request.language = "es-ES"
     request.librarySongIncludes = ["albums"]
@@ -61,7 +61,7 @@ struct LibraryPinsTests {
 
   @Test
   func testMusicLibraryPinsEndpointURLWithAllIncludesDisabled() throws {
-    var request = MusicLibraryPinsRequest(developerToken: "test_token")
+    var request = try MusicLibraryPinsRequest(developerToken: "test_token")
     request.libraryArtistIncludes = []
     request.libraryMusicVideoIncludes = []
     request.librarySongIncludes = []
@@ -81,7 +81,7 @@ struct LibraryPinsTests {
 
   @Test
   func testMusicLibraryPinsEndpointURLWithEmptyArtistFields() throws {
-    var request = MusicLibraryPinsRequest(developerToken: "test_token")
+    var request = try MusicLibraryPinsRequest(developerToken: "test_token")
     request.artistFields = []
 
     let endpointURL = try request.pinsEndpointURL
@@ -95,7 +95,7 @@ struct LibraryPinsTests {
 
   @Test
   func testMusicLibraryPinsEndpointURLWithZeroLimit() throws {
-    var request = MusicLibraryPinsRequest(developerToken: "test_token")
+    var request = try MusicLibraryPinsRequest(developerToken: "test_token")
     request.limit = 0
 
     let endpointURL = try request.pinsEndpointURL
@@ -108,7 +108,7 @@ struct LibraryPinsTests {
 
   @Test
   func testMusicLibraryPinsEndpointURLWithHighLimit() throws {
-    var request = MusicLibraryPinsRequest(developerToken: "test_token")
+    var request = try MusicLibraryPinsRequest(developerToken: "test_token")
     request.limit = 100
 
     let endpointURL = try request.pinsEndpointURL
@@ -123,7 +123,7 @@ struct LibraryPinsTests {
   func testMusicLibraryPinsEndpointURLWithDifferentLanguages() throws {
     let languages = ["en-US", "es-ES", "fr-FR", "de-DE", "ja-JP"]
     for language in languages {
-      var request = MusicLibraryPinsRequest(developerToken: "test_token")
+      var request = try MusicLibraryPinsRequest(developerToken: "test_token")
       request.language = language
 
       let endpointURL = try request.pinsEndpointURL
@@ -137,7 +137,7 @@ struct LibraryPinsTests {
 
   @Test
   func testMusicLibraryPinsEndpointURLWithArtworkDisabled() throws {
-    var request = MusicLibraryPinsRequest(developerToken: "test_token")
+    var request = try MusicLibraryPinsRequest(developerToken: "test_token")
     request.includeArtworkURLs = false
 
     let endpointURL = try request.pinsEndpointURL

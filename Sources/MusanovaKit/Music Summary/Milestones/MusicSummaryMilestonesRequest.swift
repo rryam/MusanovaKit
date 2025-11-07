@@ -36,7 +36,10 @@ public extension MSummaries {
   ///
   /// - Throws: `MusanovaKitError` if the request fails or the response cannot be decoded.
   static func milestones(forYear year: MusicYearID, musicItemTypes: [MusicSummaryMilestonesMusicItemsType] = [], developerToken: String) async throws -> MusicSummaryMilestones {
-    let request = MusicSummaryMilestonesRequest(year: year, types: musicItemTypes, developerToken: developerToken)
+    guard !developerToken.isEmpty else {
+      throw MusanovaKitError.missingDeveloperToken
+    }
+    let request = try MusicSummaryMilestonesRequest(year: year, types: musicItemTypes, developerToken: developerToken)
     let response = try await request.response()
     return response
   }
@@ -58,8 +61,12 @@ struct MusicSummaryMilestonesRequest {
   /// - Parameters:
   ///   - year: The year to fetch music summary milestones for.
   ///   - types: The types of music items to include in the music summary milestones.
-  ///   - developerToken: The privileged developer token used to authorize the request.
-  init(year: MusicYearID, types: [MusicSummaryMilestonesMusicItemsType], developerToken: String) {
+  ///   - developerToken: The privileged developer token used to authorize the request. Must not be empty.
+  /// - Throws: `MusanovaKitError.missingDeveloperToken` if the developer token is empty.
+  init(year: MusicYearID, types: [MusicSummaryMilestonesMusicItemsType], developerToken: String) throws {
+    guard !developerToken.isEmpty else {
+      throw MusanovaKitError.missingDeveloperToken
+    }
     self.year = year
     self.types = types
     self.developerToken = developerToken
@@ -73,7 +80,7 @@ struct MusicSummaryMilestonesRequest {
       let url = try musicSummariesMilestonesEndpointURL
       let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
       let response = try await request.response()
-      
+
       do {
         let milestonesResponse = try JSONDecoder().decode(MusicSummaryMilestonesResponse.self, from: response.data)
         return milestonesResponse.milestones

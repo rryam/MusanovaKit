@@ -18,9 +18,6 @@ public class LyricsParser: NSObject, XMLParserDelegate {
   /// The song part (e.g., "Verse", "Chorus") of the current paragraph.
   private var currentSongPart: String?
 
-  /// The name of the current XML element being processed.
-  private var currentElement: String = ""
-
   /// The element stack to track the current parsing context.
   private var elementStack: [String] = []
 
@@ -68,7 +65,6 @@ public class LyricsParser: NSObject, XMLParserDelegate {
   ///   - qName: The qualified name or `nil` if none is available.
   ///   - attributeDict: A dictionary of attribute names and values.
   public func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String: String] = [:]) {
-    currentElement = elementName
     elementStack.append(elementName)
 
     if elementName == "div" {
@@ -163,17 +159,21 @@ public class LyricsParser: NSObject, XMLParserDelegate {
 
     switch components.count {
     case 3:
-      hours = Int(components[0]) ?? 0
-      minutes = Int(components[1]) ?? 0
+      guard let hoursValue = Int(components[0]), let minutesValue = Int(components[1]) else { return nil }
+      hours = hoursValue
+      minutes = minutesValue
       secondsComponent = components[2]
     case 2:
-      minutes = Int(components[0]) ?? 0
+      guard let minutesValue = Int(components[0]) else { return nil }
+      minutes = minutesValue
       secondsComponent = components[1]
     default:
       break
     }
 
-    let seconds = Double(secondsComponent.replacingOccurrences(of: ",", with: ".")) ?? 0
+    guard let seconds = Double(secondsComponent.replacingOccurrences(of: ",", with: ".")) else {
+      return nil
+    }
     return TimeInterval(hours * 3600 + minutes * 60) + seconds
   }
 
