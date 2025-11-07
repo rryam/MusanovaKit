@@ -97,7 +97,6 @@ public extension MLibrary {
   ///     try await MLibrary.pin(song, developerToken: token)
   ///     print("Song pinned successfully!")
   ///
-  @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *)
   static func pin(_ item: some Pinnable, developerToken: String) async throws {
     guard !developerToken.isEmpty else {
       throw MusanovaKitError.missingDeveloperToken
@@ -158,7 +157,6 @@ public extension MLibrary {
   ///     try await MLibrary.unpin(song, developerToken: token)
   ///     print("Song unpinned successfully!")
   ///
-  @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *)
   static func unpin(_ item: some Pinnable, developerToken: String) async throws {
     guard !developerToken.isEmpty else {
       throw MusanovaKitError.missingDeveloperToken
