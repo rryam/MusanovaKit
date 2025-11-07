@@ -6,7 +6,7 @@
 //
 
 import Foundation
-@preconcurrency import MusadoraKit
+import MusadoraKit
 
 /// HTTP methods supported for privileged data requests.
 public enum HTTPMethod: String, Sendable {

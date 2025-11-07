@@ -8,3 +8,9 @@ DerivedData/
 .swiftpm/config/registries.json
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .netrc
+# Xcode project build artifacts
+*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+*.xcodeproj/**/xcuserdata/
+# Build directories
+.build/
+**/.build/

@@ -214,21 +214,36 @@ struct LyricsView: View {
                     }
                 }
 
-            } catch let lyricsError as LyricsError {
-                print("[Lyrics] LyricsError caught: \(lyricsError)")
+            } catch let lyricsError as MusanovaKitError {
+                print("[Lyrics] MusanovaKitError caught: \(lyricsError)")
                 switch lyricsError {
-                case .apiError(let detail):
-                    print("[Lyrics] API Error detail: \(detail)")
-                    if detail.contains("No related resources found") {
+                case .apiError(let message, let code, let status):
+                    print("[Lyrics] API Error: \(message), code: \(code ?? "none"), status: \(status ?? "none")")
+                    if message.contains("No related resources found") {
                         errorMessage = "Lyrics are not available for this song. " +
                             "The Apple Music lyrics API may be temporarily unavailable " +
                             "or this song may not have lyrics."
-                    } else if detail.contains("Empty response") {
+                    } else if message.contains("Empty response") {
                         errorMessage = "Unable to fetch lyrics. " +
                             "This may be due to authentication issues or the song not having lyrics available."
                     } else {
-                        errorMessage = detail
+                        errorMessage = message
                     }
+                case .emptyResponse:
+                    errorMessage = "Unable to fetch lyrics. " +
+                        "This may be due to authentication issues or the song not having lyrics available."
+                case .invalidResponseFormat(let description):
+                    errorMessage = "Invalid response format: \(description)"
+                case .invalidURL(let description):
+                    errorMessage = "Failed to construct request URL: \(description)"
+                case .decodingError(let description):
+                    errorMessage = "Failed to parse lyrics: \(description)"
+                case .networkError(let description):
+                    errorMessage = "Network error: \(description)"
+                case .missingDeveloperToken:
+                    errorMessage = "Developer token is required. Please set it in Settings."
+                case .countryCodeUnavailable:
+                    errorMessage = "Unable to determine country code."
                 }
             } catch {
                 print("[Lyrics] Unexpected error: \(error)")
