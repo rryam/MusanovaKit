@@ -17,6 +17,9 @@ import MusadoraKit
 ///
 ///     let pin: LibraryPin = ...
 ///     print("Pinned item ID: \(pin.id), Type: \(pin.type)")
+///     if let action = pin.libraryPin?.action {
+///         print("Pin action: \(action)")
+///     }
 ///
 public struct LibraryPin: Decodable, MusicItem, Sendable {
   /// The unique identifier of the pinned item.
@@ -39,9 +42,57 @@ public struct LibraryPin: Decodable, MusicItem, Sendable {
   /// playlists, artists, or other associated content.
   public let relationships: LibraryPinRelationships?
 
+  /// Pin-specific metadata containing interaction details.
+  ///
+  /// This includes information about how to interact with the pinned item,
+  /// such as the action to perform when tapped (e.g., "play", "drillIn", "shuffle")
+  /// and positioning information.
+  public let libraryPin: LibraryPinAction?
+
   /// Coding keys for decoding the JSON response.
   enum CodingKeys: String, CodingKey {
-    case id, type, attributes, relationships
+    case id, type, attributes, relationships, meta
+  }
+}
+
+/// Metadata specific to a library pin item.
+///
+/// This contains information about the pin itself, such as the action
+/// to perform when interacting with the pinned item.
+public struct LibraryPinAction: Decodable, Sendable {
+  /// The action to perform when interacting with the pinned item.
+  ///
+  /// Possible values include:
+  /// - "play": Play the item (songs, albums)
+  /// - "drillIn": Navigate to the item (playlists, artists)
+  /// - "shuffle": Shuffle play the item (playlists)
+  public let action: String
+
+  /// A unique identifier for the position of this pin.
+  public let positionUUID: String
+
+  enum CodingKeys: String, CodingKey {
+    case action
+    case positionUUID
+  }
+}
+
+/// Extension to handle the nested meta.libraryPin structure.
+extension LibraryPin {
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    id = try container.decode(MusicItemID.self, forKey: .id)
+    type = try container.decode(String.self, forKey: .type)
+    attributes = try container.decode(LibraryPinAttributes.self, forKey: .attributes)
+    relationships = try container.decodeIfPresent(LibraryPinRelationships.self, forKey: .relationships)
+
+    // Decode the nested meta.libraryPin structure
+    let metaContainer = try? container.nestedContainer(keyedBy: MetaCodingKeys.self, forKey: .meta)
+    libraryPin = try metaContainer?.decodeIfPresent(LibraryPinAction.self, forKey: .libraryPin)
+  }
+
+  enum MetaCodingKeys: String, CodingKey {
+    case libraryPin
   }
 }
 
@@ -58,6 +109,10 @@ public struct LibraryPinAttributes: Decodable, Sendable {
   /// This may include information like the date the item was pinned
   /// or other platform-specific metadata.
   public let meta: [String: String]?
+
+  enum CodingKeys: String, CodingKey {
+    case name, artwork, meta
+  }
 }
 
 /// Relationships for a library pin item.
