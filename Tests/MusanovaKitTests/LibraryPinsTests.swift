@@ -339,12 +339,9 @@ struct LibraryPinsTests {
     #expect(response.data.count == 1)
     #expect(response.data[0].id == "p.YJXV7pVIRA1R7XD")
     #expect(response.data[0].type == "library-playlists")
-    #expect(response.resources?.libraryPlaylists != nil) // Playlists should be decoded
-    #expect(response.resources?.libraryPlaylists?["p.YJXV7pVIRA1R7XD"] != nil) // Specific playlist exists
 
-    if let playlist = response.resources?.libraryPlaylists?["p.YJXV7pVIRA1R7XD"] {
-      #expect(playlist.id.rawValue == "p.YJXV7pVIRA1R7XD")
-      #expect(playlist.attributes?.name == "Replay 2025")
-    }
+    let playlist = try #require(response.resources?.libraryPlaylists?["p.YJXV7pVIRA1R7XD"])
+    #expect(playlist.id.rawValue == "p.YJXV7pVIRA1R7XD")
+    #expect(playlist.attributes?.name == "Replay 2025")
   }
 }
