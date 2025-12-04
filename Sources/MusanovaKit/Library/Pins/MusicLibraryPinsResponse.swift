@@ -36,11 +36,15 @@ public struct PinResources: Decodable, Sendable {
   /// Library songs referenced by pinned items.
   public let librarySongs: [String: Song]?
 
+  /// Library playlists referenced by pinned items.
+  public let libraryPlaylists: [String: Playlist]?
+
   enum CodingKeys: String, CodingKey {
     case artists
     case libraryAlbums = "library-albums"
     case libraryArtists = "library-artists"
     case librarySongs = "library-songs"
+    case libraryPlaylists = "library-playlists"
   }
 }
 

@@ -283,4 +283,65 @@ struct LibraryPinsTests {
     #expect(response.data[0].type == "library-albums")
     #expect(response.resources?.libraryAlbums?["l.Vkvyybh"] != nil) // Album exists in resources
   }
+
+  @Test
+  func testMusicLibraryPinsResponseWithPlaylistsDecoding() throws {
+    let jsonString = """
+    {
+      "data": [
+        {
+          "id": "p.YJXV7pVIRA1R7XD",
+          "type": "library-playlists",
+          "href": "/v1/me/library/playlists/p.YJXV7pVIRA1R7XD?l=en-GB"
+        }
+      ],
+      "resources": {
+        "library-playlists": {
+          "p.YJXV7pVIRA1R7XD": {
+            "id": "p.YJXV7pVIRA1R7XD",
+            "type": "library-playlists",
+            "href": "/v1/me/library/playlists/p.YJXV7pVIRA1R7XD?l=en-GB",
+            "attributes": {
+              "artwork": {
+                "hasP3": false,
+                "height": 1400,
+                "width": 1400,
+                "url": "https://example.com/playlist-artwork.jpg"
+              },
+              "canDelete": true,
+              "canEdit": false,
+              "dateAdded": "2025-10-05T12:19:32Z",
+              "description": {
+                "standard": "Your favourite tracks of the year—all in one playlist, updated weekly."
+              },
+              "hasCatalog": true,
+              "hasCollaboration": false,
+              "isPublic": false,
+              "lastModifiedDate": "2025-10-05T12:19:32Z",
+              "name": "Replay 2025",
+              "playParams": {
+                "globalId": "pl.rp-2ZkZTv76vkQN",
+                "id": "p.YJXV7pVIRA1R7XD",
+                "isLibrary": true,
+                "kind": "playlist",
+                "versionHash": "c9d6c8396f98640b977eec01df9995023e78d77f431e72cf65b3340a44bcafe5"
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+
+    let data = try #require(jsonString.data(using: .utf8))
+    let response = try JSONDecoder().decode(MusicLibraryPinsResponse.self, from: data)
+
+    #expect(response.data.count == 1)
+    #expect(response.data[0].id == "p.YJXV7pVIRA1R7XD")
+    #expect(response.data[0].type == "library-playlists")
+
+    let playlist = try #require(response.resources?.libraryPlaylists?["p.YJXV7pVIRA1R7XD"])
+    #expect(playlist.id.rawValue == "p.YJXV7pVIRA1R7XD")
+    #expect(playlist.attributes?.name == "Replay 2025")
+  }
 }
