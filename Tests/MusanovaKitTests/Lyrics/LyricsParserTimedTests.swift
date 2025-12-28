@@ -295,6 +295,63 @@ struct LyricsParserTimedTests {
     #expect(line.segments.count == 5)
   }
 
+  @Test
+  func testParserMergesSingleLetterWithAccentedStartToken() throws {
+    let ttml = wrapTTML(body: """
+      <div>
+        <p><span begin="0.0" end="1.0">o</span><span begin="1.0" end="2.0">ù je</span></p>
+      </div>
+      """)
+    let parser = LyricsParser()
+    let paragraphs = parser.parse(ttml)
+
+    let line = try #require(paragraphs.first?.lines.first)
+    #expect(line.text == "où je")
+    #expect(line.segments.count == 2)
+  }
+
+  @Test
+  func testParserKeepsSpaceBeforeAccentedWord() throws {
+    let ttml = wrapTTML(body: """
+      <div>
+        <p><span begin="0.0" end="1.0">vais</span><span begin="1.0" end="2.0">à</span><span begin="2.0" end="3.0">paris</span></p>
+      </div>
+      """)
+    let parser = LyricsParser()
+    let paragraphs = parser.parse(ttml)
+
+    let line = try #require(paragraphs.first?.lines.first)
+    #expect(line.text == "vais à paris")
+    #expect(line.segments.count == 3)
+  }
+
+  @Test
+  func testParserMergesAccentedTokensInIssueSample() throws {
+    let ttml = wrapTTML(body: """
+      <div>
+        <p>
+          <span begin="14.680000" end="15.001000">suis,</span>
+          <span begin="15.001000" end="15.195000">ni</span>
+          <span begin="15.195000" end="15.385000">o ù</span>
+          <span begin="15.385000" end="15.572000">je</span>
+          <span begin="15.572000" end="15.784000">vais,</span>
+          <span begin="15.784000" end="15.996000">c'est</span>
+          <span begin="15.996000" end="16.247000">l à</span>
+          <span begin="16.247000" end="17.112000">apparemment</span>
+          <span begin="17.250000" end="17.482000">Demain</span>
+        </p>
+      </div>
+      """)
+    let parser = LyricsParser()
+    let paragraphs = parser.parse(ttml)
+
+    let line = try #require(paragraphs.first?.lines.first)
+    #expect(line.text == "suis, ni où je vais, c'est là apparemment Demain")
+    #expect(line.segments.count == 9)
+    #expect(line.segments[2].text == "où")
+    #expect(line.segments[6].text == "là")
+  }
+
   private func wrapTTML(body: String) -> String {
     """
     <tt xmlns="http://www.w3.org/ns/ttml" xmlns:itunes="http://music.apple.com/lyric-ttml-internal" xmlns:ttm="http://www.w3.org/ns/ttml#metadata">
