@@ -9,6 +9,13 @@ import Foundation
 
 /// A parser for converting TTML (Timed Text Markup Language) lyrics into structured `LyricParagraph` objects.
 public class LyricsParser: NSObject, XMLParserDelegate {
+  /// Characters that should not have a preceding space (ASCII punctuation).
+  private static let punctuationChars = ",.!?:;)]}"
+
+  /// Single accented characters at the start of a token that are typically
+  /// continuations of the previous word (like "ù" in "où").
+  private static let accentedStartChars = "ùàâéèêëîïôöüûñçœæ"
+
   /// The parsed lyric paragraphs.
   private var paragraphs: [LyricParagraph] = []
 
@@ -216,22 +223,8 @@ public class LyricsParser: NSObject, XMLParserDelegate {
   private func shouldAvoidPrecedingSpace(before token: String) -> Bool {
     guard let first = token.first else { return false }
 
-    // Check for ASCII punctuation
-    if ",.!?:;)]}".contains(first) {
-      return true
-    }
-
-    // Check for single accented characters at the start of a token
-    // These are typically continuations of the previous word (like "ù" in "où")
-    // Multi-character tokens starting with accented chars are usually separate words
-    if token.count == 1 {
-      let accentedStartChars = "ùàâéèêëîïôöùüûñçœæ"
-      if accentedStartChars.contains(first) {
-        return true
-      }
-    }
-
-    return false
+    return Self.punctuationChars.contains(first) ||
+      (token.count == 1 && Self.accentedStartChars.contains(first))
   }
 }
 
