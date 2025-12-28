@@ -245,11 +245,25 @@ public class LyricsParser: NSObject, XMLParserDelegate {
       return true
     }
 
-    guard let previousToken, previousToken.count == 1, previousToken.first?.isLetter == true else {
+    guard let previousToken,
+          previousToken.count == 1,
+          let prevFirst = previousToken.first,
+          prevFirst.isASCII,
+          prevFirst.isLetter else {
       return false
     }
 
-    return Self.isNonAsciiLatin(first)
+    if token.contains(" ") {
+      if let firstWord = token.split(separator: " ").first,
+         firstWord.count == 1,
+         let firstChar = firstWord.first {
+        return Self.isNonAsciiLatin(firstChar)
+      }
+    } else if token.count == 1 {
+      return Self.isNonAsciiLatin(first)
+    }
+
+    return false
   }
 
   private func mergeSingleLetterAccentedTokens(in text: String) -> String {
@@ -266,7 +280,9 @@ public class LyricsParser: NSObject, XMLParserDelegate {
          currentFirst.isLetter,
          index + 1 < parts.count {
         let next = String(parts[index + 1])
-        if let nextFirst = next.first, Self.isNonAsciiLatin(nextFirst) {
+        if next.count == 1,
+           let nextFirst = next.first,
+           Self.isNonAsciiLatin(nextFirst) {
           result.append(current + next)
           index += 2
           continue
