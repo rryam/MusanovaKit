@@ -278,6 +278,23 @@ struct LyricsParserTimedTests {
     #expect(line.segments.isEmpty)
   }
 
+  @Test
+  func testParserDoesNotAddSpaceBeforeAccentedCharacters() throws {
+    // Simulates structure from "amsterdam" by Disiz
+    let ttml = wrapTTML(body: """
+      <div>
+        <p><span begin="14.680000" end="15.001000">suis,</span><span begin="15.001000" end="15.195000">ni</span><span begin="15.195000" end="15.385000">o</span><span begin="15.385000" end="15.572000">ù</span><span begin="15.572000" end="15.784000">je</span></p>
+      </div>
+      """)
+    let parser = LyricsParser()
+    let paragraphs = parser.parse(ttml)
+
+    let line = try #require(paragraphs.first?.lines.first)
+    // "o ù" should be "où" without a space between o and ù
+    #expect(line.text == "suis, ni où je")
+    #expect(line.segments.count == 5)
+  }
+
   private func wrapTTML(body: String) -> String {
     """
     <tt xmlns="http://www.w3.org/ns/ttml" xmlns:itunes="http://music.apple.com/lyric-ttml-internal" xmlns:ttm="http://www.w3.org/ns/ttml#metadata">
