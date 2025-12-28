@@ -215,7 +215,23 @@ public class LyricsParser: NSObject, XMLParserDelegate {
 
   private func shouldAvoidPrecedingSpace(before token: String) -> Bool {
     guard let first = token.first else { return false }
-    return ",.!?:;)]}".contains(first)
+
+    // Check for ASCII punctuation
+    if ",.!?:;)]}".contains(first) {
+      return true
+    }
+
+    // Check for single accented characters at the start of a token
+    // These are typically continuations of the previous word (like "ù" in "où")
+    // Multi-character tokens starting with accented chars are usually separate words
+    if token.count == 1 {
+      let accentedStartChars = "ùàâéèêëîïôöùüûñçœæ"
+      if accentedStartChars.contains(first) {
+        return true
+      }
+    }
+
+    return false
   }
 }
 
