@@ -12,9 +12,22 @@ public class LyricsParser: NSObject, XMLParserDelegate {
   /// Characters that should not have a preceding space (ASCII punctuation).
   private static let punctuationChars: Set<Character> = Set(",.!?:;)]}")
 
-  /// Single accented characters at the start of a token that are typically
-  /// continuations of the previous word (like "ù" in "où").
-  private static let accentedStartChars: Set<Character> = Set("ùàâéèêëîïôöüûñçœæ")
+  /// Non-ASCII Latin letters that may start a token that's a continuation
+  /// of the previous word (like "ù" in "où").
+  private static let nonAsciiLatinRegex: NSRegularExpression = {
+    let pattern = "^[\\p{Latin}&&[^\\p{ASCII}]]$"
+    do {
+      return try NSRegularExpression(pattern: pattern)
+    } catch {
+      preconditionFailure("Invalid non-ASCII Latin regex: \(error)")
+    }
+  }()
+
+  private static func isNonAsciiLatin(_ char: Character) -> Bool {
+    let text = String(char)
+    let range = NSRange(text.startIndex..<text.endIndex, in: text)
+    return nonAsciiLatinRegex.firstMatch(in: text, range: range) != nil
+  }
 
   /// The parsed lyric paragraphs.
   private var paragraphs: [LyricParagraph] = []
@@ -133,10 +146,11 @@ public class LyricsParser: NSObject, XMLParserDelegate {
       let start = currentSegmentStart ?? 0
       let end = currentSegmentEnd ?? start
       let trimmedText = currentSegmentText.trimmingCharacters(in: .whitespacesAndNewlines)
-      if !trimmedText.isEmpty {
-        let segment = LyricSegment(text: trimmedText, startTime: start, endTime: end)
+      let mergedText = mergeSingleLetterAccentedTokens(in: trimmedText)
+      if !mergedText.isEmpty {
+        let segment = LyricSegment(text: mergedText, startTime: start, endTime: end)
         currentLineSegments.append(segment)
-        appendToCurrentLineTokens(trimmedText)
+        appendToCurrentLineTokens(mergedText)
       }
       currentSegmentText = ""
       currentSegmentStart = nil
@@ -193,38 +207,77 @@ public class LyricsParser: NSObject, XMLParserDelegate {
   }
 
   private func assembledLineText() -> String {
-    currentLineTokens.reduce(into: "") { result, token in
-      guard !token.text.isEmpty else { return }
+    var result = ""
+    var previousTokenText: String?
 
+    for token in currentLineTokens where !token.text.isEmpty {
       if result.isEmpty {
         result = token.text
-        return
+        previousTokenText = token.text
+        continue
       }
 
-      let avoidSpace = shouldAvoidPrecedingSpace(before: token.text)
-      // Add space between tokens unless avoiding it (punctuation) or result already ends with space
-      // Tokens come from different XML elements and should be separated
+      let avoidSpace = shouldAvoidPrecedingSpace(before: token.text, previousToken: previousTokenText)
+      // Add space between tokens unless avoiding it (punctuation or accented continuation).
       if !avoidSpace && !result.hasSuffix(" ") {
         result += " "
       }
 
       result += token.text
+      previousTokenText = token.text
     }
+
+    return result
   }
 
   private func normalizeSpanText(_ string: String) -> String {
-    string.collapsingWhitespace()
+    mergeSingleLetterAccentedTokens(in: string.collapsingWhitespace())
   }
 
   private func normalizePlainText(_ string: String) -> String {
-    string.collapsingWhitespace()
+    mergeSingleLetterAccentedTokens(in: string.collapsingWhitespace())
   }
 
-  private func shouldAvoidPrecedingSpace(before token: String) -> Bool {
+  private func shouldAvoidPrecedingSpace(before token: String, previousToken: String?) -> Bool {
     guard let first = token.first else { return false }
 
-    return Self.punctuationChars.contains(first) ||
-      (token.count == 1 && Self.accentedStartChars.contains(first))
+    if Self.punctuationChars.contains(first) {
+      return true
+    }
+
+    guard let previousToken, previousToken.count == 1, previousToken.first?.isLetter == true else {
+      return false
+    }
+
+    return Self.isNonAsciiLatin(first)
+  }
+
+  private func mergeSingleLetterAccentedTokens(in text: String) -> String {
+    let parts = text.split(separator: " ")
+    guard parts.count > 1 else { return text }
+
+    var result: [String] = []
+    var index = 0
+    while index < parts.count {
+      let current = String(parts[index])
+      if current.count == 1,
+         let currentFirst = current.first,
+         currentFirst.isASCII,
+         currentFirst.isLetter,
+         index + 1 < parts.count {
+        let next = String(parts[index + 1])
+        if let nextFirst = next.first, Self.isNonAsciiLatin(nextFirst) {
+          result.append(current + next)
+          index += 2
+          continue
+        }
+      }
+
+      result.append(current)
+      index += 1
+    }
+
+    return result.joined(separator: " ")
   }
 }
 
