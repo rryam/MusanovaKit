@@ -112,9 +112,7 @@ public class LyricsParser: NSObject, XMLParserDelegate {
     if currentElement == "span" {
       let normalized = normalizeSpanText(string)
       if !normalized.isEmpty {
-        if !currentSegmentText.isEmpty {
-          currentSegmentText += " "
-        }
+        // Don't add space - XMLParser may split multi-byte UTF-8 chars across calls
         currentSegmentText += normalized
       } else if string.containsWhitespaceOnly {
         hasPendingWhitespace = true
