@@ -15,8 +15,7 @@ struct LyricsParserAccentedCharacterTests {
         <p><span begin="14.680000" end="15.001000">suis,</span><span begin="15.001000" end="15.195000">ni</span><span begin="15.195000" end="15.385000">o</span><span begin="15.385000" end="15.572000">ù</span><span begin="15.572000" end="15.784000">je</span></p>
       </div>
       """)
-    let parser = LyricsParser()
-    let paragraphs = parser.parse(ttml)
+    let paragraphs = parse(ttml: ttml)
 
     let line = try #require(paragraphs.first?.lines.first)
     // "o ù" should be "où" without a space between o and ù
@@ -31,8 +30,7 @@ struct LyricsParserAccentedCharacterTests {
         <p><span begin="0.0" end="1.0">o</span><span begin="1.0" end="2.0">ù je</span></p>
       </div>
       """)
-    let parser = LyricsParser()
-    let paragraphs = parser.parse(ttml)
+    let paragraphs = parse(ttml: ttml)
 
     let line = try #require(paragraphs.first?.lines.first)
     #expect(line.text == "où je")
@@ -46,8 +44,7 @@ struct LyricsParserAccentedCharacterTests {
         <p><span begin="0.0" end="1.0">vais</span><span begin="1.0" end="2.0">à</span><span begin="2.0" end="3.0">paris</span></p>
       </div>
       """)
-    let parser = LyricsParser()
-    let paragraphs = parser.parse(ttml)
+    let paragraphs = parse(ttml: ttml)
 
     let line = try #require(paragraphs.first?.lines.first)
     #expect(line.text == "vais à paris")
@@ -71,8 +68,7 @@ struct LyricsParserAccentedCharacterTests {
         </p>
       </div>
       """)
-    let parser = LyricsParser()
-    let paragraphs = parser.parse(ttml)
+    let paragraphs = parse(ttml: ttml)
 
     let line = try #require(paragraphs.first?.lines.first)
     #expect(line.text == "suis, ni où je vais, c'est là apparemment Demain")
@@ -101,8 +97,7 @@ struct LyricsParserAccentedCharacterTests {
         </p>
       </div>
       """)
-    let parser = LyricsParser()
-    let paragraphs = parser.parse(ttml)
+    let paragraphs = parse(ttml: ttml)
 
     let line = try #require(paragraphs.first?.lines.first)
     // Words with accented characters should be intact, no spaces inserted
@@ -127,8 +122,7 @@ struct LyricsParserAccentedCharacterTests {
         </p>
       </div>
       """)
-    let parser = LyricsParser()
-    let paragraphs = parser.parse(ttml)
+    let paragraphs = parse(ttml: ttml)
 
     let line = try #require(paragraphs.first?.lines.first)
     #expect(line.text == "J'ai quitté l'aventure du réel ce soir")
@@ -151,8 +145,7 @@ struct LyricsParserAccentedCharacterTests {
         </p>
       </div>
       """)
-    let parser = LyricsParser()
-    let paragraphs = parser.parse(ttml)
+    let paragraphs = parse(ttml: ttml)
 
     let line = try #require(paragraphs.first?.lines.first)
     #expect(line.text == "très tête fée pâte où")
@@ -211,8 +204,7 @@ struct LyricsParserAccentedCharacterTests {
         </p>
       </div>
       """)
-    let parser = LyricsParser()
-    let paragraphs = parser.parse(ttml)
+    let paragraphs = parse(ttml: ttml)
 
     #expect(paragraphs.count == 1)
     #expect(paragraphs[0].songPart == "Verse")
@@ -234,7 +226,12 @@ struct LyricsParserAccentedCharacterTests {
     #expect(!line3.text.contains("r éussis"))
   }
 
-  // MARK: - Helper
+  // MARK: - Helpers
+
+  private func parse(ttml: String) -> [LyricParagraph] {
+    let parser = LyricsParser()
+    return parser.parse(ttml)
+  }
 
   private func wrapTTML(body: String) -> String {
     """
