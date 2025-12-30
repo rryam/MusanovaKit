@@ -377,8 +377,7 @@ struct LyricsParserTimedTests {
 
     let line = try #require(paragraphs.first?.lines.first)
     // Words with accented characters should be intact, no spaces inserted
-    #expect(line.text.contains("félicite"))
-    #expect(line.text.contains("j'réussis"))
+    #expect(line.text == "Demain j'me félicite si j'réussis à rejoindre l'appartement")
     #expect(!line.text.contains("f élicite"))
     #expect(!line.text.contains("r éussis"))
   }
@@ -492,20 +491,16 @@ struct LyricsParserTimedTests {
 
     // Line 1: "La nuit, des fois, ça tise..."
     let line1 = paragraphs[0].lines[0]
-    #expect(line1.text.contains("très bizarrement"))
+    #expect(line1.text == "La nuit, des fois, ça tise, des fois, ça taz, ça vit très bizarrement")
     #expect(!line1.text.contains("tr ès"))
 
     // Line 2: "Ni où est-ce que je suis..."
     let line2 = paragraphs[0].lines[1]
-    #expect(line2.text.contains("Ni où"))
-    #expect(line2.text.contains("ni où"))
-    #expect(line2.text.contains("c'est là"))
-    #expect(!line2.text.contains("  ")) // No double spaces
+    #expect(line2.text == "Ni où est-ce que je suis, ni où je vais, c'est là apparemment")
 
     // Line 3: "Demain j'me félicite..."
     let line3 = paragraphs[0].lines[2]
-    #expect(line3.text.contains("félicite"))
-    #expect(line3.text.contains("j'réussis"))
+    #expect(line3.text == "Demain j'me félicite si j'réussis à rejoindre l'appartement")
     #expect(!line3.text.contains("f élicite"))
     #expect(!line3.text.contains("r éussis"))
   }
