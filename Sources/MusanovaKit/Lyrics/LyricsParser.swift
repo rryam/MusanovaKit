@@ -108,8 +108,8 @@ public class LyricsParser: NSObject, XMLParserDelegate {
       if !normalized.isEmpty {
         appendToCurrentLineTokens(normalized)
       } else if hasContent {
-        // String has content but normalized to empty - this is a space between spans
-        // Don't set hasPendingWhitespace, the space is already in the output
+        // String has content but normalized to empty - this indicates a space between spans
+        hasPendingWhitespace = true
       } else if string.containsWhitespaceOnly {
         hasPendingWhitespace = true
       }
@@ -248,10 +248,8 @@ public class LyricsParser: NSObject, XMLParserDelegate {
   }
 
   private func isAccentedLatinLetter(_ char: Character) -> Bool {
-    // Check for non-ASCII Latin letters (accented characters)
-    let charStr = String(char)
-    guard let scalar = charStr.unicodeScalars.first else { return false }
-    return scalar.value > 127 && scalar.value <= 0x024F // Latin Extended-A end
+    // Check for non-ASCII letters (accented characters)
+    return char.isLetter && !char.isASCII
   }
 
   private func normalizeSpanText(_ string: String) -> String {

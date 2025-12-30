@@ -343,26 +343,4 @@ struct LyricsParserTimedTests {
     """
   }
 
-  // MARK: - Real File Tests
-
-  @Test
-  func testParserHandlesRealAmsterdamTTMLFile() throws {
-    // This test uses the actual Amsterdam_Disiz.ttml file from Downloads
-    let ttmlPath = "/Users/rudrank/Downloads/Amsterdam_Disiz.ttml"
-    let ttml = try String(contentsOfFile: ttmlPath, encoding: .utf8)
-
-    let parser = LyricsParser()
-    let paragraphs = parser.parse(ttml)
-
-    // Find the verse containing "ni où"
-    let verseWithNiOu = paragraphs.first { paragraph in
-      paragraph.lines.contains { $0.text.contains("ni où") }
-    }
-
-    let line = try #require(verseWithNiOu?.lines.first { $0.text.contains("ni où") })
-
-    // Should contain "ni où" without double spaces
-    #expect(line.text.contains("ni où"))
-    #expect(!line.text.contains("ni  où"))
-  }
 }
