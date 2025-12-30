@@ -342,6 +342,6 @@ struct LibraryPinsTests {
 
     let playlist = try #require(response.resources?.libraryPlaylists?["p.YJXV7pVIRA1R7XD"])
     #expect(playlist.id.rawValue == "p.YJXV7pVIRA1R7XD")
-    #expect(playlist.attributes?.name == "Replay 2025")
+    #expect(playlist.name == "Replay 2025")
   }
 }

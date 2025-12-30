@@ -278,6 +278,61 @@ struct LyricsParserTimedTests {
     #expect(line.segments.isEmpty)
   }
 
+  // MARK: - Accented Characters Bug
+
+  @Test
+  func testParserPreservesWhitespaceBetweenSpans() throws {
+    // This simulates the actual structure from "amsterdam" by Disiz
+    // where spans are separated by whitespace in the XML
+    let ttml = wrapTTML(body: """
+      <div>
+        <p><span begin="14.048" end="14.216">Ni</span> <span begin="14.216" end="14.399">où</span></p>
+      </div>
+      """)
+    let parser = LyricsParser()
+    let paragraphs = parser.parse(ttml)
+
+    let line = try #require(paragraphs.first?.lines.first)
+    // The space between </span> and <span> should be preserved
+    // "Ni où" should have proper spacing
+    #expect(line.text == "Ni où")
+    #expect(line.segments.count == 2)
+  }
+
+  @Test
+  func testParserMergesSingleLetterWithAccentedContinuation() throws {
+    // When a single letter (o) is followed by an accented character (ù) as a separate token
+    // they should be merged into "où"
+    let ttml = wrapTTML(body: """
+      <div>
+        <p><span begin="15.195" end="15.385">o</span> <span begin="15.385" end="15.572">ù</span></p>
+      </div>
+      """)
+    let parser = LyricsParser()
+    let paragraphs = parser.parse(ttml)
+
+    let line = try #require(paragraphs.first?.lines.first)
+    // "o ù" should be merged to "où" without extra space
+    #expect(line.text == "où")
+  }
+
+  @Test
+  func testParserHandlesActualDisizAmsterdamStructure() throws {
+    // This is the exact structure from the Disiz "Amsterdam" lyrics
+    let ttml = wrapTTML(body: """
+      <div>
+        <p><span begin="14.680" end="15.001">suis,</span><span begin="15.001" end="15.195">ni</span> <span begin="15.195" end="15.385">où</span><span begin="15.385" end="15.572">je</span></p>
+      </div>
+      """)
+    let parser = LyricsParser()
+    let paragraphs = parser.parse(ttml)
+
+    let line = try #require(paragraphs.first?.lines.first)
+    // "suis, ni où je" - the "ni où" should be properly merged
+    #expect(line.text.contains("ni où"))
+    #expect(!line.text.contains("ni  où")) // No double spaces
+  }
+
   private func wrapTTML(body: String) -> String {
     """
     <tt xmlns="http://www.w3.org/ns/ttml" xmlns:itunes="http://music.apple.com/lyric-ttml-internal" xmlns:ttm="http://www.w3.org/ns/ttml#metadata">
@@ -286,5 +341,28 @@ struct LyricsParserTimedTests {
       </body>
     </tt>
     """
+  }
+
+  // MARK: - Real File Tests
+
+  @Test
+  func testParserHandlesRealAmsterdamTTMLFile() throws {
+    // This test uses the actual Amsterdam_Disiz.ttml file from Downloads
+    let ttmlPath = "/Users/rudrank/Downloads/Amsterdam_Disiz.ttml"
+    let ttml = try String(contentsOfFile: ttmlPath, encoding: .utf8)
+
+    let parser = LyricsParser()
+    let paragraphs = parser.parse(ttml)
+
+    // Find the verse containing "ni où"
+    let verseWithNiOu = paragraphs.first { paragraph in
+      paragraph.lines.contains { $0.text.contains("ni où") }
+    }
+
+    let line = try #require(verseWithNiOu?.lines.first { $0.text.contains("ni où") })
+
+    // Should contain "ni où" without double spaces
+    #expect(line.text.contains("ni où"))
+    #expect(!line.text.contains("ni  où"))
   }
 }

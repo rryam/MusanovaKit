@@ -32,6 +32,7 @@ public class LyricsParser: NSObject, XMLParserDelegate {
   private var currentSegmentEnd: TimeInterval?
   private var currentSegmentText: String = ""
   private var hasPendingWhitespace: Bool = false
+  private var pendingSpaceBetweenElements: Bool = false
 
   /// Parses the given XML string into an array of `LyricParagraph` objects.
   ///
@@ -47,6 +48,7 @@ public class LyricsParser: NSObject, XMLParserDelegate {
     currentSegmentEnd = nil
     currentSegmentText = ""
     hasPendingWhitespace = false
+    pendingSpaceBetweenElements = false
     elementStack = []
     if let data = xmlString.data(using: .utf8) {
       let parser = XMLParser(data: data)
@@ -92,20 +94,30 @@ public class LyricsParser: NSObject, XMLParserDelegate {
     if currentElement == "span" {
       let normalized = normalizeSpanText(string)
       if !normalized.isEmpty {
-        if !currentSegmentText.isEmpty {
-          currentSegmentText += " "
-        }
+        // Don't add space here - multi-byte UTF-8 chars may be split across calls
+        // and spacing between spans is handled by the <p> element's whitespace
         currentSegmentText += normalized
       } else if string.containsWhitespaceOnly {
         hasPendingWhitespace = true
       }
     } else if currentElement == "p" {
+      // Check if the original string has content (not just whitespace)
+      // This preserves spaces between <span> elements in the XML
+      let hasContent = !string.allSatisfy { $0.isWhitespace }
       let normalized = normalizePlainText(string)
       if !normalized.isEmpty {
         appendToCurrentLineTokens(normalized)
+      } else if hasContent {
+        // String has content but normalized to empty - this is a space between spans
+        // Don't set hasPendingWhitespace, the space is already in the output
       } else if string.containsWhitespaceOnly {
         hasPendingWhitespace = true
       }
+    }
+
+    // Track if we just saw a space between elements
+    if currentElement == "span", string == " " {
+      pendingSpaceBetweenElements = true
     }
   }
 
@@ -134,7 +146,9 @@ public class LyricsParser: NSObject, XMLParserDelegate {
       currentSegmentText = ""
       currentSegmentStart = nil
       currentSegmentEnd = nil
-      hasPendingWhitespace = false
+      // Preserve space flag across span boundaries
+      hasPendingWhitespace = hasPendingWhitespace || pendingSpaceBetweenElements
+      pendingSpaceBetweenElements = false
     } else if elementName == "p" {
       let lineText = assembledLineText()
 
@@ -186,23 +200,58 @@ public class LyricsParser: NSObject, XMLParserDelegate {
   }
 
   private func assembledLineText() -> String {
-    currentLineTokens.reduce(into: "") { result, token in
-      guard !token.text.isEmpty else { return }
+    var result = ""
+    var index = 0
+
+    while index < currentLineTokens.count {
+      let token = currentLineTokens[index]
+
+      guard !token.text.isEmpty else {
+        index += 1
+        continue
+      }
 
       if result.isEmpty {
         result = token.text
-        return
+        index += 1
+        continue
       }
 
-      let avoidSpace = shouldAvoidPrecedingSpace(before: token.text)
-      // Add space between tokens unless avoiding it (punctuation) or result already ends with space
-      // Tokens come from different XML elements and should be separated
-      if !avoidSpace && !result.hasSuffix(" ") {
-        result += " "
+      // Check if we should merge single letter with accented token (e.g., "o" + "ù" → "où")
+      if token.needsLeadingSpace,
+         index > 0,
+         let prevFirst = currentLineTokens[index - 1].text.first,
+         prevFirst.isASCII,
+         prevFirst.isLetter,
+         currentLineTokens[index - 1].text.count == 1,
+         token.text.count == 1,
+         let first = token.text.first,
+         isAccentedLatinLetter(first) {
+        // Merge: remove trailing space if any, then append accented char
+        if result.hasSuffix(" ") {
+          result.removeLast()
+        }
+        result += token.text
+      } else {
+        // Normal case: add space if needed, then token
+        let avoidSpace = shouldAvoidPrecedingSpace(before: token.text)
+        if !avoidSpace && !result.hasSuffix(" ") {
+          result += " "
+        }
+        result += token.text
       }
 
-      result += token.text
+      index += 1
     }
+
+    return result
+  }
+
+  private func isAccentedLatinLetter(_ char: Character) -> Bool {
+    // Check for non-ASCII Latin letters (accented characters)
+    let charStr = String(char)
+    guard let scalar = charStr.unicodeScalars.first else { return false }
+    return scalar.value > 127 && scalar.value <= 0x024F // Latin Extended-A end
   }
 
   private func normalizeSpanText(_ string: String) -> String {
