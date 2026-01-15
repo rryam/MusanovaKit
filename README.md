@@ -1,4 +1,6 @@
 # MusanovaKit
+[![Star History Chart](https://api.star-history.com/svg?repos=rryam/MusanovaKit&type=Date)](https://star-history.com/#rryam/MusanovaKit&Date)
+
 
 MusanovaKit lets you explore Apple Music features that are not exposed through the public MusicKit framework. It includes helpers for private APIs such as privileged lyric endpoints and Music Summaries (Replay) data. **Use this package for research and internal tooling only.**
 
