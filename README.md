@@ -1,13 +1,11 @@
 # MusanovaKit
 
-
 MusanovaKit lets you explore Apple Music features that are not exposed through the public MusicKit framework. It includes helpers for private APIs such as privileged lyric endpoints and Music Summaries (Replay) data. **Use this package for research and internal tooling only.**
 
 > ⚠️ MusanovaKit calls Apple Music endpoints that require a **privileged developer token**. Shipping these APIs inside production software is likely to violate Apple’s terms and may break without notice. Proceed at your own risk.
 
 ## Table of Contents
 
-- [Exploring MusicKit and Apple Music API Book](#exploring-musickit-and-apple-music-api-book)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Authentication](#authentication)
@@ -23,16 +21,6 @@ MusanovaKit lets you explore Apple Music features that are not exposed through t
   - [Fetching pinned items](#fetching-pinned-items)
   - [Custom pin requests](#custom-pin-requests)
 - [Disclaimer](#disclaimer)
-
-## Exploring MusicKit and Apple Music API Book
-
-<p align="center">
-  <a href="https://academy.rudrank.com/product/musickit" target="_blank">
-    <img src="https://img.shields.io/badge/Book-Exploring%20MusicKit%20%26%20Apple%20Music%20API-blue?style=for-the-badge&logo=book&logoColor=white" alt="Exploring MusicKit and Apple Music API Book" />
-  </a>
-</p>
-
-I wrote [Exploring MusicKit and Apple Music API](https://academy.rudrank.com/product/musickit) to document how I approach Apple Music projects—auth, storefronts, tooling, and the scrappy workflows behind packages like MusanovaKit. If you need a deeper reference, that book is where I keep the details.
 
 ## Requirements
 
