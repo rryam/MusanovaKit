@@ -1,0 +1,32 @@
+{
+  "data": [
+    {
+      "id": "ob.l-1",
+      "type": "taste-preferences",
+      "href": "/v1/me/taste/taste-preferences/ob.l-1",
+      "attributes": {
+        "name": "Alternative",
+        "preference": 1,
+        "futureAttribute": true
+      }
+    },
+    {
+      "id": "ob.l-2",
+      "type": "taste-preferences",
+      "href": "/v1/me/taste/taste-preferences/ob.l-2",
+      "attributes": {
+        "name": "Jazz",
+        "preference": 0
+      }
+    },
+    {
+      "id": "ob.l-3",
+      "type": "future-taste-preference-type",
+      "attributes": {
+        "name": "Future preference",
+        "preference": 2
+      }
+    }
+  ],
+  "futureTopLevelField": "ignored"
+}
