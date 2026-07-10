@@ -1,0 +1,98 @@
+{
+  "data": [
+    {
+      "id": "me",
+      "type": "personal-social-profiles",
+      "href": "/v1/me/social/profile"
+    }
+  ],
+  "resources": {
+    "personal-social-profiles": {
+      "me": {
+        "id": "me",
+        "type": "personal-social-profiles",
+        "href": "/v1/me/social/profile",
+        "attributes": {
+          "name": "Avery Appleseed",
+          "handle": "avery",
+          "isPrivate": true,
+          "isVerified": false,
+          "isOnboarded": true,
+          "pendingFollowersCount": 1,
+          "collaborationAllowed": true,
+          "artwork": {
+            "width": 320,
+            "height": 320,
+            "url": "https://example.com/profile/{w}x{h}.jpg",
+            "bgColor": "123456",
+            "textColor1": "ffffff"
+          }
+        },
+        "relationships": {
+          "social-profile": {
+            "data": [
+              { "id": "social.me", "type": "social-profiles" }
+            ]
+          },
+          "followers": {
+            "href": "/v1/me/social/profile/followers",
+            "next": "/v1/me/social/profile/followers?offset=1",
+            "data": [
+              { "id": "social.follower", "type": "social-profiles" }
+            ]
+          },
+          "followees": {
+            "href": "/v1/me/social/profile/followees",
+            "data": [
+              { "id": "social.followee", "type": "social-profiles" }
+            ]
+          },
+          "pending-followers": {
+            "href": "/v1/me/social/profile/pending-followers",
+            "data": [
+              { "id": "social.pending", "type": "social-profiles" }
+            ]
+          }
+        }
+      }
+    },
+    "social-profiles": {
+      "social.me": {
+        "id": "social.me",
+        "type": "social-profiles",
+        "attributes": {
+          "name": "Avery Appleseed",
+          "handle": "avery",
+          "followState": "self"
+        }
+      },
+      "social.follower": {
+        "id": "social.follower",
+        "type": "social-profiles",
+        "attributes": {
+          "name": "Riley",
+          "handle": "riley",
+          "followState": "notFollowing"
+        }
+      },
+      "social.followee": {
+        "id": "social.followee",
+        "type": "social-profiles",
+        "attributes": {
+          "name": "Casey",
+          "handle": "casey",
+          "followState": "following"
+        }
+      },
+      "social.pending": {
+        "id": "social.pending",
+        "type": "social-profiles",
+        "attributes": {
+          "name": "Jamie",
+          "handle": "jamie",
+          "followState": "requested"
+        }
+      }
+    }
+  }
+}
