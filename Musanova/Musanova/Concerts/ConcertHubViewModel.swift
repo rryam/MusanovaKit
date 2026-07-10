@@ -17,18 +17,23 @@ final class ConcertHubViewModel {
   var selectedLocation = ConcertHubLocation.newYork
   var errorMessage: String?
 
+  private var activeRequestID = UUID()
+
   var sections: [ConcertHubContainer] {
     hub?.orderedContainers.filter { !$0.data.isEmpty } ?? []
   }
 
   func load() async {
-    guard !isLoading else { return }
+    let requestID = UUID()
+    activeRequestID = requestID
     guard MusicAuthorization.currentStatus == .authorized else {
+      isLoading = false
       hub = nil
       errorMessage = "Allow Apple Music access to discover live shows."
       return
     }
     guard let developerToken, !developerToken.isEmpty else {
+      isLoading = false
       hub = nil
       errorMessage = "Add your AMP developer token in Settings to load concerts."
       return
@@ -36,23 +41,31 @@ final class ConcertHubViewModel {
 
     isLoading = true
     errorMessage = nil
-    defer { isLoading = false }
+    defer {
+      if activeRequestID == requestID {
+        isLoading = false
+      }
+    }
 
     do {
       storefront = (try? await MusicDataRequest.currentCountryCode.lowercased()) ?? "in"
+      let requestedLocation = selectedLocation
       let options = ConcertHubOptions(
         containers: [.popular],
-        geoHashLocation: selectedLocation.geoHash,
+        geoHashLocation: requestedLocation.geoHash,
         limits: [.popular: 12]
       )
-      hub = try await MConcerts.hub(
+      let fetchedHub = try await MConcerts.hub(
         storefront: storefront,
         developerToken: developerToken,
         options: options
       )
+      guard activeRequestID == requestID else { return }
+      hub = fetchedHub
     } catch is CancellationError {
       return
     } catch {
+      guard activeRequestID == requestID else { return }
       hub = nil
       errorMessage = "Concerts could not be loaded. \(error.localizedDescription)"
     }

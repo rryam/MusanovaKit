@@ -62,8 +62,9 @@ final class LyricsViewModel {
         return
       }
 
+      let storefront = (try? await MusicDataRequest.currentCountryCode.lowercased()) ?? "in"
       let request = try MusicLyricsRequest(songID: songID, developerToken: developerToken)
-      let response = try await request.response(countryCode: "in")
+      let response = try await request.response(countryCode: storefront)
       guard let rawTTML = response.rawTTML else {
         lyrics = []
         return
@@ -74,7 +75,7 @@ final class LyricsViewModel {
          let musicPlayParams = try? JSONDecoder().decode(PlayParameters.self, from: encodedPlayParams) {
         playbackItem = LyricsPlaybackItem(id: songID, playParameters: musicPlayParams)
       }
-      song = try? await loadSong(developerToken: developerToken)
+      song = try? await loadSong(storefront: storefront, developerToken: developerToken)
     } catch is CancellationError {
       return
     } catch {
@@ -179,9 +180,9 @@ final class LyricsViewModel {
     }
   }
 
-  private func loadSong(developerToken: String) async throws -> Song {
+  private func loadSong(storefront: String, developerToken: String) async throws -> Song {
     var components = AppleMusicAMPURLComponents()
-    components.path = "catalog/in/songs/\(songID.rawValue)"
+    components.path = "catalog/\(storefront)/songs/\(songID.rawValue)"
     guard let url = components.url else {
       throw MusanovaKitError.invalidURL(description: "Could not build the catalog song URL.")
     }
