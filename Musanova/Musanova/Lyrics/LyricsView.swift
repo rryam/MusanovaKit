@@ -244,6 +244,8 @@ struct LyricsView: View {
                     errorMessage = "Developer token is required. Please set it in Settings."
                 case .countryCodeUnavailable:
                     errorMessage = "Unable to determine country code."
+                case .requestSigningFailed(let description):
+                    errorMessage = "Request signing failed: \(description)"
                 }
             } catch {
                 print("[Lyrics] Unexpected error: \(error)")

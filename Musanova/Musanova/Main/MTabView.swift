@@ -10,25 +10,25 @@ import SwiftUI
 struct MTabView: View {
   var body: some View {
     TabView {
-      ReplayView()
-        .tabItem {
-          Label("Replay", systemImage: "clock.arrow.circlepath")
-        }
+      Tab("API Lab", systemImage: "testtube.2") {
+        APIExplorerView()
+      }
 
-      LyricsView()
-        .tabItem {
-          Label("Lyrics", systemImage: "music.note")
-        }
+      Tab("Replay", systemImage: "clock.arrow.circlepath") {
+        ReplayView()
+      }
 
-      PinsView()
-        .tabItem {
-          Label("Pins", systemImage: "pin")
-        }
+      Tab("Lyrics", systemImage: "music.note") {
+        LyricsView()
+      }
 
-      SettingsView()
-        .tabItem {
-          Label("Settings", systemImage: "gear")
-        }
+      Tab("Pins", systemImage: "pin") {
+        PinsView()
+      }
+
+      Tab("Settings", systemImage: "gear") {
+        SettingsView()
+      }
     }
     .welcomeSheet()
     .tint(.purple)
