@@ -1,0 +1,81 @@
+{
+  "data": [{
+    "id": "ce.example",
+    "type": "concerts",
+    "href": "/v1/catalog/gb/concerts/ce.example",
+    "attributes": {
+      "name": "Example Festival",
+      "startISODateTime": "2026-07-25T18:00:00Z",
+      "endISODateTime": "2026-07-25T22:30:00Z",
+      "timezone": "Europe/London",
+      "url": "https://music.apple.com/gb/concerts/ce.example",
+      "eventDataProviders": [{
+        "name": "Example Provider",
+        "url": "https://provider.example/events/1"
+      }],
+      "tickets": [{
+        "vendor": "Example Tickets",
+        "url": "https://tickets.example/events/1",
+        "provider": {
+          "name": "Example Provider",
+          "url": "https://provider.example/events/1"
+        }
+      }]
+    },
+    "relationships": {
+      "artists": {
+        "data": [{
+          "id": "100",
+          "type": "artists",
+          "attributes": {
+            "name": "Example Artist",
+            "url": "https://music.apple.com/gb/artist/example/100",
+            "genreNames": ["Pop"]
+          }
+        }]
+      },
+      "venues": {
+        "data": [{
+          "id": "evu.example",
+          "type": "venues",
+          "attributes": {
+            "name": "Example Hall",
+            "geoLocation": {"latitude": 51.5, "longitude": -0.1},
+            "structuredAddress": {
+              "address": "1 Example Road",
+              "city": "London",
+              "region": "England",
+              "postCode": "E1 1AA",
+              "country": "United Kingdom",
+              "countryIsoCode": "GB"
+            }
+          }
+        }]
+      },
+      "playlists": {
+        "data": [{
+          "id": "pl.example",
+          "type": "playlists",
+          "attributes": {
+            "name": "Example Set List",
+            "curatorName": "Apple Music Pop",
+            "url": "https://music.apple.com/gb/playlist/pl.example"
+          }
+        }]
+      }
+    },
+    "views": {
+      "more-upcoming-concerts": {
+        "attributes": {"title": "More Upcoming Concerts"},
+        "data": [{
+          "id": "ce.next",
+          "type": "concerts",
+          "attributes": {
+            "name": "Next Show",
+            "startISODateTime": "2026-08-01T18:00:00Z"
+          }
+        }]
+      }
+    }
+  }]
+}

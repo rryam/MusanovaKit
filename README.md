@@ -11,6 +11,9 @@ MusanovaKit lets you explore Apple Music features that are not exposed through t
 - [Authentication](#authentication)
   - [Privileged developer token](#privileged-developer-token)
   - [Music user token](#music-user-token)
+- [Concerts](#concerts)
+  - [Concert details](#concert-details)
+  - [Artist concerts](#artist-concerts)
 - [Lyrics](#lyrics)
   - [Fetching TTML lyrics](#fetching-ttml-lyrics)
   - [Working with timed segments](#working-with-timed-segments)
@@ -53,6 +56,64 @@ Obtain a privileged Apple Music developer token from your internal tooling and p
 ### Music user token
 
 When you call MusanovaKit from a signed-in MusicKit app, the system automatically attaches the Music User Token to privileged requests. If you issue requests from outside MusicKit (for example, using `curl`), include the `Media-User-Token` header manually.
+
+## Concerts
+
+Load Apple Music's concert hub by storefront. Filters support a geohash, calendar dates, genres, selected sections, and per-section limits.
+
+```swift
+let options = ConcertHubOptions(
+    geoHashLocation: "gcpvj",
+    dateRange: ConcertDateRange(
+        startDate: "2026-07-10",
+        endDate: "2026-07-31"
+    ),
+    genreIDs: ["14"]
+)
+
+let hub = try await MConcerts.hub(
+    storefront: "gb",
+    developerToken: token,
+    options: options
+)
+
+for section in hub.orderedContainers {
+    print(section.title ?? "Concerts")
+    section.data.forEach { print($0.attributes.name) }
+}
+```
+
+### Concert details
+
+The detail response includes venues, coordinates, postal addresses, artists, related playlists, ticket vendors, and the data providers behind the event.
+
+```swift
+let concert = try await MConcerts.concert(
+    id: "ce.example",
+    storefront: "gb",
+    developerToken: token
+)
+
+print(concert.attributes.name)
+print(concert.relationships?.venues?.data.first?.attributes.name ?? "No venue")
+```
+
+### Artist concerts
+
+An artist lookup returns the complete upcoming view. Pass a geohash to request Apple's nearby view in the same response.
+
+```swift
+let concerts = try await MConcerts.upcomingConcerts(
+    forArtistID: "1462541757",
+    storefront: "gb",
+    geoHashLocation: "gcpvj",
+    limit: 8,
+    developerToken: token
+)
+
+print(concerts.all.data.count)
+print(concerts.nearby?.data.count ?? 0)
+```
 
 ## Lyrics
 
