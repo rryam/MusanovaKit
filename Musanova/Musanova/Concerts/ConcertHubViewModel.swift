@@ -39,6 +39,7 @@ final class ConcertHubViewModel {
       return
     }
 
+    hub = nil
     isLoading = true
     errorMessage = nil
     defer {
