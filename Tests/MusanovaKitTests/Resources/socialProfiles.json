@@ -1,0 +1,35 @@
+{
+  "data": [
+    { "id": "social.one", "type": "social-profiles" },
+    { "id": "social.two", "type": "social-profiles" }
+  ],
+  "next": "/v1/me/social/profile/followees?offset=2&limit=2",
+  "resources": {
+    "social-profiles": {
+      "social.one": {
+        "id": "social.one",
+        "type": "social-profiles",
+        "href": "/v1/social/us/social-profiles/social.one",
+        "attributes": {
+          "name": "Morgan",
+          "handle": "morgan",
+          "isPrivate": false,
+          "isVerified": true,
+          "followState": "following"
+        }
+      },
+      "social.two": {
+        "id": "social.two",
+        "type": "social-profiles",
+        "href": "/v1/social/us/social-profiles/social.two",
+        "attributes": {
+          "name": "Taylor",
+          "handle": "taylor",
+          "isPrivate": true,
+          "isVerified": false,
+          "followState": "requested"
+        }
+      }
+    }
+  }
+}

@@ -26,6 +26,7 @@ MusanovaKit lets you explore Apple Music features that are not exposed through t
   - [Pinning and unpinning items](#pinning-and-unpinning-items)
   - [Reordering pins and changing playback](#reordering-pins-and-changing-playback)
 - [Editorial Rooms](#editorial-rooms)
+- [Social Relationships](#social-relationships)
 - [Disclaimer](#disclaimer)
 
 ## Requirements
@@ -368,6 +369,28 @@ for section in page.children {
 ```
 
 `EditorialContentResource` keeps the resource `type`, identifier, and common display fields instead of assuming every item has the same catalog shape. Unknown resource types still decode, although their type-specific fields aren't modeled.
+
+## Social Relationships
+
+Apple Music protects follower, followee, and pending-follower reads with an action signature in addition to the developer and user tokens. MusanovaKit asks AppleMediaServices to add that signature before sending these requests.
+
+```swift
+let followers = try await MSocial.followers(developerToken: token)
+let followees = try await MSocial.followees(developerToken: token)
+let pending = try await MSocial.pendingFollowers(developerToken: token)
+```
+
+An account with no matching profiles returns an empty `profiles` array. For another endpoint that uses the same signature gate, opt in through `MusicPrivilegedDataRequest`:
+
+```swift
+let request = MusicPrivilegedDataRequest(
+    url: url,
+    developerToken: token,
+    requiresActionSignature: true
+)
+```
+
+This signer depends on a private system framework and can stop working after an OS update. Treat it as macOS research tooling, not production or App Store code.
 
 ## Disclaimer
 

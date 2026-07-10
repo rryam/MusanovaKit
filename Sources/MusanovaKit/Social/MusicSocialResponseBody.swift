@@ -8,6 +8,16 @@ import Foundation
 struct MusicSocialResponseBody: Decodable, Sendable {
   let data: [MusicSocialResource]
   let resources: MusicSocialResourceMap?
+  let href: String?
+  let next: String?
+
+  func profilePage() -> MusicSocialProfilesPage {
+    MusicSocialProfilesPage(
+      profiles: data.map { profile(for: $0) },
+      href: href,
+      next: next
+    )
+  }
 
   func personalProfile() throws -> PersonalMusicSocialProfile {
     guard let identifier = data.first else {
