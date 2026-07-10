@@ -184,9 +184,9 @@ struct LyricsView: View {
     ScrollViewReader { proxy in
       GeometryReader { geometry in
         ScrollView {
-          LazyVStack(alignment: .leading, spacing: 26) {
+          LazyVStack(alignment: .leading, spacing: 54) {
             ForEach(viewModel.lyrics) { paragraph in
-              VStack(alignment: .leading, spacing: 22) {
+              VStack(alignment: .leading, spacing: 46) {
                 ForEach(paragraph.lines) { line in
                   Button {
                     viewModel.seek(to: line)
@@ -203,7 +203,6 @@ struct LyricsView: View {
                   .id(line.id)
                 }
               }
-              .padding(.bottom, 8)
             }
           }
           .padding(.horizontal, 44)
