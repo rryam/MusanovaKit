@@ -8,16 +8,6 @@ import Foundation
 struct MusicSocialResponseBody: Decodable, Sendable {
   let data: [MusicSocialResource]
   let resources: MusicSocialResourceMap?
-  let href: String?
-  let next: String?
-
-  func profilePage() -> MusicSocialProfilesPage {
-    MusicSocialProfilesPage(
-      profiles: data.map { profile(for: $0) },
-      href: href,
-      next: next
-    )
-  }
 
   func personalProfile() throws -> PersonalMusicSocialProfile {
     guard let identifier = data.first else {
@@ -32,22 +22,7 @@ struct MusicSocialResponseBody: Decodable, Sendable {
       type: resource.type,
       href: resource.href,
       attributes: resource.attributes,
-      socialProfile: relationships?.socialProfile?.data.first.map { profile(for: $0) },
-      followers: page(for: relationships?.followers),
-      followees: page(for: relationships?.followees),
-      pendingFollowers: page(for: relationships?.pendingFollowers)
-    )
-  }
-
-  private func page(for relationship: MusicSocialRelationship?) -> MusicSocialProfilesPage? {
-    guard let relationship else {
-      return nil
-    }
-
-    return MusicSocialProfilesPage(
-      profiles: relationship.data.map { profile(for: $0) },
-      href: relationship.href,
-      next: relationship.next
+      socialProfile: relationships?.socialProfile?.data.first.map { profile(for: $0) }
     )
   }
 
@@ -93,15 +68,9 @@ struct MusicSocialResource: Decodable, Sendable {
 
 struct MusicSocialRelationships: Decodable, Sendable {
   let socialProfile: MusicSocialRelationship?
-  let followers: MusicSocialRelationship?
-  let followees: MusicSocialRelationship?
-  let pendingFollowers: MusicSocialRelationship?
 
   enum CodingKeys: String, CodingKey {
     case socialProfile = "social-profile"
-    case followers
-    case followees
-    case pendingFollowers = "pending-followers"
   }
 }
 

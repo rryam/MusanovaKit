@@ -10,9 +10,6 @@ public struct PersonalMusicSocialProfile: Identifiable, Decodable, Sendable {
   public let href: String?
   public let attributes: MusicSocialProfileAttributes?
   public let socialProfile: MusicSocialProfile?
-  public let followers: MusicSocialProfilesPage?
-  public let followees: MusicSocialProfilesPage?
-  public let pendingFollowers: MusicSocialProfilesPage?
 
   public init(from decoder: Decoder) throws {
     let response = try MusicSocialResponseBody(from: decoder)
@@ -24,18 +21,12 @@ public struct PersonalMusicSocialProfile: Identifiable, Decodable, Sendable {
     type: String,
     href: String?,
     attributes: MusicSocialProfileAttributes?,
-    socialProfile: MusicSocialProfile?,
-    followers: MusicSocialProfilesPage?,
-    followees: MusicSocialProfilesPage?,
-    pendingFollowers: MusicSocialProfilesPage?
+    socialProfile: MusicSocialProfile?
   ) {
     self.id = id
     self.type = type
     self.href = href
     self.attributes = attributes
     self.socialProfile = socialProfile
-    self.followers = followers
-    self.followees = followees
-    self.pendingFollowers = pendingFollowers
   }
 }

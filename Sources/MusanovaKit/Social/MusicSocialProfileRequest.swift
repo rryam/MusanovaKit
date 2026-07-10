@@ -9,9 +9,6 @@ import Foundation
 public struct MusicSocialProfileRequest: Sendable {
   private let developerToken: String
 
-  public var includeFollowers = true
-  public var includeFollowees = true
-  public var includePendingFollowers = true
   public var allowNonOnboarded = true
   public var includeArtworkURLs = true
 
@@ -59,20 +56,9 @@ extension MusicSocialProfileRequest {
       var components = AppleMusicAMPURLComponents()
       components.path = "me/social/profile"
 
-      var includes = ["social-profile"]
-      if includeFollowers {
-        includes.append("followers")
-      }
-      if includeFollowees {
-        includes.append("followees")
-      }
-      if includePendingFollowers {
-        includes.append("pending-followers")
-      }
-
       var queryItems = [
-        URLQueryItem(name: "include", value: includes.joined(separator: ",")),
-        URLQueryItem(name: "extend", value: "followState,pendingFollowersCount"),
+        URLQueryItem(name: "include", value: "social-profile"),
+        URLQueryItem(name: "extend", value: "followState"),
         URLQueryItem(name: "format[resources]", value: "map")
       ]
       if allowNonOnboarded {

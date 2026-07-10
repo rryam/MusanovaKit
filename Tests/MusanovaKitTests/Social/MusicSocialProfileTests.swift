@@ -17,19 +17,16 @@ struct MusicSocialProfileTests {
     let query = try queryItems(for: endpointURL)
 
     #expect(endpointURL.path == "/v1/me/social/profile")
-    #expect(query["include"] == "social-profile,followers,followees,pending-followers")
-    #expect(query["extend"] == "followState,pendingFollowersCount")
+    #expect(query["include"] == "social-profile")
+    #expect(query["extend"] == "followState")
     #expect(query["with"] == "nonOnboarded")
     #expect(query["format[resources]"] == "map")
     #expect(query["art[url]"] == "f")
   }
 
   @Test
-  func profileEndpointCanOmitOptionalRelationships() throws {
+  func profileEndpointCanOmitOptionalParameters() throws {
     var request = try MusicSocialProfileRequest(developerToken: "test_token")
-    request.includeFollowers = false
-    request.includeFollowees = false
-    request.includePendingFollowers = false
     request.allowNonOnboarded = false
     request.includeArtworkURLs = false
 
@@ -52,10 +49,6 @@ struct MusicSocialProfileTests {
     #expect(profile.attributes?.pendingFollowersCount == 1)
     #expect(profile.socialProfile?.id == "social.me")
     #expect(profile.socialProfile?.attributes?.followState == .currentUser)
-    #expect(profile.followers?.profiles.map(\.id) == ["social.follower"])
-    #expect(profile.followers?.next == "/v1/me/social/profile/followers?offset=1")
-    #expect(profile.followees?.profiles.map(\.id) == ["social.followee"])
-    #expect(profile.pendingFollowers?.profiles.map(\.id) == ["social.pending"])
   }
 
   @Test
@@ -70,7 +63,6 @@ struct MusicSocialProfileTests {
 
     #expect(profile.id == "me")
     #expect(profile.attributes == nil)
-    #expect(profile.followers == nil)
   }
 
   @Test
