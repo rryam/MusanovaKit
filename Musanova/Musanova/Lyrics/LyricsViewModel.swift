@@ -94,14 +94,7 @@ final class LyricsViewModel {
     guard canPlay else { return }
     playbackErrorMessage = nil
     do {
-      if !hasPreparedQueue {
-        if let song {
-          player.queue = [song]
-        } else if let playbackItem {
-          player.queue = ApplicationMusicPlayer.Queue(for: [playbackItem])
-        }
-        hasPreparedQueue = true
-      }
+      prepareQueueIfNeeded()
       try await player.play()
       isPlaying = true
       startPlaybackObservation()
@@ -120,11 +113,40 @@ final class LyricsViewModel {
     stopPlaybackObservation()
   }
 
+  func seek(to line: LyricLine) {
+    guard let startTime = line.segments.first?.startTime else { return }
+    prepareQueueIfNeeded()
+    player.playbackTime = startTime
+    currentTime = startTime
+    currentLineID = line.id
+  }
+
+  func seek(by interval: TimeInterval) {
+    prepareQueueIfNeeded()
+    let targetTime = min(max(0, currentTime + interval), duration)
+    player.playbackTime = targetTime
+    currentTime = targetTime
+    currentLineID = currentLine(at: targetTime)?.id
+  }
+
   func stop() {
     player.stop()
+    player.playbackTime = 0
+    currentTime = 0
+    currentLineID = nil
     isPlaying = false
     hasPreparedQueue = false
     stopPlaybackObservation()
+  }
+
+  private func prepareQueueIfNeeded() {
+    guard !hasPreparedQueue else { return }
+    if let song {
+      player.queue = [song]
+    } else if let playbackItem {
+      player.queue = ApplicationMusicPlayer.Queue(for: [playbackItem])
+    }
+    hasPreparedQueue = true
   }
 
   private func startPlaybackObservation() {

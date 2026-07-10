@@ -64,9 +64,6 @@ struct LyricsView: View {
     HStack(spacing: 0) {
       nowPlayingPanel
 
-      Divider()
-        .overlay(.white.opacity(0.12))
-
       lyricScroller
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -133,20 +130,36 @@ struct LyricsView: View {
         }
       }
 
-      HStack(spacing: 10) {
+      HStack(spacing: 34) {
+        Button {
+          viewModel.seek(by: -15)
+        } label: {
+          Label("Back 15 seconds", systemImage: "gobackward.15")
+        }
+        .help("Back 15 seconds")
+
         Button {
           Task { await viewModel.togglePlayback() }
         } label: {
           Label(viewModel.isPlaying ? "Pause" : "Play", systemImage: viewModel.isPlaying ? "pause.fill" : "play.fill")
         }
-        .buttonStyle(.borderedProminent)
-        .tint(.purple)
-        .disabled(!viewModel.canPlay)
+        .font(.system(size: 34, weight: .semibold))
+        .help(viewModel.isPlaying ? "Pause" : "Play")
 
-        Button("Restart", systemImage: "arrow.counterclockwise", action: viewModel.resetPlayback)
-          .buttonStyle(.bordered)
-          .tint(.white)
+        Button {
+          viewModel.seek(by: 15)
+        } label: {
+          Label("Forward 15 seconds", systemImage: "goforward.15")
+        }
+        .help("Forward 15 seconds")
       }
+      .font(.system(size: 26, weight: .semibold))
+      .foregroundStyle(.white.opacity(0.9))
+      .labelStyle(.iconOnly)
+      .buttonStyle(.plain)
+      .disabled(!viewModel.canPlay)
+      .frame(maxWidth: .infinity)
+      .padding(.vertical, 4)
 
       if viewModel.duration == 0 {
         Text(viewModel.formattedPlaybackTime)
@@ -175,11 +188,18 @@ struct LyricsView: View {
           ForEach(viewModel.lyrics) { paragraph in
             VStack(alignment: .leading, spacing: 13) {
               ForEach(paragraph.lines) { line in
-                LyricLineView(
-                  line: line,
-                  isCurrent: line.id == viewModel.currentLineID,
-                  hasPlaybackStarted: viewModel.currentTime > 0
-                )
+                Button {
+                  viewModel.seek(to: line)
+                } label: {
+                  LyricLineView(
+                    line: line,
+                    isCurrent: line.id == viewModel.currentLineID,
+                    hasPlaybackStarted: viewModel.currentTime > 0
+                  )
+                }
+                .buttonStyle(.plain)
+                .disabled(line.segments.first == nil)
+                .help("Move playback to this line")
                 .id(line.id)
               }
             }

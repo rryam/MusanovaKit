@@ -65,12 +65,13 @@ struct ConcertHubView: View {
   private var concertContent: some View {
     ScrollView {
       LazyVStack(alignment: .leading, spacing: 34) {
-        if let featured = viewModel.sections.first?.data.first {
+        let featured = viewModel.sections.first?.data.first
+        if let featured {
           featuredConcert(featured)
         }
 
-        ForEach(Array(viewModel.sections.enumerated()), id: \.offset) { _, section in
-          concertSection(section)
+        ForEach(Array(viewModel.sections.enumerated()), id: \.offset) { index, section in
+          concertSection(section, excluding: index == 0 ? featured?.id : nil)
         }
       }
       .padding(.horizontal, 28)
@@ -125,21 +126,25 @@ struct ConcertHubView: View {
     .accessibilityLabel("Featured concert: \(concert.artistNames), \(concert.formattedDate)")
   }
 
-  private func concertSection(_ section: ConcertHubContainer) -> some View {
-    VStack(alignment: .leading, spacing: 16) {
-      Text("\(section.title ?? "Popular Concerts") in \(viewModel.selectedLocation.name)")
-        .font(.title2.bold())
+  @ViewBuilder
+  private func concertSection(_ section: ConcertHubContainer, excluding featuredID: String?) -> some View {
+    let concerts = section.data.filter { $0.id != featuredID }
+    if !concerts.isEmpty {
+      VStack(alignment: .leading, spacing: 16) {
+        Text("\(section.title ?? "Popular Concerts") in \(viewModel.selectedLocation.name)")
+          .font(.title2.bold())
 
-      ScrollView(.horizontal) {
-        LazyHStack(spacing: 18) {
-          ForEach(section.data, id: \.id) { concert in
-            NavigationLink(value: concert) {
-              ConcertCard(concert: concert)
+        ScrollView(.horizontal) {
+          LazyHStack(spacing: 18) {
+            ForEach(concerts, id: \.id) { concert in
+              NavigationLink(value: concert) {
+                ConcertCard(concert: concert)
+              }
+              .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
           }
+          .padding(.bottom, 8)
         }
-        .padding(.bottom, 8)
       }
     }
   }
