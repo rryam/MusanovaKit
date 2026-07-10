@@ -62,7 +62,11 @@ struct ReplayView: View {
       VStack(alignment: .leading, spacing: 40) {
         replayHero(summary)
 
-        if viewModel.milestones.isEmpty {
+        if viewModel.isLoadingMilestones {
+          ProgressView("Loading \(String(summary.year)) milestones…")
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 36)
+        } else if viewModel.milestones.isEmpty {
           ContentUnavailableView(
             "No Milestones for \(String(summary.year))",
             systemImage: "flag.checkered",

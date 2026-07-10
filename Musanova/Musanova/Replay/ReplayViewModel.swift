@@ -19,9 +19,12 @@ final class ReplayViewModel {
   var subtitle: String?
   var isEligible: Bool = false
   var isLoading: Bool = false
+  var isLoadingMilestones: Bool = false
   var errorMessage: String?
   var summaries: [MusicSummarySearch] = []
   var milestones: [MusicSummaryMilestone] = []
+
+  private var activeMilestonesRequestID = UUID()
 
   var selectedSummary: MusicSummarySearch? {
     guard let selectedYear else { return nil }
@@ -91,17 +94,31 @@ final class ReplayViewModel {
   }
   
   func loadPlaylistSongs() async {
+    let requestID = UUID()
+    activeMilestonesRequestID = requestID
+    milestones = []
+    isLoadingMilestones = false
+
     guard let year = selectedYear else { return }
     guard let summary = summaries.first(where: { $0.year == year }) else { return }
     guard let token = developerToken, !token.isEmpty else { return }
+
+    isLoadingMilestones = true
+    defer {
+      if activeMilestonesRequestID == requestID {
+        isLoadingMilestones = false
+      }
+    }
     
     title = "Your \(year) Replay"
     subtitle = summary.playlist.name
     
     do {
       let fetchedMilestones = try await MSummaries.milestones(forYear: MusicYearID(year), developerToken: token)
+      guard activeMilestonesRequestID == requestID, selectedYear == year else { return }
       self.milestones = Array(fetchedMilestones)
     } catch {
+      guard activeMilestonesRequestID == requestID else { return }
       self.milestones = []
     }
   }
