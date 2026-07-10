@@ -43,6 +43,7 @@ struct LibraryPinMetaTests {
 
     let libraryPin = try #require(pin.libraryPin)
     #expect(libraryPin.action == "play")
+    #expect(libraryPin.actionKind == .play)
     #expect(libraryPin.positionUUID == "321069fb-bf1b-41ed-a239-0ae56fa7b35d")
   }
 
@@ -74,7 +75,33 @@ struct LibraryPinMetaTests {
 
     let libraryPin = try #require(pin.libraryPin)
     #expect(libraryPin.action == "drillIn")
+    #expect(libraryPin.actionKind == .drillIn)
     #expect(libraryPin.positionUUID == "DC6E1538-7515-4FF7-86D7-2CBF28790BDF")
+  }
+
+  @Test
+  func testUnknownLibraryPinActionRemainsAvailableAsRawValue() throws {
+    let jsonString = """
+    {
+      "id": "p.example",
+      "type": "library-playlists",
+      "attributes": {
+        "name": "Example"
+      },
+      "meta": {
+        "libraryPin": {
+          "action": "open",
+          "positionUUID": "D3FEED98-DC16-4C25-B96E-C73DA7247A43"
+        }
+      }
+    }
+    """
+
+    let data = try #require(jsonString.data(using: .utf8))
+    let pin = try JSONDecoder().decode(LibraryPin.self, from: data)
+
+    #expect(pin.libraryPin?.action == "open")
+    #expect(pin.libraryPin?.actionKind == nil)
   }
 
   @Test

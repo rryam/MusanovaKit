@@ -20,6 +20,8 @@ MusanovaKit lets you explore Apple Music features that are not exposed through t
 - [Library Pins](#library-pins)
   - [Fetching pinned items](#fetching-pinned-items)
   - [Custom pin requests](#custom-pin-requests)
+  - [Pinning and unpinning items](#pinning-and-unpinning-items)
+  - [Reordering pins and changing playback](#reordering-pins-and-changing-playback)
 - [Disclaimer](#disclaimer)
 
 ## Requirements
@@ -210,6 +212,26 @@ try await MLibrary.unpin(artist, developerToken: token)
 ```
 
 All `Album`, `Song`, `Playlist`, and `Artist` types conform to the `Pinnable` protocol, allowing them to be used with the `pin(_:developerToken:)` and `unpin(_:developerToken:)` methods.
+
+### Reordering pins and changing playback
+
+Pins can be moved after another pin or straight to the top. Albums and playlists can also use play or shuffle as their default action.
+
+```swift
+try await MLibrary.movePin(
+    withID: pinID,
+    afterPinWithID: precedingPinID,
+    developerToken: token
+)
+
+try await MLibrary.movePinToTop(withID: pinID, developerToken: token)
+
+try await MLibrary.setPlaybackAction(
+    .shuffle,
+    forPinWithID: pinID,
+    developerToken: token
+)
+```
 
 The `Pinnable` protocol is defined as:
 
