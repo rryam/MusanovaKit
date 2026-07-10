@@ -75,7 +75,7 @@ struct LyricsView: View {
 
       Group {
         if let artwork = viewModel.song?.artwork {
-          ArtworkImage(artwork, width: 260, height: 260)
+          ArtworkImage(artwork, width: 320, height: 320)
         } else if let artworkURL = viewModel.artworkURL {
           AsyncImage(url: artworkURL) { image in
             image
@@ -95,7 +95,7 @@ struct LyricsView: View {
             }
         }
       }
-      .frame(width: 260, height: 260)
+      .frame(width: 320, height: 320)
       .clipShape(.rect(cornerRadius: 20))
       .shadow(color: .black.opacity(0.35), radius: 26, y: 14)
 
@@ -177,7 +177,7 @@ struct LyricsView: View {
       Spacer(minLength: 16)
     }
     .padding(30)
-    .frame(width: 340)
+    .frame(width: 420)
   }
 
   private var lyricScroller: some View {
@@ -251,7 +251,7 @@ private struct LyricLineView: View {
 
   var body: some View {
     Text(line.text)
-      .font(.system(size: isCurrent ? 46 : 41, weight: isCurrent ? .bold : .semibold))
+      .font(.system(size: isCurrent ? 56 : 50, weight: isCurrent ? .bold : .semibold))
       .foregroundStyle(foregroundStyle)
       .lineSpacing(7)
       .fixedSize(horizontal: false, vertical: true)
