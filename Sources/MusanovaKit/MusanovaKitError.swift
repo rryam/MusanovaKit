@@ -32,6 +32,9 @@ public enum MusanovaKitError: Error, Sendable {
 
   /// The country code could not be determined.
   case countryCodeUnavailable
+
+  /// Apple Music could not sign a request that requires Mescal authorization.
+  case requestSigningFailed(String)
 }
 
 extension MusanovaKitError: CustomStringConvertible {
@@ -60,6 +63,8 @@ extension MusanovaKitError: CustomStringConvertible {
       return "Developer token is missing or invalid. Please provide a valid developer token."
     case .countryCodeUnavailable:
       return "Unable to determine the current country code."
+    case let .requestSigningFailed(description):
+      return "Request signing failed: \(description)"
     }
   }
 }
@@ -87,6 +92,8 @@ extension MusanovaKitError: LocalizedError {
       return "Authentication failed due to missing or invalid developer token."
     case .countryCodeUnavailable:
       return "The country code is required but could not be determined."
+    case .requestSigningFailed:
+      return "Apple Music could not sign the privileged request."
     }
   }
 
@@ -108,6 +115,8 @@ extension MusanovaKitError: LocalizedError {
       return "Provide a valid developer token via the developerToken parameter or DEVELOPER_TOKEN environment variable."
     case .countryCodeUnavailable:
       return "Ensure you have proper network connectivity and MusicKit authorization."
+    case .requestSigningFailed:
+      return "Run the request on an Apple platform where AppleMediaServices action signing is available."
     }
   }
 }
