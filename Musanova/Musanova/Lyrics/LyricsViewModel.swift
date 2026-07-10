@@ -150,7 +150,7 @@ final class LyricsViewModel {
 
     var lowerBound = 0
     var upperBound = lines.count - 1
-    var latestStartedLine = lines.first
+    var latestStartedLine: LyricLine?
     while lowerBound <= upperBound {
       let midpoint = (lowerBound + upperBound) / 2
       let line = lines[midpoint]

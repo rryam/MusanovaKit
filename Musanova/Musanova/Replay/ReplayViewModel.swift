@@ -79,6 +79,12 @@ final class ReplayViewModel {
     } catch is CancellationError {
       // Task cancelled
     } catch {
+      summaries = []
+      availableYears = []
+      selectedYear = nil
+      title = ""
+      subtitle = nil
+      milestones = []
       errorMessage = "Could not load Replay (\(error.localizedDescription))."
       isEligible = false
     }

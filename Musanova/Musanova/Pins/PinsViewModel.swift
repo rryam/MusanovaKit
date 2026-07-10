@@ -19,6 +19,8 @@ final class PinsViewModel {
     guard !isLoading else { return }
     guard let developerToken = UserDefaults.standard.string(forKey: "developerToken"),
           !developerToken.isEmpty else {
+      pins = []
+      resources = nil
       errorMessage = "Add your AMP developer token in Settings to load pins."
       return
     }
@@ -34,6 +36,8 @@ final class PinsViewModel {
     } catch is CancellationError {
       return
     } catch {
+      pins = []
+      resources = nil
       errorMessage = "Your pins could not be loaded. \(error.localizedDescription)"
     }
   }

@@ -38,6 +38,16 @@ struct ConcertHubView: View {
       }
       .navigationTitle("Concerts")
       .toolbar {
+        Picker("Concert location", selection: $viewModel.selectedLocation) {
+          ForEach(ConcertHubLocation.all) { location in
+            Text(location.name).tag(location)
+          }
+        }
+        .pickerStyle(.menu)
+        .onChange(of: viewModel.selectedLocation) { _, _ in
+          Task { await viewModel.load() }
+        }
+
         Button("Refresh", systemImage: "arrow.clockwise") {
           Task { await viewModel.load() }
         }
@@ -117,7 +127,7 @@ struct ConcertHubView: View {
 
   private func concertSection(_ section: ConcertHubContainer) -> some View {
     VStack(alignment: .leading, spacing: 16) {
-      Text(section.title ?? "Popular Concerts")
+      Text("\(section.title ?? "Popular Concerts") in \(viewModel.selectedLocation.name)")
         .font(.title2.bold())
 
       ScrollView(.horizontal) {
