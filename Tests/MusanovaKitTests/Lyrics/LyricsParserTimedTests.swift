@@ -75,6 +75,20 @@ struct LyricsParserTimedTests {
   }
 
   @Test
+  func testParserJoinsAdjacentSyllableSpansWithoutCollapsingWordBoundaries() throws {
+    let ttml = wrapTTML(body: """
+      <div>
+        <p begin="1.0" end="4.0"><span begin="1.0" end="1.3">Some</span> <span begin="1.3" end="1.6">things</span> <span begin="1.6" end="1.9">are</span> <span begin="1.9" end="2.2">bro</span><span begin="2.2" end="2.5">ken</span> <span begin="2.5" end="2.8">when</span> <span begin="2.8" end="3.1">you</span> <span begin="3.1" end="3.4">o</span><span begin="3.4" end="3.7">pen</span> <span begin="3.7" end="4.0">it</span></p>
+      </div>
+      """)
+
+    let line = try #require(LyricsParser().parse(ttml).first?.lines.first)
+
+    #expect(line.text == "Some things are broken when you open it")
+    #expect(line.segments.map(\.text) == ["Some", "things", "are", "bro", "ken", "when", "you", "o", "pen", "it"])
+  }
+
+  @Test
   func testParserHandlesNestedBackgroundSpans() throws {
     let ttml = wrapTTML(body: """
       <div>

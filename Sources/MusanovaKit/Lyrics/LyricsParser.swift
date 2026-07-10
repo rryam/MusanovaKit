@@ -141,7 +141,11 @@ public class LyricsParser: NSObject, XMLParserDelegate {
     } else if currentElement == "p" {
       let normalized = normalizePlainText(string)
       if !normalized.isEmpty {
+        if string.first?.isWhitespace == true {
+          hasPendingWhitespace = true
+        }
         appendToCurrentLineTokens(normalized)
+        hasPendingWhitespace = string.last?.isWhitespace == true
       } else if string.containsWhitespaceOnly {
         hasPendingWhitespace = true
       }
@@ -251,8 +255,9 @@ public class LyricsParser: NSObject, XMLParserDelegate {
       }
 
       let avoidSpace = shouldAvoidPrecedingSpace(before: token.text, previousToken: previousTokenText)
-      // Add space between tokens unless avoiding it (punctuation or accented continuation).
-      if !avoidSpace && !result.hasSuffix(" ") {
+      // Apple uses adjacent timed spans for syllables in the same word and
+      // literal whitespace between spans for word boundaries.
+      if token.needsLeadingSpace && !avoidSpace && !result.hasSuffix(" ") {
         result += " "
       }
 

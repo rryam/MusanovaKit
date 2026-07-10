@@ -12,7 +12,7 @@ struct LyricsParserAccentedCharacterTests {
     // Tests merging of single letter with following accented character
     let ttml = wrapTTML(body: """
       <div>
-        <p><span begin="0.0" end="0.5">je</span><span begin="0.5" end="1.0">vais</span><span begin="1.0" end="1.5">o</span><span begin="1.5" end="2.0">ù</span><span begin="2.0" end="2.5">tu</span></p>
+        <p><span begin="0.0" end="0.5">je</span> <span begin="0.5" end="1.0">vais</span> <span begin="1.0" end="1.5">o</span><span begin="1.5" end="2.0">ù</span> <span begin="2.0" end="2.5">tu</span></p>
       </div>
       """)
     let paragraphs = parse(ttml: ttml)
@@ -41,7 +41,7 @@ struct LyricsParserAccentedCharacterTests {
   func testParserKeepsSpaceBeforeAccentedWord() throws {
     let ttml = wrapTTML(body: """
       <div>
-        <p><span begin="0.0" end="1.0">aller</span><span begin="1.0" end="2.0">à</span><span begin="2.0" end="3.0">droite</span></p>
+        <p><span begin="0.0" end="1.0">aller</span> <span begin="1.0" end="2.0">à</span> <span begin="2.0" end="3.0">droite</span></p>
       </div>
       """)
     let paragraphs = parse(ttml: ttml)
