@@ -8,6 +8,7 @@ MusanovaKit lets you explore Apple Music features that are not exposed through t
 
 - [Requirements](#requirements)
 - [Installation](#installation)
+- [What's in 4.0.0](#whats-in-400)
 - [Authentication](#authentication)
   - [Privileged developer token](#privileged-developer-token)
   - [Music user token](#music-user-token)
@@ -25,14 +26,16 @@ MusanovaKit lets you explore Apple Music features that are not exposed through t
   - [Custom pin requests](#custom-pin-requests)
   - [Pinning and unpinning items](#pinning-and-unpinning-items)
   - [Reordering pins and changing playback](#reordering-pins-and-changing-playback)
+- [Taste Preferences](#taste-preferences)
 - [Editorial Rooms](#editorial-rooms)
 - [Social Relationships](#social-relationships)
+- [Sample App](#sample-app)
 - [Disclaimer](#disclaimer)
 
 ## Requirements
 
-- Swift 6.2 or later
-- Xcode 16.2 (Swift 6.2 toolchain) or later
+- Swift 6.0 or later
+- Xcode 16 or later
 - An Apple Developer account with access to Apple Music privileged developer tokens
 
 ## Installation
@@ -41,11 +44,17 @@ Add MusanovaKit to your project using the Swift Package Manager:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/rryam/MusanovaKit.git", branch: "main")
+    .package(url: "https://github.com/rryam/MusanovaKit.git", from: "4.0.0")
 ]
 ```
 
 Then add `MusanovaKit` to the target that should use these APIs.
+
+## What's in 4.0.0
+
+Version 4 adds typed clients and decoding models for Apple Music's concert hub, editorial rooms, taste preferences, social profiles, Replay milestones, and library pin mutations. Lyrics now expose raw TTML, line-level text, and timed syllable segments; the parser uses Apple's literal TTML whitespace to distinguish word boundaries from adjacent timed syllables.
+
+The repository also includes a signed macOS sample app. It turns the responses into a concert browser, a Replay timeline, a pin shelf, and a synchronized lyrics player with clickable seeking.
 
 ## Authentication
 
@@ -342,6 +351,20 @@ Available configuration options:
 - `libraryArtistIncludes`: Relationships to include for artists
 - `libraryMusicVideoIncludes`: Relationships to include for music videos
 
+## Taste Preferences
+
+Fetch the resources Apple Music uses when personalizing recommendations for the current user:
+
+```swift
+let preferences = try await MTaste.preferences(developerToken: token)
+
+for preference in preferences {
+    print("\(preference.attributes.name): \(preference.attributes.preference)")
+}
+```
+
+Use `MusicTastePreferencesRequest` directly when you need the unresolved references and resource map from `TastePreferencesResponse`.
+
 ## Editorial Rooms
 
 Apple Music uses rooms and multirooms to build editorial pages. A room holds catalog resources such as artists, albums, and playlists. A multiroom combines text sections, catalog content, links to child rooms, and hero artwork.
@@ -375,6 +398,7 @@ for section in page.children {
 Apple Music protects follower, followee, and pending-follower reads with an action signature in addition to the developer and user tokens. MusanovaKit asks AppleMediaServices to add that signature before sending these requests.
 
 ```swift
+let profile = try await MSocial.profile(developerToken: token)
 let followers = try await MSocial.followers(developerToken: token)
 let followees = try await MSocial.followees(developerToken: token)
 let pending = try await MSocial.pendingFollowers(developerToken: token)
@@ -391,6 +415,12 @@ let request = MusicPrivilegedDataRequest(
 ```
 
 This signer depends on a private system framework and can stop working after an OS update. Treat it as macOS research tooling, not production or App Store code.
+
+## Sample App
+
+Open `Musanova/Musanova.xcodeproj`, select your development team, and use a bundle identifier with MusicKit enabled. Paste the AMP developer token into the app's Settings tab; the repository does not contain a token.
+
+The macOS app includes Concerts, Replay, Lyrics, Pins, and Settings tabs. The lyrics screen uses `ApplicationMusicPlayer`, follows line timing from TTML, seeks when a line is clicked, and keeps the current line centered while playback advances.
 
 ## Disclaimer
 
