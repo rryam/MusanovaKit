@@ -50,6 +50,31 @@ struct TastePreferencesTests {
   }
 
   @Test
+  func responseDecodesExpandedResourcesWithoutResourceMap() throws {
+    let data = Data(
+      """
+      {
+        "data": [
+          {
+            "id": "ob.l-302539673",
+            "type": "taste-preferences",
+            "href": "/v1/me/taste/taste-preferences/ob.l-302539673",
+            "attributes": {"name": "Rock", "preference": 1}
+          }
+        ]
+      }
+      """.utf8
+    )
+
+    let response = try JSONDecoder().decode(TastePreferencesResponse.self, from: data)
+    let preference = try #require(response.preferences.first)
+
+    #expect(preference.id == "ob.l-302539673")
+    #expect(preference.attributes.name == "Rock")
+    #expect(preference.attributes.preference == 1)
+  }
+
+  @Test
   func responseWithoutExpandedResourcesResolvesToEmptyPreferences() throws {
     let data = Data(#"{"data":[{"id":"ob.l-1","type":"taste-preferences"}]}"#.utf8)
 

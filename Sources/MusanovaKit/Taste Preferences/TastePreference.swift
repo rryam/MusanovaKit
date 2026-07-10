@@ -17,6 +17,9 @@ public struct TastePreferenceReference: Decodable, Hashable, Identifiable, Senda
 
   /// The relative API URL for the resource, when supplied.
   public let href: String?
+
+  /// Expanded attributes when the endpoint returns resources inline.
+  public let attributes: TastePreference.Attributes?
 }
 
 /// A taste-preference resource returned for the current Apple Music user.
@@ -65,12 +68,20 @@ public struct TastePreferencesResponse: Decodable, Hashable, Sendable {
 
   /// Expanded preferences in the order supplied by `data`.
   public var preferences: [TastePreference] {
-    guard let tastePreferences = resources?.tastePreferences else {
-      return []
-    }
-
     return data.compactMap { reference in
-      tastePreferences[reference.id]
+      if let attributes = reference.attributes {
+        return TastePreference(
+          id: reference.id,
+          type: reference.type,
+          href: reference.href,
+          attributes: attributes
+        )
+      }
+
+      guard let tastePreferences = resources?.tastePreferences else {
+        return nil
+      }
+      return tastePreferences[reference.id]
         ?? tastePreferences.values.first { $0.id == reference.id }
     }
   }
