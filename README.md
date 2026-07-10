@@ -11,6 +11,9 @@ MusanovaKit lets you explore Apple Music features that are not exposed through t
 - [Authentication](#authentication)
   - [Privileged developer token](#privileged-developer-token)
   - [Music user token](#music-user-token)
+- [Concerts](#concerts)
+  - [Concert details](#concert-details)
+  - [Artist concerts](#artist-concerts)
 - [Lyrics](#lyrics)
   - [Fetching TTML lyrics](#fetching-ttml-lyrics)
   - [Working with timed segments](#working-with-timed-segments)
@@ -20,6 +23,8 @@ MusanovaKit lets you explore Apple Music features that are not exposed through t
 - [Library Pins](#library-pins)
   - [Fetching pinned items](#fetching-pinned-items)
   - [Custom pin requests](#custom-pin-requests)
+  - [Pinning and unpinning items](#pinning-and-unpinning-items)
+  - [Reordering pins and changing playback](#reordering-pins-and-changing-playback)
 - [Editorial Rooms](#editorial-rooms)
 - [Disclaimer](#disclaimer)
 
@@ -53,9 +58,67 @@ Obtain a privileged Apple Music developer token from your internal tooling and p
 
 When you call MusanovaKit from a signed-in MusicKit app, the system automatically attaches the Music User Token to privileged requests. If you issue requests from outside MusicKit (for example, using `curl`), include the `Media-User-Token` header manually.
 
+## Concerts
+
+Load Apple Music's concert hub by storefront. Filters support a geohash, calendar dates, genres, selected sections, and per-section limits.
+
+```swift
+let options = ConcertHubOptions(
+    geoHashLocation: "gcpvj",
+    dateRange: ConcertDateRange(
+        startDate: "2026-07-10",
+        endDate: "2026-07-31"
+    ),
+    genreIDs: ["14"]
+)
+
+let hub = try await MConcerts.hub(
+    storefront: "gb",
+    developerToken: token,
+    options: options
+)
+
+for section in hub.orderedContainers {
+    print(section.title ?? "Concerts")
+    section.data.forEach { print($0.attributes.name) }
+}
+```
+
+### Concert details
+
+The detail response includes venues, coordinates, postal addresses, artists, related playlists, ticket vendors, and the data providers behind the event.
+
+```swift
+let concert = try await MConcerts.concert(
+    id: "ce.example",
+    storefront: "gb",
+    developerToken: token
+)
+
+print(concert.attributes.name)
+print(concert.relationships?.venues?.data.first?.attributes.name ?? "No venue")
+```
+
+### Artist concerts
+
+An artist lookup returns the complete upcoming view. Pass a geohash to request Apple's nearby view in the same response.
+
+```swift
+let concerts = try await MConcerts.upcomingConcerts(
+    forArtistID: "1462541757",
+    storefront: "gb",
+    geoHashLocation: "gcpvj",
+    limit: 8,
+    developerToken: token
+)
+
+print(concerts.all.data.count)
+print(concerts.nearby?.data.count ?? 0)
+```
+
 ## Lyrics
 
-`MCatalog.lyrics(for:developerToken:)` fetches the syllable-lyrics TTML feed for a given song. The parser extracts both plain text and per-segment timing metadata.
+MusanovaKit can return the original TTML, parsed paragraphs, or a flat list of timed segments. `MCatalog.lyrics(for:developerToken:)` remains available and returns the parsed paragraphs.
 
 ### Fetching TTML lyrics
 
@@ -98,6 +161,28 @@ line?.segments.forEach { segment in
 
 Use the segment timings to drive your own lyric highlighting, karaoke bars, or subtitle cues. Segments default to a `startTime` of `0` if the TTML omits the `begin` attribute.
 
+Fetch the segments directly when paragraph and line grouping isn't needed:
+
+```swift
+let segments = try await MCatalog.timedLyrics(for: song, developerToken: token)
+
+for segment in segments {
+    print("\(segment.startTime): \(segment.text)")
+}
+```
+
+`MCatalog.parsedLyrics(for:developerToken:countryCode:)` returns the grouped paragraphs explicitly. Both methods accept an optional storefront country code; without one, MusicKit resolves the current storefront.
+
+### Raw TTML
+
+Use `rawLyrics` when you need Apple Music's original document:
+
+```swift
+let ttml = try await MCatalog.rawLyrics(for: song, developerToken: token)
+```
+
+To decode the complete resource, including its playback parameters, call `lyricsResponse` instead.
+
 ### Direct lyric requests
 
 If you need the raw TTML, instantiate `MusicLyricsRequest` directly:
@@ -109,6 +194,13 @@ let ttml = response.data.first?.attributes.ttml
 ```
 
 `MusicLyricsRequest` automatically targets the `/syllable-lyrics` endpoint and decodes the `MusicLyricsResponse` payload.
+
+You can also parse TTML obtained elsewhere. `parse` returns an empty array for malformed input, while `parseValidating` throws `MusanovaKitError.invalidResponseFormat`:
+
+```swift
+let paragraphs = try LyricsParser().parseValidating(ttml)
+let segments = paragraphs.timedSegments
+```
 
 ## Replay and Summaries
 
@@ -211,6 +303,26 @@ try await MLibrary.unpin(artist, developerToken: token)
 ```
 
 All `Album`, `Song`, `Playlist`, and `Artist` types conform to the `Pinnable` protocol, allowing them to be used with the `pin(_:developerToken:)` and `unpin(_:developerToken:)` methods.
+
+### Reordering pins and changing playback
+
+Pins can be moved after another pin or straight to the top. Albums and playlists can also use play or shuffle as their default action.
+
+```swift
+try await MLibrary.movePin(
+    withID: pinID,
+    afterPinWithID: precedingPinID,
+    developerToken: token
+)
+
+try await MLibrary.movePinToTop(withID: pinID, developerToken: token)
+
+try await MLibrary.setPlaybackAction(
+    .shuffle,
+    forPinWithID: pinID,
+    developerToken: token
+)
+```
 
 The `Pinnable` protocol is defined as:
 

@@ -68,6 +68,11 @@ public struct LibraryPinAction: Decodable, Sendable {
   /// - "shuffle": Shuffle play the item (playlists)
   public let action: String
 
+  /// A typed representation of `action` when its value is known to MusanovaKit.
+  public var actionKind: LibraryPinActionKind? {
+    LibraryPinActionKind(rawValue: action)
+  }
+
   /// A unique identifier for the position of this pin.
   public let positionUUID: String
 
@@ -75,6 +80,18 @@ public struct LibraryPinAction: Decodable, Sendable {
     case action
     case positionUUID
   }
+}
+
+/// Actions reported by Apple Music for a library pin.
+public enum LibraryPinActionKind: String, Codable, Sendable {
+  /// Navigates into the pinned resource.
+  case drillIn
+
+  /// Plays the pinned resource in its natural order.
+  case play
+
+  /// Shuffles the contents of the pinned resource.
+  case shuffle
 }
 
 /// Extension to handle the nested meta.libraryPin structure.

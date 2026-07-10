@@ -1,0 +1,33 @@
+{
+  "results": {
+    "containers": {
+      "concerts-this-week": {
+        "title": "This Week",
+        "data": [{
+          "id": "ce.week",
+          "type": "concerts",
+          "attributes": {
+            "name": "Weekly Show",
+            "startISODateTime": "2026-07-11T18:00:00Z"
+          }
+        }]
+      },
+      "popular-concerts": {
+        "title": "Popular",
+        "data": [{
+          "id": "ce.popular",
+          "type": "concerts",
+          "attributes": {
+            "name": "Popular Show",
+            "startISODateTime": "2026-08-02T23:00:00Z"
+          }
+        }]
+      }
+    },
+    "meta": {
+      "containers": {
+        "order": ["popular-concerts", "concerts-this-week"]
+      }
+    }
+  }
+}

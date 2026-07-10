@@ -1,0 +1,32 @@
+{
+  "data": [{
+    "id": "100",
+    "type": "artists",
+    "attributes": {"name": "Example Artist"},
+    "views": {
+      "all-upcoming-concerts": {
+        "attributes": {"title": "All Upcoming Concerts"},
+        "data": [{
+          "id": "ce.anywhere",
+          "type": "concerts",
+          "attributes": {
+            "name": "Anywhere Show",
+            "startISODateTime": "2026-07-11T18:00:00Z"
+          }
+        }]
+      },
+      "nearby-upcoming-concerts": {
+        "attributes": {"title": "Nearby Upcoming Concerts"},
+        "data": [{
+          "id": "ce.nearby",
+          "type": "concerts",
+          "attributes": {
+            "name": "Nearby Show",
+            "startISODateTime": "2026-07-12T18:00:00Z"
+          }
+        }],
+        "meta": {"count": 1}
+      }
+    }
+  }]
+}

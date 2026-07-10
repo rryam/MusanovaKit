@@ -164,6 +164,64 @@ public extension MLibrary {
     try await unpin(itemId: item.id.rawValue, developerToken: developerToken)
   }
 
+  /// Moves a pin immediately after another pin.
+  ///
+  /// - Parameters:
+  ///   - pinID: The identifier of the pin to move.
+  ///   - precedingPinID: The identifier of the pin that should precede the moved pin.
+  ///   - developerToken: The privileged developer token used to authorize the request.
+  ///
+  /// - Note: This endpoint requires a privileged developer token and access to private Apple Music APIs.
+  static func movePin(
+    withID pinID: String,
+    afterPinWithID precedingPinID: String,
+    developerToken: String
+  ) async throws {
+    let request = try MusicLibraryPinMutationRequest(
+      pinID: pinID,
+      developerToken: developerToken,
+      mutation: .move(afterPinID: precedingPinID)
+    )
+    try await request.response()
+  }
+
+  /// Moves a pin to the first position in the user's pinned items.
+  ///
+  /// - Parameters:
+  ///   - pinID: The identifier of the pin to move.
+  ///   - developerToken: The privileged developer token used to authorize the request.
+  ///
+  /// - Note: This endpoint requires a privileged developer token and access to private Apple Music APIs.
+  static func movePinToTop(withID pinID: String, developerToken: String) async throws {
+    let request = try MusicLibraryPinMutationRequest(
+      pinID: pinID,
+      developerToken: developerToken,
+      mutation: .move(afterPinID: nil)
+    )
+    try await request.response()
+  }
+
+  /// Changes the playback behavior used when a pin is selected.
+  ///
+  /// - Parameters:
+  ///   - action: The new playback behavior for the pin.
+  ///   - pinID: The identifier of the pin to update.
+  ///   - developerToken: The privileged developer token used to authorize the request.
+  ///
+  /// - Note: This endpoint requires a privileged developer token and access to private Apple Music APIs.
+  static func setPlaybackAction(
+    _ action: LibraryPinPlaybackAction,
+    forPinWithID pinID: String,
+    developerToken: String
+  ) async throws {
+    let request = try MusicLibraryPinMutationRequest(
+      pinID: pinID,
+      developerToken: developerToken,
+      mutation: .setPlaybackAction(action)
+    )
+    try await request.response()
+  }
+
   /// Private helper method that performs the actual pinning operation using an item ID.
   ///
   /// - Parameters:
