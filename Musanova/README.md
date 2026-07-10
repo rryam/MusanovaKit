@@ -6,12 +6,11 @@ Musanova is a sample app for trying MusanovaKit against a signed-in Apple Music 
 
 Use a bundle identifier with MusicKit enabled, then build the app with your Apple Development team. Add the AMP developer token in Settings; the token is not part of the repository.
 
-## API Lab
+## Experiences
 
-The macOS API Lab runs every safe read example individually or as one sequence:
+The macOS sample turns MusanovaKit responses into complete product surfaces:
 
-- taste preferences, library pins, lyrics, Replay, and milestones
-- concert hub, concert detail, artist concerts, editorial rooms, and multirooms
-- social profile, followers, followees, and pending followers
-
-Pin, unpin, reorder, and playback mutations are not included in Run All because they change the account.
+- a live Concert Hub with artist artwork, dates, venues, details, and ticket links
+- a personal Replay timeline with annual playlists and listening milestones
+- synchronized lyrics with artwork and playback controls
+- a visual shelf of pinned library items

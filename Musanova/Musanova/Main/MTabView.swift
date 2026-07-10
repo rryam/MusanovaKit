@@ -10,8 +10,8 @@ import SwiftUI
 struct MTabView: View {
   var body: some View {
     TabView {
-      Tab("API Lab", systemImage: "testtube.2") {
-        APIExplorerView()
+      Tab("Concerts", systemImage: "music.mic") {
+        ConcertHubView()
       }
 
       Tab("Replay", systemImage: "clock.arrow.circlepath") {

@@ -2,401 +2,267 @@
 //  LyricsView.swift
 //  Musanova
 //
-//  Created by Rudrank Riyam on 25/10/25.
-//
 
-import SwiftUI
-import MusadoraKit
 import MusanovaKit
 import MusicKit
+import SwiftUI
 
 struct LyricsView: View {
-    @State private var lyrics: LyricParagraphs = []
-    @State private var isLoading = false
-    @State private var errorMessage: String?
-    @State private var song: Song?
-    @State private var currentTime: TimeInterval = 0
-    @State private var isPlaying = false
-    @State private var artworkURL: URL?
-    @State private var playbackTimer: Timer?
+  @State private var viewModel = LyricsViewModel()
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private let player = ApplicationMusicPlayer.shared
+  var body: some View {
+    NavigationStack {
+      ZStack {
+        lyricBackdrop
 
-    private let songID = MusicItemID("1837754303")
-
-    /// Flattened array of all lyric lines sorted by time for efficient binary search
-    private var flattenedLyrics: [LyricLine] {
-        lyrics.flatMap { $0.lines }
-    }
-
-    @ViewBuilder
-    private var backgroundGradient: some View {
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color.black.opacity(0.9),
-                Color.purple.opacity(0.3),
-                Color.black.opacity(0.9)
-            ]),
-            startPoint: .top,
-            endPoint: .bottom
-        )
-        .ignoresSafeArea()
-    }
-
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                if let artworkURL = artworkURL {
-                    AsyncImage(url: artworkURL) { image in
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .blur(radius: 20)
-                            .opacity(0.3)
-                            .overlay(
-                                Color.black.opacity(0.7)
-                            )
-                    } placeholder: {
-                        backgroundGradient
-                    }
-                } else {
-                    backgroundGradient
-                }
-
-                VStack(spacing: 0) {
-                    if isLoading {
-                        VStack(spacing: 20) {
-                            ProgressView()
-                                .scaleEffect(1.5)
-                                .tint(.white)
-                            Text("Loading lyrics...")
-                                .foregroundColor(.white.opacity(0.8))
-                                .font(.headline)
-                        }
-                        .frame(maxHeight: .infinity)
-                    } else if let error = errorMessage {
-                        VStack(spacing: 20) {
-                            Image(systemName: "music.note")
-                                .font(.system(size: 60))
-                                .foregroundColor(.white.opacity(0.6))
-                            Text("Lyrics Unavailable")
-                                .font(.title2)
-                                .foregroundColor(.white)
-                            Text(error)
-                                .foregroundColor(.white.opacity(0.7))
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal)
-                        }
-                        .frame(maxHeight: .infinity)
-                    } else if lyrics.isEmpty {
-                        VStack(spacing: 20) {
-                            Image(systemName: "music.note")
-                                .font(.system(size: 60))
-                                .foregroundColor(.white.opacity(0.6))
-                            Text("No Lyrics Available")
-                                .font(.title2)
-                                .foregroundColor(.white)
-                            Text("Lyrics for this song are not available")
-                                .foregroundColor(.white.opacity(0.7))
-                        }
-                        .frame(maxHeight: .infinity)
-                    } else {
-                        if let song = song {
-                            VStack(spacing: 8) {
-                                Text(song.title)
-                                    .font(.title)
-                                    .foregroundColor(.white)
-                                    .multilineTextAlignment(.center)
-
-                                Text(song.artistName)
-                                    .font(.title3)
-                                    .foregroundColor(.white.opacity(0.8))
-
-                                if let albumTitle = song.albumTitle {
-                                    Text(albumTitle)
-                                        .font(.subheadline)
-                                        .foregroundColor(.white.opacity(0.6))
-                                }
-                            }
-                            .padding(.top, 20)
-                            .padding(.bottom, 10)
-                        }
-
-                        ScrollViewReader { proxy in
-                            ScrollView(showsIndicators: false) {
-                                VStack(spacing: 24) {
-                                    ForEach(lyrics) { paragraph in
-                                        VStack(spacing: 16) {
-                                            ForEach(paragraph.lines) { line in
-                                                LyricLineView(
-                                                    line: line,
-                                                    currentTime: currentTime,
-                                                    isPlaying: isPlaying
-                                                )
-                                                .id(line.id)
-                                            }
-                                        }
-                                    }
-                                }
-                                .padding(.horizontal, 20)
-                                .padding(.vertical, 20)
-                            }
-                            .onChange(of: currentTime) { _, newValue in
-                                if let currentLine = findCurrentLine(at: newValue) {
-                                    withAnimation(.easeInOut(duration: 0.3)) {
-                                        proxy.scrollTo(currentLine.id, anchor: .center)
-                                    }
-                                }
-                            }
-                        }
-
-                        HStack(spacing: 40) {
-                            Button(action: togglePlayback) {
-                                Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                                    .font(.system(size: 24))
-                                    .foregroundColor(.white)
-                                    .frame(width: 50, height: 50)
-                            }
-
-                            Button(action: resetPlayback) {
-                                Image(systemName: "arrow.counterclockwise")
-                                    .font(.system(size: 20))
-                                    .foregroundColor(.white.opacity(0.7))
-                            }
-                        }
-                        .padding(.bottom, 40)
-                    }
-                }
-            }
-            .navigationTitle("Lyrics")
-        }
-        .onAppear {
-            loadSongAndLyrics()
-        }
-        .onDisappear {
-            player.stop()
-            invalidatePlaybackTimer()
-        }
-    }
-
-    private func loadSongAndLyrics() {
-        Task {
-            isLoading = true
-            errorMessage = nil
-
-            print("[Lyrics] Starting to load song and lyrics")
-
-            do {
-                print("[Lyrics] Fetching song with ID: \(songID)")
-                let fetchedSong = try await MCatalog.song(id: songID)
-                print("[Lyrics] Song fetched: \(fetchedSong.title) by \(fetchedSong.artistName)")
-                self.song = fetchedSong
-                self.artworkURL = fetchedSong.artwork?.url(width: 1000, height: 1000)
-                print("[Lyrics] Artwork URL: \(self.artworkURL?.absoluteString ?? "nil")")
-
-                guard let developerToken = UserDefaults.standard.string(forKey: "developerToken"),
-                      !developerToken.isEmpty else {
-                    print("[Lyrics] ERROR: Developer token is missing or empty")
-                    errorMessage = "Developer token is required. Please set it in Settings."
-                    isLoading = false
-                    return
-                }
-
-                print("[Lyrics] Developer token found, fetching lyrics...")
-                print("[Lyrics] Token length: \(developerToken.count)")
-                self.lyrics = try await MCatalog.lyrics(for: fetchedSong, developerToken: developerToken)
-                print("[Lyrics] Lyrics fetched successfully")
-                print("[Lyrics] Number of paragraphs: \(self.lyrics.count)")
-                for (index, paragraph) in self.lyrics.enumerated() {
-                    print("[Lyrics] Paragraph \(index): \(paragraph.lines.count) lines")
-                    for (lineIndex, line) in paragraph.lines.prefix(3).enumerated() {
-                        print("[Lyrics]   Line \(lineIndex): \(line.segments.map { $0.text }.joined())")
-                    }
-                }
-
-            } catch let lyricsError as MusanovaKitError {
-                print("[Lyrics] MusanovaKitError caught: \(lyricsError)")
-                switch lyricsError {
-                case .apiError(let message, let code, let status):
-                    print("[Lyrics] API Error: \(message), code: \(code ?? "none"), status: \(status ?? "none")")
-                    if message.contains("No related resources found") {
-                        errorMessage = "Lyrics are not available for this song. " +
-                            "The Apple Music lyrics API may be temporarily unavailable " +
-                            "or this song may not have lyrics."
-                    } else if message.contains("Empty response") {
-                        errorMessage = "Unable to fetch lyrics. " +
-                            "This may be due to authentication issues or the song not having lyrics available."
-                    } else {
-                        errorMessage = message
-                    }
-                case .emptyResponse:
-                    errorMessage = "Unable to fetch lyrics. " +
-                        "This may be due to authentication issues or the song not having lyrics available."
-                case .invalidResponseFormat(let description):
-                    errorMessage = "Invalid response format: \(description)"
-                case .invalidURL(let description):
-                    errorMessage = "Failed to construct request URL: \(description)"
-                case .decodingError(let description):
-                    errorMessage = "Failed to parse lyrics: \(description)"
-                case .networkError(let description):
-                    errorMessage = "Network error: \(description)"
-                case .missingDeveloperToken:
-                    errorMessage = "Developer token is required. Please set it in Settings."
-                case .countryCodeUnavailable:
-                    errorMessage = "Unable to determine country code."
-                case .requestSigningFailed(let description):
-                    errorMessage = "Request signing failed: \(description)"
-                }
-            } catch {
-                print("[Lyrics] Unexpected error: \(error)")
-                print("[Lyrics] Error type: \(type(of: error))")
-                print("[Lyrics] Error description: \(error.localizedDescription)")
-                errorMessage = error.localizedDescription
-            }
-
-            print("[Lyrics] Loading complete. isLoading: false")
-            isLoading = false
-        }
-    }
-
-    private func togglePlayback() {
-        Task {
-            do {
-                print("[Lyrics] togglePlayback called, isPlaying: \(isPlaying)")
-                if isPlaying {
-                    print("[Lyrics] Stopping playback")
-                    player.stop()
-                    isPlaying = false
-                    invalidatePlaybackTimer()
-                } else {
-                    if let song = song {
-                        print("[Lyrics] Starting playback for: \(song.title)")
-                        player.queue = [song]
-                        try await player.play()
-                        print("[Lyrics] Playback started successfully")
-                        isPlaying = true
-                        startPlaybackObserver()
-                    } else {
-                        print("[Lyrics] ERROR: No song available for playback")
-                    }
-                }
-            } catch {
-                print("[Lyrics] Playback error: \(error)")
-                errorMessage = "Failed to play song: \(error.localizedDescription)"
-                isPlaying = false
-            }
-        }
-    }
-
-    private func resetPlayback() {
-        player.stop()
-        currentTime = 0
-        isPlaying = false
-        player.playbackTime = 0
-        invalidatePlaybackTimer()
-    }
-
-    private func startPlaybackObserver() {
-        invalidatePlaybackTimer()
-
-        playbackTimer = Timer(timeInterval: 0.1, repeats: true) { _ in
-            Task { @MainActor in
-                self.currentTime = self.player.playbackTime
-                self.isPlaying = self.player.state.playbackStatus == .playing
-            }
-        }
-
-        if let timer = playbackTimer {
-            // Schedule on main run loop to ensure it fires correctly,
-            // especially when called from a background task.
-            RunLoop.main.add(timer, forMode: .common)
-        }
-    }
-
-    private func invalidatePlaybackTimer() {
-        playbackTimer?.invalidate()
-        playbackTimer = nil
-    }
-
-    private func findCurrentLine(at time: TimeInterval) -> LyricLine? {
-        let lines = flattenedLyrics
-        guard !lines.isEmpty else { return nil }
-
-        var left = 0
-        var right = lines.count - 1
-
-        while left <= right {
-            let mid = (left + right) / 2
-            let line = lines[mid]
-
-            guard let firstSegment = line.segments.first,
-                  let lastSegment = line.segments.last else {
-                return nil
-            }
-
-            let lineStartTime = firstSegment.startTime
-            let lineEndTime = lastSegment.endTime
-
-            if time >= lineStartTime && time <= lineEndTime {
-                // Found the current line
-                return line
-            } else if time < lineStartTime {
-                // Time is before this line's range, search left half
-                right = mid - 1
-            } else {
-                // Time is after this line's range, search right half
-                left = mid + 1
-            }
-        }
-
-        return nil
-    }
-}
-
-struct LyricLineView: View {
-    let line: LyricLine
-    let currentTime: TimeInterval
-    let isPlaying: Bool
-
-    private var isCurrentLine: Bool {
-        guard let firstSegment = line.segments.first,
-              let lastSegment = line.segments.last else {
-            return false
-        }
-        return currentTime >= firstSegment.startTime && currentTime <= lastSegment.endTime
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 0) {
-                ForEach(line.segments) { segment in
-                    Text(segment.text)
-                        .font(.system(size: 24, weight: isCurrentLine ? .semibold : .regular))
-                        .foregroundColor(segmentColor(for: segment))
-                        .multilineTextAlignment(.leading)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .padding(.vertical, 4)
-        .opacity(isCurrentLine ? 1.0 : 0.7)
-    }
-
-    private func segmentColor(for segment: LyricSegment) -> Color {
-        if !isPlaying {
-            return .white
-        }
-
-        if currentTime >= segment.startTime && currentTime <= segment.endTime {
-            return .purple
-        } else if currentTime > segment.endTime {
-            return .white.opacity(0.8)
+        if viewModel.isLoading {
+          ProgressView("Listening for the words…")
+            .tint(.white)
+            .foregroundStyle(.white)
+        } else if let errorMessage = viewModel.errorMessage {
+          unavailableState(errorMessage)
+        } else if viewModel.lyrics.isEmpty {
+          unavailableState("Apple Music did not return lyrics for this song.")
         } else {
-            return .white.opacity(0.6)
+          lyricExperience
         }
+      }
+      .navigationTitle("Lyrics")
+      .toolbarBackground(.hidden, for: .windowToolbar)
     }
+    .task { await viewModel.load() }
+    .onDisappear(perform: viewModel.stop)
+  }
+
+  private var lyricBackdrop: some View {
+    ZStack {
+      Color.black
+      if let artworkURL = viewModel.artworkURL {
+        AsyncImage(url: artworkURL) { image in
+          image
+            .resizable()
+            .scaledToFill()
+        } placeholder: {
+          Color.black
+        }
+        .blur(radius: 48)
+        .scaleEffect(1.18)
+        .opacity(0.55)
+      }
+      LinearGradient(
+        colors: [.black.opacity(0.28), .black.opacity(0.78)],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+      )
+    }
+    .ignoresSafeArea()
+    .accessibilityHidden(true)
+  }
+
+  private var lyricExperience: some View {
+    HStack(spacing: 44) {
+      nowPlayingPanel
+
+      lyricScroller
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+  }
+
+  private var nowPlayingPanel: some View {
+    VStack(alignment: .leading, spacing: 18) {
+      Spacer(minLength: 16)
+
+      Group {
+        if let artwork = viewModel.song?.artwork {
+          ArtworkImage(artwork, width: 320, height: 320)
+        } else if let artworkURL = viewModel.artworkURL {
+          AsyncImage(url: artworkURL) { image in
+            image
+              .resizable()
+              .scaledToFill()
+          } placeholder: {
+            ProgressView()
+              .tint(.white)
+          }
+        } else {
+          RoundedRectangle(cornerRadius: 20)
+            .fill(.white.opacity(0.1))
+            .overlay {
+              Image(systemName: "music.note")
+                .font(.system(size: 44, weight: .medium))
+                .foregroundStyle(.white.opacity(0.7))
+            }
+        }
+      }
+      .frame(width: 320, height: 320)
+      .clipShape(.rect(cornerRadius: 20))
+      .shadow(color: .black.opacity(0.35), radius: 26, y: 14)
+
+      VStack(alignment: .leading, spacing: 5) {
+        Text(viewModel.songTitle)
+          .font(.title2.bold())
+          .foregroundStyle(.white)
+          .lineLimit(2)
+        Text(viewModel.artistName)
+          .font(.headline)
+          .foregroundStyle(.white.opacity(0.7))
+        if let albumTitle = viewModel.song?.albumTitle {
+          Text(albumTitle)
+            .font(.subheadline)
+            .foregroundStyle(.white.opacity(0.5))
+            .lineLimit(1)
+        }
+      }
+
+      if viewModel.duration > 0 {
+        VStack(spacing: 5) {
+          ProgressView(value: viewModel.currentTime, total: viewModel.duration)
+            .progressViewStyle(.linear)
+            .tint(.white)
+          HStack {
+            Text(viewModel.formattedPlaybackTime)
+            Spacer()
+            Text(viewModel.formattedRemainingTime)
+          }
+          .font(.caption2.monospacedDigit())
+          .foregroundStyle(.white.opacity(0.52))
+        }
+      }
+
+      HStack(spacing: 34) {
+        Button {
+          viewModel.seek(by: -15)
+        } label: {
+          Label("Back 15 seconds", systemImage: "gobackward.15")
+        }
+        .help("Back 15 seconds")
+
+        Button {
+          Task { await viewModel.togglePlayback() }
+        } label: {
+          Label(viewModel.isPlaying ? "Pause" : "Play", systemImage: viewModel.isPlaying ? "pause.fill" : "play.fill")
+        }
+        .font(.system(size: 34, weight: .semibold))
+        .help(viewModel.isPlaying ? "Pause" : "Play")
+
+        Button {
+          viewModel.seek(by: 15)
+        } label: {
+          Label("Forward 15 seconds", systemImage: "goforward.15")
+        }
+        .help("Forward 15 seconds")
+      }
+      .font(.system(size: 26, weight: .semibold))
+      .foregroundStyle(.white.opacity(0.9))
+      .labelStyle(.iconOnly)
+      .buttonStyle(.plain)
+      .disabled(!viewModel.canPlay)
+      .frame(maxWidth: .infinity)
+      .padding(.vertical, 4)
+
+      if viewModel.duration == 0 {
+        Text(viewModel.formattedPlaybackTime)
+          .font(.caption.monospacedDigit())
+          .foregroundStyle(.white.opacity(0.55))
+      }
+
+      if let playbackErrorMessage = viewModel.playbackErrorMessage {
+        Text(playbackErrorMessage)
+          .font(.caption)
+          .foregroundStyle(.white.opacity(0.62))
+          .fixedSize(horizontal: false, vertical: true)
+      }
+
+      Spacer(minLength: 16)
+    }
+    .padding(30)
+    .frame(width: 420)
+  }
+
+  private var lyricScroller: some View {
+    ScrollViewReader { proxy in
+      GeometryReader { geometry in
+        ScrollView {
+          LazyVStack(alignment: .leading, spacing: 54) {
+            ForEach(viewModel.lyrics) { paragraph in
+              VStack(alignment: .leading, spacing: 46) {
+                ForEach(paragraph.lines) { line in
+                  Button {
+                    viewModel.seek(to: line)
+                  } label: {
+                    LyricLineView(
+                      line: line,
+                      isCurrent: line.id == viewModel.currentLineID,
+                      hasPlaybackStarted: viewModel.currentTime > 0
+                    )
+                  }
+                  .buttonStyle(.plain)
+                  .disabled(line.segments.first == nil)
+                  .help("Move playback to this line")
+                  .id(line.id)
+                }
+              }
+            }
+          }
+          .padding(.horizontal, 44)
+          .padding(.top, max(92, geometry.size.height * 0.42))
+          .padding(.bottom, max(92, geometry.size.height * 0.42))
+          .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .scrollIndicators(.hidden)
+        .onChange(of: viewModel.currentLineID) { _, lineID in
+          guard let lineID else { return }
+          withAnimation(reduceMotion ? nil : .smooth(duration: 0.65)) {
+            proxy.scrollTo(lineID, anchor: .center)
+          }
+        }
+      }
+    }
+  }
+
+  private func unavailableState(_ message: String) -> some View {
+    VStack(spacing: 14) {
+      Image(systemName: "quote.bubble")
+        .font(.system(size: 42, weight: .medium))
+        .foregroundStyle(.white.opacity(0.7))
+      Text("Lyrics Unavailable")
+        .font(.title2.bold())
+        .foregroundStyle(.white)
+      Text(message)
+        .foregroundStyle(.white.opacity(0.65))
+        .multilineTextAlignment(.center)
+        .frame(maxWidth: 440)
+      Button("Try Again", systemImage: "arrow.clockwise") {
+        Task { await viewModel.load() }
+      }
+      .buttonStyle(.borderedProminent)
+      .tint(.purple)
+    }
+    .padding(32)
+  }
 }
 
-#Preview {
-    LyricsView()
+private struct LyricLineView: View {
+  let line: LyricLine
+  let isCurrent: Bool
+  let hasPlaybackStarted: Bool
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+  var body: some View {
+    Text(line.text)
+      .font(.system(size: isCurrent ? 56 : 50, weight: isCurrent ? .bold : .semibold))
+      .foregroundStyle(foregroundStyle)
+      .lineSpacing(7)
+      .fixedSize(horizontal: false, vertical: true)
+      .scaleEffect(isCurrent ? 1.015 : 1, anchor: .leading)
+      .blur(radius: hasPlaybackStarted && !isCurrent ? 1.6 : 0)
+      .animation(reduceMotion ? nil : .smooth(duration: 0.52), value: isCurrent)
+      .accessibilityAddTraits(isCurrent ? .isSelected : [])
+  }
+
+  private var foregroundStyle: Color {
+    if isCurrent { return .white }
+    return .white.opacity(hasPlaybackStarted ? 0.38 : 0.68)
+  }
 }

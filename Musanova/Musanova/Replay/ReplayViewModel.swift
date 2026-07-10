@@ -12,33 +12,46 @@ import Observation
 
 @MainActor
 @Observable
-class ReplayViewModel {
+final class ReplayViewModel {
   var selectedYear: Int?
   var availableYears: [Int] = []
   var title: String = ""
   var subtitle: String?
   var isEligible: Bool = false
   var isLoading: Bool = false
+  var isLoadingMilestones: Bool = false
   var errorMessage: String?
   var summaries: [MusicSummarySearch] = []
   var milestones: [MusicSummaryMilestone] = []
+
+  private var activeMilestonesRequestID = UUID()
+  private var activeSummariesRequestID = UUID()
+
+  var selectedSummary: MusicSummarySearch? {
+    guard let selectedYear else { return nil }
+    return summaries.first { $0.year == selectedYear }
+  }
   
   private var developerToken: String? {
     UserDefaults.standard.string(forKey: "developerToken")
   }
 
   func checkEligibilityAndLoad() async {
+    activeSummariesRequestID = UUID()
+    isLoading = false
     errorMessage = nil
     isEligible = false
 
     let status = MusicAuthorization.currentStatus
     guard status == .authorized else {
+      clearContent()
       errorMessage = "Not authorized for Apple Music. Tap Continue on the welcome screen."
       return
     }
 
     let subscription: MusicSubscription? = try? await MusicSubscription.current
     guard subscription?.canPlayCatalogContent == true else {
+      clearContent()
       errorMessage = "Requires an active Apple Music subscription to load Replay."
       return
     }
@@ -47,25 +60,33 @@ class ReplayViewModel {
   }
 
   func loadSummaries() async {
-    guard !isLoading else { return }
+    let requestID = UUID()
+    activeSummariesRequestID = requestID
 
     errorMessage = nil
     isLoading = true
-    defer { isLoading = false }
+    defer {
+      if activeSummariesRequestID == requestID {
+        isLoading = false
+      }
+    }
 
     do {
       guard let token = developerToken, !token.isEmpty else {
+        clearContent()
         errorMessage = "Developer token is required. Please set it in Settings."
         return
       }
       
       let fetchedSummaries = try await MSummaries.search(developerToken: token)
-      
+      guard activeSummariesRequestID == requestID,
+            MusicAuthorization.currentStatus == .authorized else { return }
+
       self.summaries = Array(fetchedSummaries)
       self.availableYears = self.summaries.map { $0.year }.sorted(by: >)
       
       if !self.summaries.isEmpty {
-        self.selectedYear = self.summaries.first?.year
+        self.selectedYear = self.availableYears.first
         await loadPlaylistSongs()
       }
       
@@ -74,24 +95,53 @@ class ReplayViewModel {
     } catch is CancellationError {
       // Task cancelled
     } catch {
+      guard activeSummariesRequestID == requestID else { return }
+      clearContent()
       errorMessage = "Could not load Replay (\(error.localizedDescription))."
       isEligible = false
     }
   }
   
   func loadPlaylistSongs() async {
+    let requestID = UUID()
+    activeMilestonesRequestID = requestID
+    milestones = []
+    isLoadingMilestones = false
+
     guard let year = selectedYear else { return }
     guard let summary = summaries.first(where: { $0.year == year }) else { return }
     guard let token = developerToken, !token.isEmpty else { return }
+
+    isLoadingMilestones = true
+    defer {
+      if activeMilestonesRequestID == requestID {
+        isLoadingMilestones = false
+      }
+    }
     
-    title = "Year: \(year)"
+    title = "Your \(year) Replay"
     subtitle = summary.playlist.name
     
     do {
       let fetchedMilestones = try await MSummaries.milestones(forYear: MusicYearID(year), developerToken: token)
+      guard activeMilestonesRequestID == requestID, selectedYear == year else { return }
       self.milestones = Array(fetchedMilestones)
     } catch {
+      guard activeMilestonesRequestID == requestID else { return }
       self.milestones = []
     }
+  }
+
+  private func clearContent() {
+    activeSummariesRequestID = UUID()
+    activeMilestonesRequestID = UUID()
+    summaries = []
+    availableYears = []
+    selectedYear = nil
+    title = ""
+    subtitle = nil
+    milestones = []
+    isLoadingMilestones = false
+    isLoading = false
   }
 }
