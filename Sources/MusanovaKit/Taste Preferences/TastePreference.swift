@@ -7,8 +7,20 @@
 
 import Foundation
 
+/// A resource identifier from the taste-preferences response.
+public struct TastePreferenceReference: Decodable, Hashable, Identifiable, Sendable {
+  /// The resource identifier.
+  public let id: String
+
+  /// The server-provided resource type.
+  public let type: String
+
+  /// The relative API URL for the resource, when supplied.
+  public let href: String?
+}
+
 /// A taste-preference resource returned for the current Apple Music user.
-public struct TastePreference: Codable, Hashable, Identifiable, Sendable {
+public struct TastePreference: Decodable, Hashable, Identifiable, Sendable {
   /// The resource identifier.
   public let id: String
 
@@ -20,37 +32,46 @@ public struct TastePreference: Codable, Hashable, Identifiable, Sendable {
 
   /// The preference's display name and value.
   public let attributes: Attributes
-
-  public init(id: String, type: String, href: String? = nil, attributes: Attributes) {
-    self.id = id
-    self.type = type
-    self.href = href
-    self.attributes = attributes
-  }
 }
 
 public extension TastePreference {
   /// Attributes for a taste-preference resource.
-  struct Attributes: Codable, Hashable, Sendable {
+  struct Attributes: Decodable, Hashable, Sendable {
     /// The display name of the genre or other preference.
     public let name: String
 
     /// The raw preference level returned by Apple Music.
     public let preference: Int
+  }
+}
 
-    public init(name: String, preference: Int) {
-      self.name = name
-      self.preference = preference
-    }
+/// Expanded resources returned alongside taste-preference references.
+public struct TastePreferenceResources: Decodable, Hashable, Sendable {
+  /// Taste preferences keyed by their resource-map identifier.
+  public let tastePreferences: [String: TastePreference]?
+
+  enum CodingKeys: String, CodingKey {
+    case tastePreferences = "taste-preferences"
   }
 }
 
 /// The response returned by the taste-preferences endpoint.
-public struct TastePreferencesResponse: Codable, Hashable, Sendable {
-  /// The current user's taste-preference resources.
-  public let data: [TastePreference]
+public struct TastePreferencesResponse: Decodable, Hashable, Sendable {
+  /// References that define the current user's preference order.
+  public let data: [TastePreferenceReference]
 
-  public init(data: [TastePreference]) {
-    self.data = data
+  /// Expanded taste-preference resources.
+  public let resources: TastePreferenceResources?
+
+  /// Expanded preferences in the order supplied by `data`.
+  public var preferences: [TastePreference] {
+    guard let tastePreferences = resources?.tastePreferences else {
+      return []
+    }
+
+    return data.compactMap { reference in
+      tastePreferences[reference.id]
+        ?? tastePreferences.values.first { $0.id == reference.id }
+    }
   }
 }

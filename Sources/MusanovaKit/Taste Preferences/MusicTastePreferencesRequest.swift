@@ -11,13 +11,13 @@ public extension MTaste {
   /// Fetches the taste preferences Apple Music uses to personalize recommendations.
   ///
   /// - Parameter developerToken: A privileged Apple Music developer token.
-  /// - Returns: The taste-preference resources for the current Apple Music user.
+  /// - Returns: The resolved taste-preference resources for the current Apple Music user.
   /// - Throws: An error if the request fails or its response cannot be decoded.
   ///
   /// - Note: This endpoint requires a privileged developer token and access to private Apple Music APIs.
-  static func preferences(developerToken: String) async throws -> TastePreferencesResponse {
+  static func preferences(developerToken: String) async throws -> [TastePreference] {
     let request = try MusicTastePreferencesRequest(developerToken: developerToken)
-    return try await request.response()
+    return try await request.response().preferences
   }
 }
 
