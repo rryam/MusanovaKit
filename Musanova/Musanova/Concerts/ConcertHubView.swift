@@ -131,7 +131,7 @@ struct ConcertHubView: View {
     let concerts = section.data.filter { $0.id != featuredID }
     if !concerts.isEmpty {
       VStack(alignment: .leading, spacing: 16) {
-        Text("\(section.title ?? "Popular Concerts") in \(viewModel.selectedLocation.name)")
+        Text("\(section.title ?? "Popular Concerts") in \(viewModel.loadedLocation?.name ?? viewModel.selectedLocation.name)")
           .font(.title2.bold())
 
         ScrollView(.horizontal) {

@@ -25,6 +25,7 @@ final class ReplayViewModel {
   var milestones: [MusicSummaryMilestone] = []
 
   private var activeMilestonesRequestID = UUID()
+  private var activeSummariesRequestID = UUID()
 
   var selectedSummary: MusicSummarySearch? {
     guard let selectedYear else { return nil }
@@ -36,6 +37,8 @@ final class ReplayViewModel {
   }
 
   func checkEligibilityAndLoad() async {
+    activeSummariesRequestID = UUID()
+    isLoading = false
     errorMessage = nil
     isEligible = false
 
@@ -57,11 +60,16 @@ final class ReplayViewModel {
   }
 
   func loadSummaries() async {
-    guard !isLoading else { return }
+    let requestID = UUID()
+    activeSummariesRequestID = requestID
 
     errorMessage = nil
     isLoading = true
-    defer { isLoading = false }
+    defer {
+      if activeSummariesRequestID == requestID {
+        isLoading = false
+      }
+    }
 
     do {
       guard let token = developerToken, !token.isEmpty else {
@@ -71,7 +79,9 @@ final class ReplayViewModel {
       }
       
       let fetchedSummaries = try await MSummaries.search(developerToken: token)
-      
+      guard activeSummariesRequestID == requestID,
+            MusicAuthorization.currentStatus == .authorized else { return }
+
       self.summaries = Array(fetchedSummaries)
       self.availableYears = self.summaries.map { $0.year }.sorted(by: >)
       
@@ -85,6 +95,7 @@ final class ReplayViewModel {
     } catch is CancellationError {
       // Task cancelled
     } catch {
+      guard activeSummariesRequestID == requestID else { return }
       clearContent()
       errorMessage = "Could not load Replay (\(error.localizedDescription))."
       isEligible = false
@@ -122,6 +133,7 @@ final class ReplayViewModel {
   }
 
   private func clearContent() {
+    activeSummariesRequestID = UUID()
     activeMilestonesRequestID = UUID()
     summaries = []
     availableYears = []
@@ -130,5 +142,6 @@ final class ReplayViewModel {
     subtitle = nil
     milestones = []
     isLoadingMilestones = false
+    isLoading = false
   }
 }
