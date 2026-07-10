@@ -100,10 +100,13 @@ struct ConcertDetailView: View {
   private func loadDetail() async {
     guard let developerToken = UserDefaults.standard.string(forKey: "developerToken"),
           !developerToken.isEmpty else {
-      errorMessage = "Add your AMP developer token in Settings to load full event details."
+      if detail == nil {
+        errorMessage = "Add your AMP developer token in Settings to load full event details."
+      }
       return
     }
     isLoading = true
+    errorMessage = nil
     defer { isLoading = false }
     do {
       detail = try await MConcerts.concert(
@@ -114,7 +117,9 @@ struct ConcertDetailView: View {
     } catch is CancellationError {
       return
     } catch {
-      errorMessage = "Full event details are temporarily unavailable."
+      if detail == nil {
+        errorMessage = "Full event details are temporarily unavailable."
+      }
     }
   }
 }
