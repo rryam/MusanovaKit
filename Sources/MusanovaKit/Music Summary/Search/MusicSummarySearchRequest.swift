@@ -84,8 +84,13 @@ struct MusicSummarySearchRequest {
 
       do {
         return try JSONDecoder().decode(MusicSummarySearches.self, from: response.data)
-      } catch let decodingError as DecodingError {
-        throw MusanovaKitError.decodingError(decodingError.localizedDescription)
+      } catch is DecodingError {
+        do {
+          let normalizedData = try ReplayPlaylistResponseNormalizer.normalize(response.data)
+          return try JSONDecoder().decode(MusicSummarySearches.self, from: normalizedData)
+        } catch let decodingError as DecodingError {
+          throw MusanovaKitError.decodingError(decodingError.localizedDescription)
+        }
       } catch {
         throw MusanovaKitError.decodingError(error.localizedDescription)
       }
