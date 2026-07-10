@@ -12,7 +12,7 @@ import Observation
 
 @MainActor
 @Observable
-class ReplayViewModel {
+final class ReplayViewModel {
   var selectedYear: Int?
   var availableYears: [Int] = []
   var title: String = ""
@@ -22,6 +22,11 @@ class ReplayViewModel {
   var errorMessage: String?
   var summaries: [MusicSummarySearch] = []
   var milestones: [MusicSummaryMilestone] = []
+
+  var selectedSummary: MusicSummarySearch? {
+    guard let selectedYear else { return nil }
+    return summaries.first { $0.year == selectedYear }
+  }
   
   private var developerToken: String? {
     UserDefaults.standard.string(forKey: "developerToken")
@@ -65,7 +70,7 @@ class ReplayViewModel {
       self.availableYears = self.summaries.map { $0.year }.sorted(by: >)
       
       if !self.summaries.isEmpty {
-        self.selectedYear = self.summaries.first?.year
+        self.selectedYear = self.availableYears.first
         await loadPlaylistSongs()
       }
       
@@ -84,7 +89,7 @@ class ReplayViewModel {
     guard let summary = summaries.first(where: { $0.year == year }) else { return }
     guard let token = developerToken, !token.isEmpty else { return }
     
-    title = "Year: \(year)"
+    title = "Your \(year) Replay"
     subtitle = summary.playlist.name
     
     do {

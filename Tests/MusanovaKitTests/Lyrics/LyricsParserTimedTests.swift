@@ -43,6 +43,22 @@ struct LyricsParserTimedTests {
   }
 
   @Test
+  func testParserPreservesLineLevelTimingWithoutSpans() throws {
+    let ttml = wrapTTML(body: """
+      <div>
+        <p begin="12.5" end="15.25">A line-timed lyric</p>
+      </div>
+      """)
+    let parser = LyricsParser()
+    let paragraphs = parser.parse(ttml)
+
+    let segment = try #require(paragraphs.first?.lines.first?.segments.first)
+    #expect(segment.text == "A line-timed lyric")
+    #expect(abs(segment.startTime - 12.5) < 0.0001)
+    #expect(abs(segment.endTime - 15.25) < 0.0001)
+  }
+
+  @Test
   func testParserKeepsUntimedTextAlongsideSegments() throws {
     let ttml = wrapTTML(body: """
       <div>

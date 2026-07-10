@@ -48,6 +48,8 @@ public class LyricsParser: NSObject, XMLParserDelegate {
 
   private var currentLineTokens: [LineToken] = []
   private var currentLineSegments: [LyricSegment] = []
+  private var currentLineStart: TimeInterval?
+  private var currentLineEnd: TimeInterval?
   private var currentSegmentStart: TimeInterval?
   private var currentSegmentEnd: TimeInterval?
   private var currentSegmentText: String = ""
@@ -72,6 +74,8 @@ public class LyricsParser: NSObject, XMLParserDelegate {
     currentSongPart = nil
     currentLineTokens = []
     currentLineSegments = []
+    currentLineStart = nil
+    currentLineEnd = nil
     currentSegmentStart = nil
     currentSegmentEnd = nil
     currentSegmentText = ""
@@ -108,6 +112,8 @@ public class LyricsParser: NSObject, XMLParserDelegate {
     } else if elementName == "p" {
       currentLineTokens = []
       currentLineSegments = []
+      currentLineStart = attributeDict["begin"].flatMap(parseTimecode)
+      currentLineEnd = attributeDict["end"].flatMap(parseTimecode)
       hasPendingWhitespace = false
     } else if elementName == "span" {
       currentSegmentText = ""
@@ -172,10 +178,24 @@ public class LyricsParser: NSObject, XMLParserDelegate {
     } else if elementName == "p" {
       let lineText = assembledLineText()
 
+      if currentLineSegments.isEmpty,
+         !lineText.isEmpty,
+         let currentLineStart {
+        currentLineSegments = [
+          LyricSegment(
+            text: lineText,
+            startTime: currentLineStart,
+            endTime: currentLineEnd ?? currentLineStart
+          )
+        ]
+      }
+
       let line = LyricLine(text: lineText, segments: currentLineSegments)
       currentParagraph.append(line)
       currentLineTokens = []
       currentLineSegments = []
+      currentLineStart = nil
+      currentLineEnd = nil
       hasPendingWhitespace = false
     }
     if !elementStack.isEmpty {

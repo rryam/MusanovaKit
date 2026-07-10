@@ -2,164 +2,162 @@
 //  PinsView.swift
 //  Musanova
 //
-//  Created by Rudrank Riyam on 25/10/25.
-//
 
-import SwiftUI
-import MusadoraKit
+import MusicKit
 import MusanovaKit
+import SwiftUI
 
 struct PinsView: View {
-    @State private var pinsResponse: MusicLibraryPinsResponse?
-    @State private var isLoading = false
-    @State private var errorMessage: String?
-    @State private var developerToken: String = ""
+  @State private var viewModel = PinsViewModel()
 
-    var body: some View {
-        NavigationStack {
-            Group {
-                if isLoading {
-                    ProgressView("Loading pins...")
-                } else if let error = errorMessage {
-                    VStack(spacing: 16) {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.largeTitle)
-                            .foregroundColor(.orange)
-                        Text("Failed to load pins")
-                            .font(.headline)
-                        Text(error)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                        Button("Try Again") {
-                            loadPins()
-                        }
-                        .buttonStyle(.borderedProminent)
-                    }
-                    .padding()
-                } else if pinsResponse?.data.isEmpty ?? true {
-                    VStack(spacing: 16) {
-                        Image(systemName: "pin")
-                            .font(.largeTitle)
-                            .foregroundColor(.secondary)
-                        Text("No Pinned Items")
-                            .font(.headline)
-                        Text("Items you pin in Apple Music will appear here")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                        Button("Refresh") {
-                            loadPins()
-                        }
-                        .buttonStyle(.bordered)
-                    }
-                    .padding()
-                } else {
-                    List {
-                        ForEach(pinsResponse!.data, id: \.id) { pinRef in
-                            PinRow(pinRef: pinRef, resources: pinsResponse!.resources)
-                        }
-                    }
-                    .refreshable {
-                        loadPins()
-                    }
-                }
+  var body: some View {
+    NavigationStack {
+      Group {
+        if viewModel.isLoading && viewModel.pins.isEmpty {
+          ProgressView("Opening your pinned shelf…")
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if let errorMessage = viewModel.errorMessage, viewModel.pins.isEmpty {
+          ContentUnavailableView {
+            Label("Pins Unavailable", systemImage: "pin.slash")
+          } description: {
+            Text(errorMessage)
+          } actions: {
+            Button("Try Again", systemImage: "arrow.clockwise") {
+              Task { await viewModel.load() }
             }
-            .navigationTitle("Pinned Items")
-            .toolbar {
-                Button(action: loadPins) {
-                    Image(systemName: "arrow.clockwise")
-                }
-            }
+            .buttonStyle(.borderedProminent)
+          }
+        } else if viewModel.pins.isEmpty {
+          ContentUnavailableView(
+            "Nothing Pinned Yet",
+            systemImage: "pin",
+            description: Text("Albums, songs, artists, and playlists you pin in Apple Music will appear here.")
+          )
+        } else {
+          pinShelf
         }
-        .onAppear {
-            developerToken = UserDefaults.standard.string(forKey: "developerToken") ?? ""
-            loadPins()
+      }
+      .navigationTitle("Pins")
+      .toolbar {
+        Button("Refresh", systemImage: "arrow.clockwise") {
+          Task { await viewModel.load() }
         }
+        .disabled(viewModel.isLoading)
+      }
     }
+    .task { await viewModel.load() }
+  }
 
-    private func loadPins() {
-        guard !developerToken.isEmpty else {
-            errorMessage = "Developer token is required. Please set it in Settings."
-            return
+  private var pinShelf: some View {
+    ScrollView {
+      VStack(alignment: .leading, spacing: 22) {
+        VStack(alignment: .leading, spacing: 4) {
+          Text("Your music, close at hand")
+            .font(.title2.bold())
+          Text("\(viewModel.pins.count) pinned \(viewModel.pins.count == 1 ? "item" : "items") from your Apple Music library")
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
         }
 
-        isLoading = true
-        errorMessage = nil
-
-        Task {
-            do {
-                let response = try await MLibrary.pins(developerToken: developerToken, limit: 50)
-                pinsResponse = response
-            } catch {
-                errorMessage = error.localizedDescription
-            }
-
-            isLoading = false
+        LazyVGrid(
+          columns: [GridItem(.adaptive(minimum: 180, maximum: 210), spacing: 24)],
+          alignment: .leading,
+          spacing: 28
+        ) {
+          ForEach(viewModel.pins, id: \.id) { pin in
+            PinTile(pin: pin, resources: viewModel.resources)
+          }
         }
+      }
+      .padding(28)
+      .frame(maxWidth: 1100, alignment: .leading)
+      .frame(maxWidth: .infinity)
     }
+  }
 }
 
-struct PinRow: View {
-    let pinRef: PinReference
-    let resources: PinResources?
+private struct PinTile: View {
+  let pin: PinReference
+  let resources: PinResources?
 
-    private var itemName: String {
-        if let album = resources?.libraryAlbums?[pinRef.id] {
-            return album.title
-        } else if let song = resources?.librarySongs?[pinRef.id] {
-            return song.title
-        } else if let artist = resources?.libraryArtists?[pinRef.id] {
-            return artist.name
+  var body: some View {
+    VStack(alignment: .leading, spacing: 10) {
+      Group {
+        if let artwork {
+          ArtworkImage(artwork, width: 190, height: 190)
+        } else {
+          LinearGradient(
+            colors: [.purple.opacity(0.65), .indigo.opacity(0.85)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+          )
+          .overlay {
+            Image(systemName: iconName)
+              .font(.system(size: 38, weight: .medium))
+              .foregroundStyle(.white.opacity(0.82))
+          }
         }
-        return "Unknown Item"
+      }
+      .frame(width: 190, height: 190)
+      .clipShape(pin.type == "library-artists" ? AnyShape(.circle) : AnyShape(.rect(cornerRadius: 16)))
+      .overlay(alignment: .topTrailing) {
+        Image(systemName: "pin.fill")
+          .font(.caption.weight(.semibold))
+          .foregroundStyle(.white)
+          .padding(8)
+          .background(.purple.gradient, in: .circle)
+          .shadow(color: .black.opacity(0.25), radius: 6, y: 2)
+          .padding(9)
+      }
+
+      Text(title)
+        .font(.headline)
+        .lineLimit(1)
+      Text(subtitle)
+        .font(.subheadline)
+        .foregroundStyle(.secondary)
+        .lineLimit(1)
     }
+    .frame(width: 190, alignment: .leading)
+    .accessibilityElement(children: .combine)
+    .accessibilityLabel("Pinned \(typeLabel): \(title), \(subtitle)")
+  }
 
-    private var itemType: String {
-        pinRef.type.replacingOccurrences(of: "library-", with: "").capitalized
+  private var album: Album? { resources?.libraryAlbums?[pin.id] }
+  private var song: Song? { resources?.librarySongs?[pin.id] }
+  private var artist: Artist? { resources?.libraryArtists?[pin.id] }
+  private var playlist: Playlist? { resources?.libraryPlaylists?[pin.id] }
+
+  private var artwork: Artwork? {
+    album?.artwork ?? song?.artwork ?? artist?.artwork ?? playlist?.artwork
+  }
+
+  private var title: String {
+    album?.title ?? song?.title ?? artist?.name ?? playlist?.name ?? "Pinned Music"
+  }
+
+  private var subtitle: String {
+    if let album { return album.artistName }
+    if let song { return song.artistName }
+    if let artist { return artist.genreNames?.first ?? "Artist" }
+    if let playlist { return playlist.curatorName ?? "Playlist" }
+    return typeLabel
+  }
+
+  private var typeLabel: String {
+    pin.type
+      .replacingOccurrences(of: "library-", with: "")
+      .dropLast(pin.type.hasSuffix("s") ? 1 : 0)
+      .capitalized
+  }
+
+  private var iconName: String {
+    switch pin.type {
+    case "library-albums": "square.stack"
+    case "library-songs": "music.note"
+    case "library-artists": "person.fill"
+    case "library-playlists": "music.note.list"
+    default: "music.note"
     }
-
-    private var iconName: String {
-        switch pinRef.type {
-        case "library-albums": return "square.stack"
-        case "library-songs": return "music.note"
-        case "library-artists": return "person"
-        default: return "music.note"
-        }
-    }
-
-    var body: some View {
-        HStack(spacing: 12) {
-            // Artwork - Note: Pins API doesn't include artwork data
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.secondary.opacity(0.3))
-                .frame(width: 50, height: 50)
-                .overlay {
-                    Image(systemName: iconName)
-                        .foregroundColor(.secondary)
-                }
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(itemName)
-                    .font(.headline)
-                    .lineLimit(1)
-
-                Text(itemType)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .lineLimit(1)
-            }
-
-            Spacer()
-
-            Image(systemName: "pin.fill")
-                .foregroundColor(.orange)
-                .font(.subheadline)
-        }
-        .padding(.vertical, 4)
-    }
-}
-
-#Preview {
-    PinsView()
+  }
 }
