@@ -209,7 +209,6 @@ struct LyricsView: View {
           .padding(.horizontal, 44)
           .padding(.top, max(92, geometry.size.height * 0.42))
           .padding(.bottom, max(92, geometry.size.height * 0.42))
-          .frame(maxWidth: 720, alignment: .leading)
           .frame(maxWidth: .infinity, alignment: .leading)
         }
         .scrollIndicators(.hidden)
