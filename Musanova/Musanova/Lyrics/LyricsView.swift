@@ -183,40 +183,42 @@ struct LyricsView: View {
 
   private var lyricScroller: some View {
     ScrollViewReader { proxy in
-      ScrollView {
-        LazyVStack(alignment: .leading, spacing: 32) {
-          ForEach(viewModel.lyrics) { paragraph in
-            VStack(alignment: .leading, spacing: 24) {
-              ForEach(paragraph.lines) { line in
-                Button {
-                  viewModel.seek(to: line)
-                } label: {
-                  LyricLineView(
-                    line: line,
-                    isCurrent: line.id == viewModel.currentLineID,
-                    hasPlaybackStarted: viewModel.currentTime > 0
-                  )
+      GeometryReader { geometry in
+        ScrollView {
+          LazyVStack(alignment: .leading, spacing: 32) {
+            ForEach(viewModel.lyrics) { paragraph in
+              VStack(alignment: .leading, spacing: 24) {
+                ForEach(paragraph.lines) { line in
+                  Button {
+                    viewModel.seek(to: line)
+                  } label: {
+                    LyricLineView(
+                      line: line,
+                      isCurrent: line.id == viewModel.currentLineID,
+                      hasPlaybackStarted: viewModel.currentTime > 0
+                    )
+                  }
+                  .buttonStyle(.plain)
+                  .disabled(line.segments.first == nil)
+                  .help("Move playback to this line")
+                  .id(line.id)
                 }
-                .buttonStyle(.plain)
-                .disabled(line.segments.first == nil)
-                .help("Move playback to this line")
-                .id(line.id)
               }
+              .padding(.bottom, 16)
             }
-            .padding(.bottom, 16)
           }
+          .padding(.horizontal, 44)
+          .padding(.top, max(92, geometry.size.height * 0.42))
+          .padding(.bottom, max(92, geometry.size.height * 0.42))
+          .frame(maxWidth: 720, alignment: .leading)
+          .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(.horizontal, 44)
-        .padding(.top, 92)
-        .padding(.bottom, 54)
-        .frame(maxWidth: 720, alignment: .leading)
-        .frame(maxWidth: .infinity, alignment: .leading)
-      }
-      .scrollIndicators(.hidden)
-      .onChange(of: viewModel.currentLineID) { _, lineID in
-        guard let lineID else { return }
-        withAnimation(reduceMotion ? nil : .smooth(duration: 0.65)) {
-          proxy.scrollTo(lineID, anchor: .center)
+        .scrollIndicators(.hidden)
+        .onChange(of: viewModel.currentLineID) { _, lineID in
+          guard let lineID else { return }
+          withAnimation(reduceMotion ? nil : .smooth(duration: 0.65)) {
+            proxy.scrollTo(lineID, anchor: .center)
+          }
         }
       }
     }
