@@ -9,25 +9,39 @@ import Foundation
 
 /// Represents an error response from the Apple Music API.
 public struct MusicErrorResponse: Codable, Sendable {
-  let errors: [MusicError]
+  public let errors: [MusicError]
+
+  /// Creates an Apple Music error response.
+  public init(errors: [MusicError]) {
+    self.errors = errors
+  }
 }
 
 /// Represents a single error from the Apple Music API.
 public struct MusicError: Codable, Sendable {
-  let id: String
-  let title: String
-  let detail: String
-  let status: String
-  let code: String
+  public let id: String
+  public let title: String
+  public let detail: String
+  public let status: String
+  public let code: String
+
+  /// Creates an Apple Music error.
+  public init(id: String, title: String, detail: String, status: String, code: String) {
+    self.id = id
+    self.title = title
+    self.detail = detail
+    self.status = status
+    self.code = code
+  }
 }
 
 /// A request object used to fetch lyrics for a specified song.
-struct MusicLyricsRequest {
+public struct MusicLyricsRequest: Sendable {
   /// The identifier of the song.
-  let songID: MusicItemID
+  public let songID: MusicItemID
 
   /// The privileged developer token used to authorize the request.
-  let developerToken: String
+  public let developerToken: String
 
   /// Initializes a new lyrics request.
   ///
@@ -35,7 +49,7 @@ struct MusicLyricsRequest {
   ///   - songID: The identifier of the song.
   ///   - developerToken: The privileged developer token used to authorize the request. Must not be empty.
   /// - Throws: `MusanovaKitError.missingDeveloperToken` if the developer token is empty.
-  init(songID: MusicItemID, developerToken: String) throws {
+  public init(songID: MusicItemID, developerToken: String) throws {
     guard !developerToken.isEmpty else {
       throw MusanovaKitError.missingDeveloperToken
     }
@@ -46,7 +60,7 @@ struct MusicLyricsRequest {
   /// Sends the request and returns a response object containing the fetched lyrics.
   ///
   /// - Returns: A `LyricsResponse` object.
-  func response(countryCode: String? = nil) async throws -> MusicLyricsResponse {
+  public func response(countryCode: String? = nil) async throws -> MusicLyricsResponse {
     let url = try await lyricsEndpointURL(countryCode: countryCode)
     let request = MusicPrivilegedDataRequest(url: url, developerToken: developerToken)
 
@@ -112,6 +126,63 @@ extension MusicLyricsRequest {
 }
 
 public extension MCatalog {
+  /// Fetches the decoded response for a song's syllable lyrics.
+  static func lyricsResponse(
+    for song: Song,
+    developerToken: String,
+    countryCode: String? = nil
+  ) async throws -> MusicLyricsResponse {
+    let request = try MusicLyricsRequest(songID: song.id, developerToken: developerToken)
+    return try await request.response(countryCode: countryCode)
+  }
+
+  /// Fetches the raw TTML for a song.
+  ///
+  /// Returns `nil` when the response has no lyrics resource.
+  static func rawLyrics(
+    for song: Song,
+    developerToken: String,
+    countryCode: String? = nil
+  ) async throws -> String? {
+    let response = try await lyricsResponse(
+      for: song,
+      developerToken: developerToken,
+      countryCode: countryCode
+    )
+    return response.rawTTML
+  }
+
+  /// Fetches and parses a song's TTML into paragraphs and lines.
+  static func parsedLyrics(
+    for song: Song,
+    developerToken: String,
+    countryCode: String? = nil
+  ) async throws -> LyricParagraphs {
+    guard let ttml = try await rawLyrics(
+      for: song,
+      developerToken: developerToken,
+      countryCode: countryCode
+    ) else {
+      return []
+    }
+
+    return try LyricsParser().parseValidating(ttml)
+  }
+
+  /// Fetches the timed lyric segments for a song in document order.
+  static func timedLyrics(
+    for song: Song,
+    developerToken: String,
+    countryCode: String? = nil
+  ) async throws -> LyricSegments {
+    let paragraphs = try await parsedLyrics(
+      for: song,
+      developerToken: developerToken,
+      countryCode: countryCode
+    )
+    return paragraphs.timedSegments
+  }
+
   /// Fetches and parses the lyrics for a specified song.
   ///
   /// This method performs the following steps:
@@ -145,17 +216,6 @@ public extension MCatalog {
   /// - Important: Ensure that you have the necessary permissions and a valid developer token
   ///   before calling this method. Unauthorized or incorrect usage may result in errors or empty results.
   static func lyrics(for song: Song, developerToken: String) async throws -> LyricParagraphs {
-    guard !developerToken.isEmpty else {
-      throw MusanovaKitError.missingDeveloperToken
-    }
-    let request = try MusicLyricsRequest(songID: song.id, developerToken: developerToken)
-    let response = try await request.response()
-
-    guard let lyricsString = response.data.first?.attributes.ttml else {
-      return []
-    }
-
-    let parser = LyricsParser()
-    return parser.parse(lyricsString)
+    try await parsedLyrics(for: song, developerToken: developerToken)
   }
 }
