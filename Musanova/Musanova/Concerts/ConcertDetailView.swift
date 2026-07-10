@@ -99,7 +99,10 @@ struct ConcertDetailView: View {
 
   private func loadDetail() async {
     guard let developerToken = UserDefaults.standard.string(forKey: "developerToken"),
-          !developerToken.isEmpty else { return }
+          !developerToken.isEmpty else {
+      errorMessage = "Add your AMP developer token in Settings to load full event details."
+      return
+    }
     isLoading = true
     defer { isLoading = false }
     do {

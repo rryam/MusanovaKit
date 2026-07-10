@@ -41,12 +41,14 @@ final class ReplayViewModel {
 
     let status = MusicAuthorization.currentStatus
     guard status == .authorized else {
+      clearContent()
       errorMessage = "Not authorized for Apple Music. Tap Continue on the welcome screen."
       return
     }
 
     let subscription: MusicSubscription? = try? await MusicSubscription.current
     guard subscription?.canPlayCatalogContent == true else {
+      clearContent()
       errorMessage = "Requires an active Apple Music subscription to load Replay."
       return
     }
@@ -63,6 +65,7 @@ final class ReplayViewModel {
 
     do {
       guard let token = developerToken, !token.isEmpty else {
+        clearContent()
         errorMessage = "Developer token is required. Please set it in Settings."
         return
       }
@@ -82,12 +85,7 @@ final class ReplayViewModel {
     } catch is CancellationError {
       // Task cancelled
     } catch {
-      summaries = []
-      availableYears = []
-      selectedYear = nil
-      title = ""
-      subtitle = nil
-      milestones = []
+      clearContent()
       errorMessage = "Could not load Replay (\(error.localizedDescription))."
       isEligible = false
     }
@@ -121,5 +119,16 @@ final class ReplayViewModel {
       guard activeMilestonesRequestID == requestID else { return }
       self.milestones = []
     }
+  }
+
+  private func clearContent() {
+    activeMilestonesRequestID = UUID()
+    summaries = []
+    availableYears = []
+    selectedYear = nil
+    title = ""
+    subtitle = nil
+    milestones = []
+    isLoadingMilestones = false
   }
 }
