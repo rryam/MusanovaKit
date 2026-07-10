@@ -43,7 +43,11 @@
                       "id": "playlist-example",
                       "type": "playlists",
                       "attributes": {
-                        "name": "Example Playlist"
+                        "name": "Example Playlist",
+                        "description": {
+                          "standard": "A longer playlist description.",
+                          "short": "A short description."
+                        }
                       }
                     }
                   ]

@@ -67,6 +67,10 @@ struct EditorialTests {
     #expect(multiroom.children.count == 2)
     #expect(multiroom.children[0].attributes?.title == "Start here")
     #expect(multiroom.children[1].relationships?.contents?.data.first?.type == "playlists")
+    #expect(
+      multiroom.children[1].relationships?.contents?.data.first?.attributes?.description?.short
+        == "A short description."
+    )
     #expect(multiroom.children[1].relationships?.room?.data.first?.id == "child-room")
   }
 }

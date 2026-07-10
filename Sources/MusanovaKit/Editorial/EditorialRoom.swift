@@ -1,5 +1,35 @@
 import Foundation
 
+/// Editorial copy that may arrive as plain text or as standard and short variants.
+public struct EditorialDescription: Codable, Sendable, Equatable {
+  public let standard: String?
+  public let short: String?
+
+  public init(from decoder: Decoder) throws {
+    let singleValue = try decoder.singleValueContainer()
+    if let value = try? singleValue.decode(String.self) {
+      standard = value
+      short = nil
+      return
+    }
+
+    let values = try decoder.container(keyedBy: CodingKeys.self)
+    standard = try values.decodeIfPresent(String.self, forKey: .standard)
+    short = try values.decodeIfPresent(String.self, forKey: .short)
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var values = encoder.container(keyedBy: CodingKeys.self)
+    try values.encodeIfPresent(standard, forKey: .standard)
+    try values.encodeIfPresent(short, forKey: .short)
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case standard
+    case short
+  }
+}
+
 /// A lightweight representation of artwork returned by editorial endpoints.
 public struct EditorialArtwork: Codable, Sendable, Equatable {
   public let url: String
@@ -37,7 +67,7 @@ public struct EditorialContentResource: Codable, Sendable, Equatable, Identifiab
     public let url: String?
     public let artwork: EditorialArtwork?
     public let genreNames: [String]?
-    public let description: String?
+    public let description: EditorialDescription?
   }
 }
 
