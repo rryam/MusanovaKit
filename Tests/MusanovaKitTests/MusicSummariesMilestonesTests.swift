@@ -14,6 +14,31 @@ import Testing
 @Suite
 struct MusicSummariesMilestonesTests {
   @Test
+  func decodesMilestoneWithoutRelationships() throws {
+    let data = Data(
+      #"""
+      {
+        "id": "year-2026-listen-time-minutes-2500",
+        "type": "music-summaries-milestones",
+        "attributes": {
+          "dateReached": "2026-03-26",
+          "kind": "listen-time",
+          "listenTimeInMinutes": 2901,
+          "value": "2500"
+        }
+      }
+      """#.utf8
+    )
+
+    let milestone = try JSONDecoder().decode(MusicSummaryMilestone.self, from: data)
+
+    #expect(milestone.id == "year-2026-listen-time-minutes-2500")
+    #expect(milestone.topSongs.isEmpty)
+    #expect(milestone.topAlbums.isEmpty)
+    #expect(milestone.topArtists.isEmpty)
+  }
+
+  @Test
   func testMusicSummariesMilestonesEndpointURL() throws {
     let request = try MusicSummaryMilestonesRequest(year: 2022, types: [], developerToken: "test_token")
     let endpointURL = try request.musicSummariesMilestonesEndpointURL

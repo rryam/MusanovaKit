@@ -84,10 +84,19 @@ public extension MusicSummaryMilestone {
     value = try attributesContainer.decode(String.self, forKey: .value)
     kind = try attributesContainer.decode(MusicSummaryMilestoneKind.self, forKey: .kind)
 
-    let relationshipsContainer = try container.nestedContainer(keyedBy: RelationshipsCodingKeys.self, forKey: .relationships)
-    topSongs = try relationshipsContainer.decodeIfPresent(Songs.self, forKey: .topSongs) ?? []
-    topAlbums = try relationshipsContainer.decodeIfPresent(Albums.self, forKey: .topAlbums) ?? []
-    topArtists = try relationshipsContainer.decodeIfPresent(Artists.self, forKey: .topArtists) ?? []
+    if container.contains(.relationships) {
+      let relationshipsContainer = try container.nestedContainer(
+        keyedBy: RelationshipsCodingKeys.self,
+        forKey: .relationships
+      )
+      topSongs = try relationshipsContainer.decodeIfPresent(Songs.self, forKey: .topSongs) ?? []
+      topAlbums = try relationshipsContainer.decodeIfPresent(Albums.self, forKey: .topAlbums) ?? []
+      topArtists = try relationshipsContainer.decodeIfPresent(Artists.self, forKey: .topArtists) ?? []
+    } else {
+      topSongs = []
+      topAlbums = []
+      topArtists = []
+    }
   }
 
   func encode(to encoder: Encoder) throws {
