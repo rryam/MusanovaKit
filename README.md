@@ -54,7 +54,7 @@ When you call MusanovaKit from a signed-in MusicKit app, the system automaticall
 
 ## Lyrics
 
-`MCatalog.lyrics(for:developerToken:)` fetches the syllable-lyrics TTML feed for a given song. The parser extracts both plain text and per-segment timing metadata.
+MusanovaKit can return the original TTML, parsed paragraphs, or a flat list of timed segments. `MCatalog.lyrics(for:developerToken:)` remains available and returns the parsed paragraphs.
 
 ### Fetching TTML lyrics
 
@@ -97,6 +97,28 @@ line?.segments.forEach { segment in
 
 Use the segment timings to drive your own lyric highlighting, karaoke bars, or subtitle cues. Segments default to a `startTime` of `0` if the TTML omits the `begin` attribute.
 
+Fetch the segments directly when paragraph and line grouping isn't needed:
+
+```swift
+let segments = try await MCatalog.timedLyrics(for: song, developerToken: token)
+
+for segment in segments {
+    print("\(segment.startTime): \(segment.text)")
+}
+```
+
+`MCatalog.parsedLyrics(for:developerToken:countryCode:)` returns the grouped paragraphs explicitly. Both methods accept an optional storefront country code; without one, MusicKit resolves the current storefront.
+
+### Raw TTML
+
+Use `rawLyrics` when you need Apple Music's original document:
+
+```swift
+let ttml = try await MCatalog.rawLyrics(for: song, developerToken: token)
+```
+
+To decode the complete resource, including its playback parameters, call `lyricsResponse` instead.
+
 ### Direct lyric requests
 
 If you need the raw TTML, instantiate `MusicLyricsRequest` directly:
@@ -108,6 +130,13 @@ let ttml = response.data.first?.attributes.ttml
 ```
 
 `MusicLyricsRequest` automatically targets the `/syllable-lyrics` endpoint and decodes the `MusicLyricsResponse` payload.
+
+You can also parse TTML obtained elsewhere. `parse` returns an empty array for malformed input, while `parseValidating` throws `MusanovaKitError.invalidResponseFormat`:
+
+```swift
+let paragraphs = try LyricsParser().parseValidating(ttml)
+let segments = paragraphs.timedSegments
+```
 
 ## Replay and Summaries
 

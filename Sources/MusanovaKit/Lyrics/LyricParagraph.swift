@@ -31,3 +31,10 @@ public struct LyricParagraph: Identifiable, Sendable {
         self.songPart = songPart
     }
 }
+
+public extension Collection where Element == LyricParagraph {
+  /// All timed segments in paragraph and line order.
+  var timedSegments: LyricSegments {
+    flatMap(\.lines).flatMap(\.segments)
+  }
+}

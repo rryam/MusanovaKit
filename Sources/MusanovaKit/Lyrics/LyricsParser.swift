@@ -56,8 +56,17 @@ public class LyricsParser: NSObject, XMLParserDelegate {
   /// Parses the given XML string into an array of `LyricParagraph` objects.
   ///
   /// - Parameter xmlString: The TTML lyrics string to parse.
+  /// - Returns: An array of parsed `LyricParagraph` objects. Invalid TTML returns an empty array.
+  public func parse(_ xmlString: String) -> LyricParagraphs {
+    (try? parseValidating(xmlString)) ?? []
+  }
+
+  /// Parses TTML and reports malformed input to the caller.
+  ///
+  /// - Parameter xmlString: The TTML lyrics string to parse.
   /// - Returns: An array of parsed `LyricParagraph` objects.
-  func parse(_ xmlString: String) -> [LyricParagraph] {
+  /// - Throws: `MusanovaKitError.invalidResponseFormat` when the string is not valid TTML.
+  public func parseValidating(_ xmlString: String) throws -> LyricParagraphs {
     paragraphs = []
     currentParagraph = []
     currentSongPart = nil
@@ -68,11 +77,17 @@ public class LyricsParser: NSObject, XMLParserDelegate {
     currentSegmentText = ""
     hasPendingWhitespace = false
     elementStack = []
-    if let data = xmlString.data(using: .utf8) {
-      let parser = XMLParser(data: data)
-      parser.delegate = self
-      parser.parse()
+    guard let data = xmlString.data(using: .utf8) else {
+      throw MusanovaKitError.invalidResponseFormat(description: "The lyrics TTML is not valid UTF-8.")
     }
+
+    let parser = XMLParser(data: data)
+    parser.delegate = self
+    guard parser.parse() else {
+      let description = parser.parserError?.localizedDescription ?? "The XML parser rejected the document."
+      throw MusanovaKitError.invalidResponseFormat(description: "Invalid lyrics TTML: \(description)")
+    }
+
     return paragraphs
   }
 
@@ -174,7 +189,7 @@ public class LyricsParser: NSObject, XMLParserDelegate {
 
     var hours = 0
     var minutes = 0
-    var secondsComponent = components.last!
+    guard var secondsComponent = components.last else { return nil }
 
     switch components.count {
     case 3:

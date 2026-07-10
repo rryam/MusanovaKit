@@ -1,5 +1,8 @@
 import Foundation
 
+/// A collection of timed lyric segments in playback order.
+public typealias LyricSegments = [LyricSegment]
+
 /// Represents a timed segment of a lyric line.
 public struct LyricSegment: Identifiable, Sendable {
   /// A unique identifier for the lyric segment.
