@@ -16,13 +16,13 @@ struct SettingsView: View {
       List {
         Section("Developer Token") {
           VStack(alignment: .leading, spacing: 8) {
-            Text("Enter your Apple Music developer token to access private APIs like pins and lyrics.")
+            Text("Enter the AMP developer token used by the private API examples.")
               .font(.subheadline)
-              .foregroundColor(.secondary)
+              .foregroundStyle(.secondary)
 
-            TextField("Developer Token", text: $developerToken)
+            SecureField("Developer Token", text: $developerToken)
               .textFieldStyle(.roundedBorder)
-              .autocorrectionDisabled()
+              .privacySensitive()
 
             Button("Save Token") {
               UserDefaults.standard.set(developerToken, forKey: "developerToken")
@@ -43,7 +43,7 @@ struct SettingsView: View {
       .alert("Token Saved", isPresented: $showTokenSavedAlert) {
         Button("OK", role: .cancel) { }
       } message: {
-        Text("Your developer token has been saved securely.")
+        Text("Your developer token has been saved on this Mac.")
       }
     }
     .tint(Color.indigo)
