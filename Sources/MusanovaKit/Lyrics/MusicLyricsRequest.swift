@@ -166,7 +166,7 @@ public extension MCatalog {
       return []
     }
 
-    return try LyricsParser().parseValidating(ttml)
+    return LyricsParser().parse(ttml)
   }
 
   /// Fetches the timed lyric segments for a song in document order.
