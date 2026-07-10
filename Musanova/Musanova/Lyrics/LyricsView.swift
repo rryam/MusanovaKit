@@ -184,9 +184,9 @@ struct LyricsView: View {
   private var lyricScroller: some View {
     ScrollViewReader { proxy in
       ScrollView {
-        LazyVStack(alignment: .leading, spacing: 19) {
+        LazyVStack(alignment: .leading, spacing: 32) {
           ForEach(viewModel.lyrics) { paragraph in
-            VStack(alignment: .leading, spacing: 13) {
+            VStack(alignment: .leading, spacing: 24) {
               ForEach(paragraph.lines) { line in
                 Button {
                   viewModel.seek(to: line)
@@ -203,7 +203,7 @@ struct LyricsView: View {
                 .id(line.id)
               }
             }
-            .padding(.bottom, 10)
+            .padding(.bottom, 16)
           }
         }
         .padding(.horizontal, 44)
@@ -212,6 +212,7 @@ struct LyricsView: View {
         .frame(maxWidth: 720, alignment: .leading)
         .frame(maxWidth: .infinity, alignment: .leading)
       }
+      .scrollIndicators(.hidden)
       .onChange(of: viewModel.currentLineID) { _, lineID in
         guard let lineID else { return }
         withAnimation(reduceMotion ? nil : .smooth(duration: 0.65)) {
@@ -251,9 +252,9 @@ private struct LyricLineView: View {
 
   var body: some View {
     Text(line.text)
-      .font(.system(size: isCurrent ? 30 : 25, weight: isCurrent ? .bold : .semibold, design: .rounded))
+      .font(.system(size: isCurrent ? 36 : 31, weight: isCurrent ? .bold : .semibold, design: .rounded))
       .foregroundStyle(foregroundStyle)
-      .lineSpacing(4)
+      .lineSpacing(7)
       .fixedSize(horizontal: false, vertical: true)
       .scaleEffect(isCurrent ? 1.015 : 1, anchor: .leading)
       .blur(radius: hasPlaybackStarted && !isCurrent ? 1.6 : 0)
