@@ -61,7 +61,7 @@ struct LyricsView: View {
   }
 
   private var lyricExperience: some View {
-    HStack(spacing: 0) {
+    HStack(spacing: 44) {
       nowPlayingPanel
 
       lyricScroller
@@ -178,7 +178,6 @@ struct LyricsView: View {
     }
     .padding(30)
     .frame(width: 340)
-    .background(.ultraThinMaterial.opacity(0.35))
   }
 
   private var lyricScroller: some View {
