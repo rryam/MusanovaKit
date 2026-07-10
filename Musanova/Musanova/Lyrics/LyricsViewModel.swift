@@ -22,13 +22,13 @@ final class LyricsViewModel {
   var playbackErrorMessage: String?
 
   private let player = ApplicationMusicPlayer.shared
-  private let songID = MusicItemID("1710156085")
+  private let songID = MusicItemID("1831339767")
   private var playbackObservation: Task<Void, Never>?
   private var playbackItem: LyricsPlaybackItem?
   private var hasPreparedQueue = false
 
-  var songTitle: String { song?.title ?? "Meri Baaton Mein Tu" }
-  var artistName: String { song?.artistName ?? "Anuv Jain" }
+  var songTitle: String { song?.title ?? "A Little More" }
+  var artistName: String { song?.artistName ?? "Ed Sheeran" }
 
   var artworkURL: URL? {
     song?.artwork?.url(width: 1200, height: 1200) ?? fallbackArtworkURL
@@ -220,7 +220,7 @@ final class LyricsViewModel {
   }
 
   private var fallbackArtworkURL: URL? {
-    URL(string: "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/c5/e2/ae/c5e2ae66-e4fe-02b6-d54c-c05fb36a2936/23UM1IM18503.rgb.jpg/1200x1200bb.jpg")
+    nil
   }
 
   private func formatTime(_ time: TimeInterval) -> String {

@@ -253,7 +253,7 @@ private struct LyricLineView: View {
 
   var body: some View {
     Text(line.text)
-      .font(.system(size: isCurrent ? 36 : 31, weight: isCurrent ? .bold : .semibold, design: .rounded))
+      .font(.system(size: isCurrent ? 46 : 41, weight: isCurrent ? .bold : .semibold))
       .foregroundStyle(foregroundStyle)
       .lineSpacing(7)
       .fixedSize(horizontal: false, vertical: true)
