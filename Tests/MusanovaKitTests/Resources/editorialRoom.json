@@ -1,0 +1,55 @@
+{
+  "data": [
+    {
+      "id": "room-example",
+      "type": "rooms",
+      "href": "/v1/editorial/zz/rooms/room-example",
+      "attributes": {
+        "defaultSort": "featured",
+        "doNotFilter": false,
+        "editorialElementKind": "345",
+        "lastModifiedDate": "2025-01-01T00:00:00Z",
+        "resourceTypes": ["artists", "albums"],
+        "sorts": ["featured", "releaseDate"],
+        "title": "Featured Picks"
+      },
+      "relationships": {
+        "contents": {
+          "href": "/v1/editorial/zz/rooms/room-example/contents",
+          "data": [
+            {
+              "id": "artist-example",
+              "type": "artists",
+              "attributes": {
+                "name": "Example Artist",
+                "genreNames": ["Pop"],
+                "artwork": {
+                  "url": "https://example.invalid/{w}x{h}.jpg",
+                  "width": 1200,
+                  "height": 1200,
+                  "bgColor": "ffffff"
+                }
+              }
+            },
+            {
+              "id": "album-example",
+              "type": "albums",
+              "attributes": {
+                "name": "Example Album",
+                "artistName": "Example Artist"
+              }
+            },
+            {
+              "id": "future-example",
+              "type": "future-resource",
+              "attributes": {
+                "title": "Future content",
+                "newField": {"ignored": true}
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "data": [
+    {
+      "id": "multiroom-example",
+      "type": "multirooms",
+      "attributes": {
+        "lastModifiedDate": "2025-01-01T00:00:00Z",
+        "uber": {
+          "backgroundColor": "101010",
+          "headerTextColor": "ffffff",
+          "name": "Editorial Example",
+          "masterArt": {
+            "url": "https://example.invalid/{w}x{h}.jpg",
+            "width": 2400,
+            "height": 1080,
+            "bgColor": "101010"
+          }
+        }
+      },
+      "relationships": {
+        "children": {
+          "data": [
+            {
+              "id": "text-element",
+              "type": "editorial-elements",
+              "attributes": {
+                "title": "Start here",
+                "description": "A short editorial introduction.",
+                "displayStyle": "large",
+                "editorialElementKind": "404"
+              }
+            },
+            {
+              "id": "content-element",
+              "type": "editorial-elements",
+              "attributes": {
+                "lockupStyle": "Spotlight+ShortCopy"
+              },
+              "relationships": {
+                "contents": {
+                  "data": [
+                    {
+                      "id": "playlist-example",
+                      "type": "playlists",
+                      "attributes": {
+                        "name": "Example Playlist"
+                      }
+                    }
+                  ]
+                },
+                "room": {
+                  "data": [
+                    {
+                      "id": "child-room",
+                      "type": "rooms",
+                      "href": "/v1/editorial/zz/rooms/child-room"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

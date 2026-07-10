@@ -20,6 +20,7 @@ MusanovaKit lets you explore Apple Music features that are not exposed through t
 - [Library Pins](#library-pins)
   - [Fetching pinned items](#fetching-pinned-items)
   - [Custom pin requests](#custom-pin-requests)
+- [Editorial Rooms](#editorial-rooms)
 - [Disclaimer](#disclaimer)
 
 ## Requirements
@@ -227,6 +228,34 @@ Available configuration options:
 - `librarySongIncludes`: Relationships to include for songs
 - `libraryArtistIncludes`: Relationships to include for artists
 - `libraryMusicVideoIncludes`: Relationships to include for music videos
+
+## Editorial Rooms
+
+Apple Music uses rooms and multirooms to build editorial pages. A room holds catalog resources such as artists, albums, and playlists. A multiroom combines text sections, catalog content, links to child rooms, and hero artwork.
+
+```swift
+let room = try await MEditorial.room(
+    id: "room-id",
+    storefront: "us",
+    developerToken: token
+)
+
+for item in room.contents {
+    print("\(item.type): \(item.attributes?.name ?? item.id)")
+}
+
+let page = try await MEditorial.multiroom(
+    id: "multiroom-id",
+    storefront: "us",
+    developerToken: token
+)
+
+for section in page.children {
+    print(section.attributes?.title ?? section.id)
+}
+```
+
+`EditorialContentResource` keeps the resource `type`, identifier, and common display fields instead of assuming every item has the same catalog shape. Unknown resource types still decode, although their type-specific fields aren't modeled.
 
 ## Disclaimer
 
