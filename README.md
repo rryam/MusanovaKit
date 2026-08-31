@@ -425,5 +425,3 @@ The macOS app includes Concerts, Replay, Lyrics, Pins, and Settings tabs. The ly
 ## Disclaimer
 
 MusanovaKit is an exploration project. These endpoints are subject to change, can disappear without warning, and may violate Apple’s App Store policies. Do not submit apps that rely on this package to the App Store. Use the code for prototyping, research, or personal experiments only.
-
-[![Star History Chart](https://api.star-history.com/svg?repos=rryam/MusanovaKit&type=Date)](https://star-history.com/#rryam/MusanovaKit&Date)
