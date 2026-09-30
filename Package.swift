@@ -10,7 +10,7 @@ let package = Package(
         .library(name: "MusanovaKit", targets: ["MusanovaKit"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/rryam/MusadoraKit", from: "8.0.0"),
+        .package(url: "https://github.com/rryam/MusadoraKit", from: "10.3.0"),
     ],
     targets: [
         .target(

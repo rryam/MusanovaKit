@@ -8,6 +8,7 @@ MusanovaKit lets you explore Apple Music features that are not exposed through t
 
 - [Requirements](#requirements)
 - [Installation](#installation)
+- [What's in 5.0.0](#whats-in-500)
 - [What's in 4.0.0](#whats-in-400)
 - [Authentication](#authentication)
   - [Privileged developer token](#privileged-developer-token)
@@ -44,11 +45,15 @@ Add MusanovaKit to your project using the Swift Package Manager:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/rryam/MusanovaKit.git", from: "4.0.0")
+    .package(url: "https://github.com/rryam/MusanovaKit.git", from: "5.0.0")
 ]
 ```
 
 Then add `MusanovaKit` to the target that should use these APIs.
+
+## What's in 5.0.0
+
+MusanovaKit now depends on MusadoraKit 10.3.0 or later instead of 8.x, so an app can use both packages at their current versions. MusanovaKit re-exports MusadoraKit, so this is a major release: code that relies on the re-exported MusadoraKit API picks up MusadoraKit's changes in versions 9 and 10. MusanovaKit's own API is unchanged.
 
 ## What's in 4.0.0
 
